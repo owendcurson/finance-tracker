@@ -1,9 +1,9 @@
-var CACHE_NAME = 'finance-tracker-v2';
+var CACHE_NAME = 'finance-tracker-v3';
 var ASSETS = [
-  '/finance-tracker.html',
-  '/manifest.json',
-  '/icon-192.svg',
-  '/icon-512.svg'
+  './finance-tracker.html',
+  './manifest.json',
+  './icon-192.svg',
+  './icon-512.svg'
 ];
 
 self.addEventListener('install', function(event) {
