@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0d1b2a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/icon-192.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icon-192.svg">
+<title>UK Personal Finance Tracker 2026/27</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f0f2f5;
+  --card: #ffffff;
+  --primary: #1a73e8;
+  --primary-light: #e8f0fe;
+  --text: #202124;
+  --text-secondary: #5f6368;
+  --border: #dadce0;
+  --green: #0d904f;
+  --green-bg: #e6f4ea;
+  --red: #c5221f;
+  --red-bg: #fce8e6;
+  --amber: #e37400;
+  --amber-bg: #fef7e0;
+  --radius: 12px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 20px 0 4px;
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-bottom: 24px;
+}
+
+/* Step indicator */
+.steps-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 28px;
+  padding: 0 8px;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.step-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: 2px solid var(--border);
+  color: var(--text-secondary);
+  background: var(--card);
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.step-circle.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.step-circle.done {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+
+.step-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-left: 6px;
+  white-space: nowrap;
+}
+
+.step-line {
+  width: 40px;
+  height: 2px;
+  background: var(--border);
+  margin: 0 8px;
+  flex-shrink: 0;
+}
+
+.step-line.done { background: var(--green); }
+
+/* Cards */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  margin-bottom: 16px;
+}
+
+.card h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.card h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--text-secondary);
+}
+
+/* Form elements */
+.field {
+  margin-bottom: 16px;
+}
+
+.field label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.input-wrap {
+  position: relative;
+}
+
+.input-wrap .prefix {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  font-weight: 500;
+  pointer-events: none;
+}
+
+.input-wrap .suffix {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  pointer-events: none;
+}
+
+input[type="number"], input[type="text"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.15s;
+  -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(26,115,232,0.15);
+}
+
+.input-wrap input.has-prefix { padding-left: 28px; }
+.input-wrap input.has-suffix { padding-right: 60px; }
+
+select {
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+/* Breakdown table */
+.breakdown {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+.breakdown td {
+  padding: 8px 0;
+  font-size: 0.9rem;
+}
+
+.breakdown td:last-child {
+  text-align: right;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.breakdown tr.divider td {
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+.breakdown tr.total td {
+  font-weight: 700;
+  font-size: 1rem;
+  border-top: 2px solid var(--text);
+  padding-top: 10px;
+}
+
+.breakdown .label-secondary {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+.breakdown .deduction { color: var(--red); }
+.breakdown .addition { color: var(--green); }
+
+/* Toggle checkbox */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg);
+  border-radius: 8px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.toggle-row .toggle-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.toggle-content {
+  padding: 4px 0 8px;
+  display: none;
+}
+
+.toggle-content.open { display: block; }
+
+.live-calc {
+  font-size: 0.85rem;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 6px 12px;
+  border-radius: 6px;
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+/* Pots */
+.pot-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.pot-row input[type="text"] {
+  flex: 1;
+  min-width: 0;
+}
+
+.pot-row .input-wrap {
+  width: 130px;
+  flex-shrink: 0;
+}
+
+.pot-row select {
+  width: 120px;
+  flex-shrink: 0;
+  padding: 10px 6px;
+  font-size: 0.8rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.btn:active { transform: scale(0.97); }
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-primary:hover { background: #1557b0; }
+
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.btn-outline:hover { background: var(--bg); }
+
+.btn-danger {
+  background: transparent;
+  color: var(--red);
+  padding: 8px;
+  font-size: 1.1rem;
+  line-height: 1;
+  border-radius: 6px;
+}
+
+.btn-danger:hover { background: var(--red-bg); }
+
+.btn-success {
+  background: var(--green);
+  color: #fff;
+}
+
+.btn-success:hover { background: #0a7a42; }
+
+.btn-amber {
+  background: var(--amber);
+  color: #fff;
+}
+
+.btn-amber:hover { background: #c86500; }
+
+/* Navigation */
+.nav-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+}
+
+/* Banner */
+.banner {
+  padding: 16px 20px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.banner-green {
+  background: var(--green-bg);
+  color: var(--green);
+  border: 1.5px solid var(--green);
+}
+
+.banner-red {
+  background: var(--red-bg);
+  color: var(--red);
+  border: 1.5px solid var(--red);
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.summary-stat {
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.summary-stat .stat-label {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 4px;
+}
+
+.summary-stat .stat-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.step-panel { display: none; }
+.step-panel.active { display: block; }
+
+/* Action buttons row */
+.action-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+/* Toast notification */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--text);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  z-index: 1000;
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+  pointer-events: none;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* History table */
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.history-table th {
+  text-align: left;
+  padding: 10px 8px;
+  border-bottom: 2px solid var(--border);
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.history-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--bg);
+  font-variant-numeric: tabular-nums;
+}
+
+.history-table tr:hover td {
+  background: var(--bg);
+}
+
+.history-table .positive { color: var(--green); font-weight: 600; }
+.history-table .negative { color: var(--red); font-weight: 600; }
+
+.history-empty {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 24px;
+  font-size: 0.9rem;
+}
+
+/* Modal overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  width: 100%;
+  max-width: 520px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 28px;
+}
+
+.modal h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.modal .modal-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.modal-close {
+  float: right;
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.modal-close:hover { color: var(--text); }
+
+/* Account group card */
+.account-group {
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.account-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.account-group-name {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.account-group-total {
+  font-weight: 700;
+  font-size: 1.1rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--primary);
+}
+
+.account-group-items {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.account-group-items div {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+}
+
+.account-grand-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: var(--primary-light);
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+/* History detail expand */
+.history-detail {
+  display: none;
+}
+
+.history-detail.open {
+  display: table-row;
+}
+
+.history-detail td {
+  padding: 12px 8px 16px;
+  background: var(--bg);
+}
+
+.history-pots-list {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.history-pots-list div {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+}
+
+/* Month picker */
+.month-picker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.month-picker select {
+  padding: 8px 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.month-picker .btn {
+  padding: 8px 10px;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Payday info card */
+.paydate-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  border-left: 4px solid var(--primary);
+}
+
+.paydate-card .paydate-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.paydate-card .paydate-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.paydate-card .paydate-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.paydate-card .paydate-date {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 8px 0 4px;
+}
+
+.paydate-card .paydate-note {
+  font-size: 0.85rem;
+  color: var(--amber);
+  background: var(--amber-bg);
+  padding: 6px 12px;
+  border-radius: 6px;
+  margin: 8px 0;
+  font-weight: 500;
+}
+
+.paydate-card .paydate-coverage {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.paydate-card .paydate-coverage strong {
+  color: var(--text);
+}
+
+@media (max-width: 500px) {
+  .container { padding: 10px; }
+  .card { padding: 16px; }
+  .step-label { display: none; }
+  .step-line { width: 28px; margin: 0 4px; }
+  .summary-grid { grid-template-columns: 1fr; }
+  .pot-row { flex-wrap: wrap; }
+  .pot-row .input-wrap { width: 100%; }
+  .pot-row select { width: 100%; }
+  .action-row { flex-direction: column; }
+  .history-table { font-size: 0.78rem; }
+  .history-table th, .history-table td { padding: 8px 4px; }
+  .modal { padding: 20px; }
+  .month-picker { flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>UK Finance Tracker</h1>
+  <p class="subtitle">Tax Year 2026/27 &middot; England, Wales &amp; NI</p>
+
+  <div class="month-picker">
+    <button class="btn btn-outline" onclick="shiftMonth(-1)" title="Previous month">&larr;</button>
+    <select id="pick-month" onchange="updatePaydate()"></select>
+    <select id="pick-year" onchange="updatePaydate()"></select>
+    <button class="btn btn-outline" onclick="shiftMonth(1)" title="Next month">&rarr;</button>
+  </div>
+
+  <div id="paydate-info"></div>
+
+  <div class="steps-bar">
+    <div class="step-item" onclick="goStep(1)">
+      <div class="step-circle active" id="sc1">1</div>
+      <span class="step-label">Income</span>
+    </div>
+    <div class="step-line" id="sl1"></div>
+    <div class="step-item" onclick="goStep(2)">
+      <div class="step-circle" id="sc2">2</div>
+      <span class="step-label">Adjustments</span>
+    </div>
+    <div class="step-line" id="sl2"></div>
+    <div class="step-item" onclick="goStep(3)">
+      <div class="step-circle" id="sc3">3</div>
+      <span class="step-label">Pots &amp; Summary</span>
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step-panel active" id="panel1">
+    <div class="card">
+      <h2>Gross Annual Salary</h2>
+      <div class="field">
+        <label for="salary">Enter your yearly gross salary</label>
+        <div class="input-wrap">
+          <span class="prefix">&pound;</span>
+          <input type="number" id="salary" class="has-prefix has-suffix" placeholder="0" min="0" step="100" oninput="calc()">
+          <span class="suffix">/year</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="tax-card" style="display:none">
+      <h2>Monthly Pay Breakdown</h2>
+      <table class="breakdown" id="monthly-table"></table>
+    </div>
+
+    <div class="card" id="annual-card" style="display:none">
+      <h2>Annual Tax Summary</h2>
+      <table class="breakdown" id="annual-table"></table>
+    </div>
+
+    <div class="nav-row">
+      <div></div>
+      <button class="btn btn-primary" onclick="goStep(2)">Next &rarr;</button>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step-panel" id="panel2">
+    <div class="card">
+      <h2>Monthly Adjustments</h2>
+      <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:14px;">Toggle any that apply this month.</p>
+
+      <label class="toggle-row">
+        <input type="checkbox" id="tog-expenses" onchange="toggleSection('expenses');calc()">
+        <span class="toggle-label">Work Expenses</span>
+      </label>
+      <div class="toggle-content" id="sec-expenses">
+        <div class="field">
+          <label>Monthly work expenses (reduces taxable income)</label>
+          <div class="input-wrap">
+            <span class="prefix">&pound;</span>
+            <input type="number" id="work-expenses" class="has-prefix" placeholder="0" min="0" step="10" oninput="calc()">
+          </div>
+        </div>
+      </div>
+
+      <label class="toggle-row">
+        <input type="checkbox" id="tog-mileage" onchange="toggleSection('mileage');calc()">
+        <span class="toggle-label">Mileage / Fuel</span>
+      </label>
+      <div class="toggle-content" id="sec-mileage">
+        <div class="field">
+          <label>Business miles driven this month</label>
+          <div class="input-wrap">
+            <input type="number" id="miles" class="has-suffix" placeholder="0" min="0" step="1" oninput="calc()">
+            <span class="suffix">miles</span>
+          </div>
+        </div>
+        <div class="live-calc" id="mileage-calc">0 miles &times; 55p = &pound;0.00</div>
+      </div>
+
+      <label class="toggle-row">
+        <input type="checkbox" id="tog-overtime" onchange="toggleSection('overtime');calc()">
+        <span class="toggle-label">Overtime / Bonus</span>
+      </label>
+      <div class="toggle-content" id="sec-overtime">
+        <div class="field">
+          <label>Extra gross pay this month (before tax)</label>
+          <div class="input-wrap">
+            <span class="prefix">&pound;</span>
+            <input type="number" id="overtime" class="has-prefix" placeholder="0" min="0" step="10" oninput="calc()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-outline" onclick="goStep(1)">&larr; Back</button>
+      <button class="btn btn-primary" onclick="goStep(3)">Next &rarr;</button>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step-panel" id="panel3">
+    <div class="card">
+      <h2>Monthly Pots</h2>
+      <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:14px;">Add your regular monthly outgoings. Assign each to an account for payday planning.</p>
+      <div id="pots-list"></div>
+      <button class="btn btn-outline" onclick="addPot()">+ Add Pot</button>
+    </div>
+
+    <div id="summary-section"></div>
+
+    <div class="card" id="history-card">
+      <h2>Monthly History</h2>
+      <div id="history-section"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-outline" onclick="goStep(2)">&larr; Back</button>
+      <div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Accounts modal -->
+<div class="modal-overlay" id="accounts-modal" onclick="if(event.target===this)closeAccounts()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeAccounts()">&times;</button>
+    <h2>Payday Account Breakdown</h2>
+    <p class="modal-subtitle">Where to transfer your money on payday</p>
+    <div id="accounts-body"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+const PERSONAL_ALLOWANCE = 12570;
+const BASIC_UPPER = 50270;
+const HIGHER_UPPER = 125140;
+const TAPER_START = 100000;
+const BASIC_RATE = 0.20;
+const HIGHER_RATE = 0.40;
+const ADDITIONAL_RATE = 0.45;
+const NI_LOWER = 12570;
+const NI_UPPER = 50270;
+const NI_MAIN = 0.08;
+const NI_HIGHER = 0.02;
+const MILEAGE_RATE = 0.55;
+
+const ACCOUNTS = ['Bills', 'Train', 'Car Finance', 'Holiday Savings', 'Car Insurance'];
+
+var UK_BANK_HOLIDAYS = [
+  '2024-01-01','2024-03-29','2024-04-01','2024-05-06','2024-05-27','2024-08-26','2024-12-25','2024-12-26',
+  '2025-01-01','2025-04-18','2025-04-21','2025-05-05','2025-05-26','2025-08-25','2025-12-25','2025-12-26',
+  '2026-01-01','2026-04-03','2026-04-06','2026-05-04','2026-05-25','2026-08-31','2026-12-25','2026-12-28',
+  '2027-01-01','2027-03-26','2027-03-29','2027-05-03','2027-05-31','2027-08-30','2027-12-27','2027-12-28',
+  '2028-01-03','2028-04-14','2028-04-17','2028-05-01','2028-05-29','2028-08-28','2028-12-25','2028-12-26'
+];
+
+var BANK_HOLIDAY_SET = {};
+UK_BANK_HOLIDAYS.forEach(function(d) { BANK_HOLIDAY_SET[d] = true; });
+
+var BANK_HOLIDAY_NAMES = {
+  '01-01': 'New Year\'s Day', '01-03': 'New Year\'s Day (substitute)',
+  '03-26': 'Good Friday', '03-29': 'Good Friday',
+  '04-01': 'Easter Monday', '04-03': 'Good Friday', '04-06': 'Easter Monday',
+  '04-14': 'Good Friday', '04-17': 'Easter Monday', '04-18': 'Good Friday', '04-21': 'Easter Monday',
+  '05-01': 'Early May bank holiday', '05-03': 'Early May bank holiday',
+  '05-04': 'Early May bank holiday', '05-05': 'Early May bank holiday', '05-06': 'Early May bank holiday',
+  '05-25': 'Spring bank holiday', '05-26': 'Spring bank holiday',
+  '05-27': 'Spring bank holiday', '05-29': 'Spring bank holiday', '05-31': 'Spring bank holiday',
+  '08-25': 'Summer bank holiday', '08-26': 'Summer bank holiday',
+  '08-28': 'Summer bank holiday', '08-30': 'Summer bank holiday', '08-31': 'Summer bank holiday',
+  '12-25': 'Christmas Day', '12-26': 'Boxing Day',
+  '12-27': 'Christmas Day (substitute)', '12-28': 'Boxing Day (substitute)'
+};
+
+var MONTH_NAMES_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+var DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+function dateToStr(d) {
+  var mm = String(d.getMonth() + 1).padStart(2, '0');
+  var dd = String(d.getDate()).padStart(2, '0');
+  return d.getFullYear() + '-' + mm + '-' + dd;
+}
+
+function isBankHoliday(d) {
+  return BANK_HOLIDAY_SET[dateToStr(d)] === true;
+}
+
+function isWorkingDay(d) {
+  var day = d.getDay();
+  return day >= 1 && day <= 5 && !isBankHoliday(d);
+}
+
+function getPayDate(year, month) {
+  var target = new Date(year, month, 23);
+  var original = new Date(target);
+  while (!isWorkingDay(target)) {
+    target.setDate(target.getDate() - 1);
+  }
+  return { payDate: target, original: original, moved: target.getTime() !== original.getTime() };
+}
+
+function getNextPayDate(year, month) {
+  var nextMonth = month + 1;
+  var nextYear = year;
+  if (nextMonth > 11) { nextMonth = 0; nextYear++; }
+  return getPayDate(nextYear, nextMonth);
+}
+
+function formatDateLong(d) {
+  var day = d.getDate();
+  var suffix = 'th';
+  if (day === 1 || day === 21 || day === 31) suffix = 'st';
+  else if (day === 2 || day === 22) suffix = 'nd';
+  else if (day === 3 || day === 23) suffix = 'rd';
+  return DAY_NAMES[d.getDay()] + ' ' + day + suffix + ' ' + MONTH_NAMES_FULL[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+function getMovedReason(original) {
+  var day = original.getDay();
+  var ds = dateToStr(original);
+  var mmdd = ds.substring(5);
+  if (day === 0) return '23rd falls on a Sunday';
+  if (day === 6) return '23rd falls on a Saturday';
+  if (BANK_HOLIDAY_SET[ds]) {
+    var name = BANK_HOLIDAY_NAMES[mmdd] || 'bank holiday';
+    return '23rd is ' + name;
+  }
+  return '23rd is a non-working day';
+}
+
+function initMonthPicker() {
+  var now = new Date();
+  var mSel = document.getElementById('pick-month');
+  var ySel = document.getElementById('pick-year');
+  for (var m = 0; m < 12; m++) {
+    var opt = document.createElement('option');
+    opt.value = m;
+    opt.textContent = MONTH_NAMES_FULL[m];
+    if (m === now.getMonth()) opt.selected = true;
+    mSel.appendChild(opt);
+  }
+  for (var y = 2024; y <= 2028; y++) {
+    var opt = document.createElement('option');
+    opt.value = y;
+    opt.textContent = y;
+    if (y === now.getFullYear()) opt.selected = true;
+    ySel.appendChild(opt);
+  }
+  updatePaydate();
+}
+
+function shiftMonth(dir) {
+  var mSel = document.getElementById('pick-month');
+  var ySel = document.getElementById('pick-year');
+  var m = parseInt(mSel.value) + dir;
+  var y = parseInt(ySel.value);
+  if (m > 11) { m = 0; y++; }
+  if (m < 0) { m = 11; y--; }
+  if (y < 2024) y = 2024;
+  if (y > 2028) y = 2028;
+  mSel.value = m;
+  ySel.value = y;
+  updatePaydate();
+}
+
+function updatePaydate() {
+  var m = parseInt(document.getElementById('pick-month').value);
+  var y = parseInt(document.getElementById('pick-year').value);
+  var result = getPayDate(y, m);
+  var next = getNextPayDate(y, m);
+  var coverageStart = new Date(result.payDate);
+  coverageStart.setDate(coverageStart.getDate() + 1);
+  var coverageEnd = next.payDate;
+
+  var html = '<div class="paydate-card">';
+  html += '<div class="paydate-header"><span class="paydate-icon">&#128197;</span>';
+  html += '<span class="paydate-title">Pay Date for ' + MONTH_NAMES_FULL[m] + ' ' + y + '</span></div>';
+  html += '<div class="paydate-date">' + formatDateLong(result.payDate) + '</div>';
+
+  if (result.moved) {
+    var reason = getMovedReason(result.original);
+    html += '<div class="paydate-note">' + reason + ' — paid ' + DAY_NAMES[result.payDate.getDay()] + ' ' + result.payDate.getDate() + ordSuffix(result.payDate.getDate()) + ' instead</div>';
+  }
+
+  html += '<div class="paydate-coverage">';
+  html += '<strong>Budget coverage:</strong> ' + formatDateShort(coverageStart) + ' — ' + formatDateShort(coverageEnd);
+  var days = Math.round((coverageEnd - coverageStart) / 86400000);
+  html += ' <span style="color:var(--primary);font-weight:600">(' + days + ' days)</span>';
+  html += '</div></div>';
+
+  document.getElementById('paydate-info').innerHTML = html;
+}
+
+function ordSuffix(d) {
+  if (d === 1 || d === 21 || d === 31) return 'st';
+  if (d === 2 || d === 22) return 'nd';
+  if (d === 3 || d === 23) return 'rd';
+  return 'th';
+}
+
+function formatDateShort(d) {
+  var day = d.getDate();
+  var monthShort = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return day + ' ' + monthShort[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+let currentStep = 1;
+let pots = [];
+let history = [];
+
+function fmt(n) {
+  return '£' + Math.abs(n).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function getPA(gross) {
+  if (gross <= TAPER_START) return PERSONAL_ALLOWANCE;
+  const reduction = Math.floor((gross - TAPER_START) / 2);
+  return Math.max(0, PERSONAL_ALLOWANCE - reduction);
+}
+
+function calcTax(gross) {
+  const pa = getPA(gross);
+  let taxable = Math.max(0, gross - pa);
+  let tax = 0;
+  const basicBand = Math.max(0, BASIC_UPPER - pa);
+  const basicTaxable = Math.min(taxable, basicBand);
+  tax += basicTaxable * BASIC_RATE;
+  taxable -= basicTaxable;
+  const higherBand = HIGHER_UPPER - BASIC_UPPER;
+  const higherTaxable = Math.min(taxable, higherBand);
+  tax += higherTaxable * HIGHER_RATE;
+  taxable -= higherTaxable;
+  tax += taxable * ADDITIONAL_RATE;
+  return tax;
+}
+
+function calcNI(gross) {
+  if (gross <= NI_LOWER) return 0;
+  let ni = 0;
+  const mainBand = Math.min(gross, NI_UPPER) - NI_LOWER;
+  ni += Math.max(0, mainBand) * NI_MAIN;
+  if (gross > NI_UPPER) {
+    ni += (gross - NI_UPPER) * NI_HIGHER;
+  }
+  return ni;
+}
+
+function calcMarginalOnExtra(baseSalary, extraGross) {
+  const totalGross = baseSalary + extraGross;
+  const baseTax = calcTax(baseSalary);
+  const totalTax = calcTax(totalGross);
+  const baseNI = calcNI(baseSalary);
+  const totalNI = calcNI(totalGross);
+  return {
+    extraTax: totalTax - baseTax,
+    extraNI: totalNI - baseNI
+  };
+}
+
+let lastTakeHome = 0;
+let lastMileage = 0;
+
+function calc() {
+  const salary = parseFloat(document.getElementById('salary').value) || 0;
+  const togExpenses = document.getElementById('tog-expenses').checked;
+  const togMileage = document.getElementById('tog-mileage').checked;
+  const togOvertime = document.getElementById('tog-overtime').checked;
+  const workExpenses = togExpenses ? (parseFloat(document.getElementById('work-expenses').value) || 0) : 0;
+  const miles = togMileage ? (parseFloat(document.getElementById('miles').value) || 0) : 0;
+  const overtime = togOvertime ? (parseFloat(document.getElementById('overtime').value) || 0) : 0;
+  const mileageAmount = miles * MILEAGE_RATE;
+
+  if (togMileage) {
+    document.getElementById('mileage-calc').innerHTML =
+      miles.toLocaleString('en-GB') + ' miles × 55p = ' + fmt(mileageAmount);
+  }
+
+  const annualTax = calcTax(salary);
+  const annualNI = calcNI(salary);
+  const annualNet = salary - annualTax - annualNI;
+  const effectiveRate = salary > 0 ? ((annualTax + annualNI) / salary * 100) : 0;
+
+  const monthlyGross = salary / 12;
+  const monthlyTax = annualTax / 12;
+  const monthlyNI = annualNI / 12;
+
+  const annualAdjustedSalary = Math.max(0, salary - (workExpenses * 12));
+  const adjustedAnnualTax = calcTax(annualAdjustedSalary);
+  const adjustedMonthlyTax = adjustedAnnualTax / 12;
+  const taxSaving = monthlyTax - adjustedMonthlyTax;
+
+  const marginal = calcMarginalOnExtra(salary, overtime * 12);
+  const overtimeTax = marginal.extraTax / 12;
+  const overtimeNI = marginal.extraNI / 12;
+  const overtimeNet = overtime - overtimeTax - overtimeNI;
+
+  const finalMonthlyTax = adjustedMonthlyTax + overtimeTax;
+  const finalMonthlyNI = monthlyNI + overtimeNI;
+  const actualTakeHome = monthlyGross + overtime - finalMonthlyTax - finalMonthlyNI;
+
+  lastTakeHome = actualTakeHome;
+  lastMileage = mileageAmount;
+
+  const show = salary > 0;
+  document.getElementById('tax-card').style.display = show ? 'block' : 'none';
+  document.getElementById('annual-card').style.display = show ? 'block' : 'none';
+
+  let mhtml = '';
+  mhtml += row('Gross salary', monthlyGross);
+  if (overtime > 0) mhtml += row('Overtime / bonus', overtime, 'addition');
+  mhtml += row('Income tax', -finalMonthlyTax, 'deduction');
+  mhtml += row('National Insurance', -finalMonthlyNI, 'deduction');
+  if (workExpenses > 0) mhtml += row('Tax relief on expenses', taxSaving, 'addition');
+  mhtml += rowTotal('Monthly take-home', actualTakeHome);
+  document.getElementById('monthly-table').innerHTML = mhtml;
+
+  let ahtml = '';
+  ahtml += row('Gross salary', salary);
+  ahtml += '<tr><td class="label-secondary">Personal allowance</td><td class="label-secondary" style="text-align:right">' + fmt(getPA(salary)) + '</td></tr>';
+  ahtml += row('Income tax', -annualTax, 'deduction');
+  ahtml += row('National Insurance', -annualNI, 'deduction');
+  ahtml += rowTotal('Annual net pay', annualNet);
+  ahtml += '<tr><td class="label-secondary">Effective deduction rate</td><td class="label-secondary" style="text-align:right">' + effectiveRate.toFixed(1) + '%</td></tr>';
+  document.getElementById('annual-table').innerHTML = ahtml;
+
+  renderSummary(actualTakeHome, mileageAmount);
+  save();
+}
+
+function row(label, value, cls) {
+  const display = fmt(value);
+  const valStr = value < 0 ? ('−' + display) : display;
+  return '<tr><td>' + label + '</td><td class="' + (cls || '') + '">' + valStr + '</td></tr>';
+}
+
+function rowTotal(label, value) {
+  return '<tr class="total"><td>' + label + '</td><td>' + fmt(value) + '</td></tr>';
+}
+
+function renderSummary(takeHome, mileage) {
+  const totalPots = pots.reduce(function(s, p) { return s + (parseFloat(p.amount) || 0); }, 0);
+  const freeMoney = takeHome + mileage - totalPots;
+  const isPositive = freeMoney >= 0;
+
+  let html = '';
+
+  if (isPositive) {
+    html += '<div class="banner banner-green">' + fmt(freeMoney) + ' free money this month</div>';
+  } else {
+    html += '<div class="banner banner-red">' + fmt(freeMoney) + ' over budget this month</div>';
+  }
+
+  html += '<div class="summary-grid">';
+  html += stat('Take-Home Pay', fmt(takeHome));
+  html += stat('Mileage Received', fmt(mileage));
+  html += stat('Total Outgoings', fmt(totalPots));
+  html += stat('Free Money', (freeMoney < 0 ? '−' : '') + fmt(freeMoney));
+  html += '</div>';
+
+  html += '<div class="action-row">';
+  html += '<button class="btn btn-success" onclick="saveMonth()">Save This Month</button>';
+  html += '<button class="btn btn-amber" onclick="openAccounts()">Form Accounts</button>';
+  html += '</div>';
+
+  html += '<div class="card"><h3>Itemised Breakdown</h3><table class="breakdown">';
+  html += row('Monthly take-home pay', takeHome);
+  if (mileage > 0) html += row('Mileage expenses (tax-free)', mileage, 'addition');
+  html += '<tr class="divider"><td colspan="2" style="font-weight:600;padding-top:12px">Outgoings</td></tr>';
+  pots.forEach(function(p) {
+    var amt = parseFloat(p.amount) || 0;
+    if (p.name || amt > 0) {
+      var label = p.name || 'Unnamed pot';
+      if (p.account) label += ' <span class="label-secondary">(' + esc(p.account) + ')</span>';
+      html += row(label, -amt, 'deduction');
+    }
+  });
+  html += rowTotal('Remaining', freeMoney);
+  html += '</table></div>';
+
+  document.getElementById('summary-section').innerHTML = html;
+  renderHistory();
+}
+
+function stat(label, value) {
+  return '<div class="summary-stat"><div class="stat-label">' + label + '</div><div class="stat-value">' + value + '</div></div>';
+}
+
+// Step navigation
+function goStep(n) {
+  currentStep = n;
+  for (var i = 1; i <= 3; i++) {
+    document.getElementById('panel' + i).classList.toggle('active', i === n);
+    var sc = document.getElementById('sc' + i);
+    sc.classList.remove('active', 'done');
+    if (i < n) { sc.classList.add('done'); sc.textContent = '✓'; }
+    else if (i === n) { sc.classList.add('active'); sc.textContent = i; }
+    else { sc.textContent = i; }
+  }
+  document.getElementById('sl1').classList.toggle('done', n > 1);
+  document.getElementById('sl2').classList.toggle('done', n > 2);
+  if (n === 3) calc();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Toggle sections
+function toggleSection(name) {
+  var sec = document.getElementById('sec-' + name);
+  var tog = document.getElementById('tog-' + name);
+  sec.classList.toggle('open', tog.checked);
+}
+
+// Pots management
+function addPot(name, amount, account) {
+  pots.push({ name: name || '', amount: amount || '', account: account || '' });
+  renderPots();
+  calc();
+}
+
+function removePot(i) {
+  pots.splice(i, 1);
+  renderPots();
+  calc();
+}
+
+function updatePot(i, field, value) {
+  pots[i][field] = value;
+  calc();
+}
+
+function renderPots() {
+  var html = '';
+  pots.forEach(function(p, i) {
+    var opts = '<option value="">No account</option>';
+    opts += '<option value="Direct Payment"' + (p.account === 'Direct Payment' ? ' selected' : '') + '>Direct Payment</option>';
+    ACCOUNTS.forEach(function(a) {
+      opts += '<option value="' + esc(a) + '"' + (p.account === a ? ' selected' : '') + '>' + esc(a) + '</option>';
+    });
+    html += '<div class="pot-row">' +
+      '<input type="text" placeholder="Pot name" value="' + esc(p.name) + '" oninput="updatePot(' + i + ',\'name\',this.value)">' +
+      '<div class="input-wrap">' +
+        '<span class="prefix">£</span>' +
+        '<input type="number" class="has-prefix" placeholder="0" min="0" step="10" value="' + p.amount + '" oninput="updatePot(' + i + ',\'amount\',this.value)">' +
+      '</div>' +
+      '<select onchange="updatePot(' + i + ',\'account\',this.value)">' + opts + '</select>' +
+      '<button class="btn btn-danger" onclick="removePot(' + i + ')" title="Remove">×</button>' +
+    '</div>';
+  });
+  document.getElementById('pots-list').innerHTML = html;
+}
+
+function esc(s) {
+  return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// === FORM ACCOUNTS ===
+function openAccounts() {
+  var groups = {};
+  var directPayments = [];
+  var unassigned = [];
+
+  pots.forEach(function(p) {
+    var amt = parseFloat(p.amount) || 0;
+    if (!p.name && amt === 0) return;
+    var name = p.name || 'Unnamed pot';
+    if (p.account === 'Direct Payment') {
+      directPayments.push({ name: name, amount: amt });
+    } else if (p.account && p.account !== '') {
+      if (!groups[p.account]) groups[p.account] = { items: [], total: 0 };
+      groups[p.account].items.push({ name: name, amount: amt });
+      groups[p.account].total += amt;
+    } else {
+      unassigned.push({ name: name, amount: amt });
+    }
+  });
+
+  var html = '';
+  var grandTotal = 0;
+
+  if (directPayments.length) {
+    var dpTotal = directPayments.reduce(function(s, it) { return s + it.amount; }, 0);
+    grandTotal += dpTotal;
+    html += '<div class="account-group" style="border-left:3px solid var(--red);background:var(--red-bg)">' +
+      '<div class="account-group-header">' +
+        '<span class="account-group-name" style="color:var(--red)">Pay Immediately</span>' +
+        '<span class="account-group-total" style="color:var(--red)">' + fmt(dpTotal) + '</span>' +
+      '</div>' +
+      '<div style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:6px">Pay these off as soon as you\'re paid</div>' +
+      '<div class="account-group-items">';
+    directPayments.forEach(function(it) {
+      html += '<div><span>' + esc(it.name) + '</span><span>' + fmt(it.amount) + '</span></div>';
+    });
+    html += '</div></div>';
+  }
+
+  ACCOUNTS.forEach(function(acct) {
+    var g = groups[acct];
+    if (!g) return;
+    grandTotal += g.total;
+    html += '<div class="account-group">' +
+      '<div class="account-group-header">' +
+        '<span class="account-group-name">' + esc(acct) + '</span>' +
+        '<span class="account-group-total">' + fmt(g.total) + '</span>' +
+      '</div>' +
+      '<div class="account-group-items">';
+    g.items.forEach(function(it) {
+      html += '<div><span>' + esc(it.name) + '</span><span>' + fmt(it.amount) + '</span></div>';
+    });
+    html += '</div></div>';
+  });
+
+  if (unassigned.length) {
+    var unTotal = unassigned.reduce(function(s, it) { return s + it.amount; }, 0);
+    grandTotal += unTotal;
+    html += '<div class="account-group">' +
+      '<div class="account-group-header">' +
+        '<span class="account-group-name" style="color:var(--text-secondary)">Main Account / Unassigned</span>' +
+        '<span class="account-group-total">' + fmt(unTotal) + '</span>' +
+      '</div>' +
+      '<div class="account-group-items">';
+    unassigned.forEach(function(it) {
+      html += '<div><span>' + esc(it.name) + '</span><span>' + fmt(it.amount) + '</span></div>';
+    });
+    html += '</div></div>';
+  }
+
+  if (!html) {
+    html = '<p class="history-empty">No pots to assign. Add some pots first.</p>';
+  } else {
+    html += '<div class="account-grand-total"><span>Total Outgoings</span><span>' + fmt(grandTotal) + '</span></div>';
+  }
+
+  document.getElementById('accounts-body').innerHTML = html;
+  document.getElementById('accounts-modal').classList.add('open');
+}
+
+function closeAccounts() {
+  document.getElementById('accounts-modal').classList.remove('open');
+}
+
+// === SAVE THIS MONTH ===
+function saveMonth() {
+  var totalPots = pots.reduce(function(s, p) { return s + (parseFloat(p.amount) || 0); }, 0);
+  var freeMoney = lastTakeHome + lastMileage - totalPots;
+  var monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var selMonth = parseInt(document.getElementById('pick-month').value);
+  var selYear = parseInt(document.getElementById('pick-year').value);
+
+  var entry = {
+    id: Date.now(),
+    date: new Date().toISOString(),
+    label: monthNames[selMonth] + ' ' + selYear,
+    takeHome: Math.round(lastTakeHome * 100) / 100,
+    mileage: Math.round(lastMileage * 100) / 100,
+    outgoings: Math.round(totalPots * 100) / 100,
+    freeMoney: Math.round(freeMoney * 100) / 100,
+    pots: pots.filter(function(p) { return p.name || (parseFloat(p.amount) || 0) > 0; }).map(function(p) {
+      return { name: p.name || 'Unnamed', amount: parseFloat(p.amount) || 0, account: p.account || '' };
+    })
+  };
+
+  history.unshift(entry);
+  saveHistory();
+  renderHistory();
+  showToast('Saved ' + entry.label + ' to history');
+}
+
+function deleteHistory(id) {
+  history = history.filter(function(h) { return h.id !== id; });
+  saveHistory();
+  renderHistory();
+  showToast('Entry removed');
+}
+
+function toggleHistoryDetail(id) {
+  var el = document.getElementById('hd-' + id);
+  if (el) el.classList.toggle('open');
+}
+
+function renderHistory() {
+  var container = document.getElementById('history-section');
+  if (!container) return;
+
+  if (!history.length) {
+    container.innerHTML = '<p class="history-empty">No saved months yet. Click "Save This Month" to log your first entry.</p>';
+    return;
+  }
+
+  var html = '<div style="overflow-x:auto"><table class="history-table">' +
+    '<thead><tr><th>Month</th><th>Take-Home</th><th>Mileage</th><th>Out</th><th>Free</th><th></th></tr></thead><tbody>';
+
+  history.forEach(function(h) {
+    var cls = h.freeMoney >= 0 ? 'positive' : 'negative';
+    var freeStr = (h.freeMoney < 0 ? '−' : '') + fmt(h.freeMoney);
+    html += '<tr style="cursor:pointer" onclick="toggleHistoryDetail(' + h.id + ')">' +
+      '<td style="font-weight:600">' + esc(h.label) + '</td>' +
+      '<td>' + fmt(h.takeHome) + '</td>' +
+      '<td>' + fmt(h.mileage) + '</td>' +
+      '<td>' + fmt(h.outgoings) + '</td>' +
+      '<td class="' + cls + '">' + freeStr + '</td>' +
+      '<td><button class="btn btn-danger" onclick="event.stopPropagation();deleteHistory(' + h.id + ')" title="Delete">×</button></td>' +
+    '</tr>';
+
+    html += '<tr class="history-detail" id="hd-' + h.id + '"><td colspan="6"><div class="history-pots-list">';
+    if (h.pots && h.pots.length) {
+      h.pots.forEach(function(p) {
+        var label = esc(p.name);
+        if (p.account) label += ' <span style="color:var(--text-secondary)">(' + esc(p.account) + ')</span>';
+        html += '<div><span>' + label + '</span><span>' + fmt(p.amount) + '</span></div>';
+      });
+    } else {
+      html += '<div>No pot details recorded</div>';
+    }
+    html += '</div></td></tr>';
+  });
+
+  html += '</tbody></table></div>';
+  container.innerHTML = html;
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2500);
+}
+
+// === PERSISTENCE ===
+function save() {
+  var data = {
+    salary: document.getElementById('salary').value,
+    togExpenses: document.getElementById('tog-expenses').checked,
+    togMileage: document.getElementById('tog-mileage').checked,
+    togOvertime: document.getElementById('tog-overtime').checked,
+    workExpenses: document.getElementById('work-expenses').value,
+    miles: document.getElementById('miles').value,
+    overtime: document.getElementById('overtime').value,
+    pots: pots
+  };
+  try { localStorage.setItem('uk-finance-tracker', JSON.stringify(data)); } catch(e) {}
+}
+
+function saveHistory() {
+  try { localStorage.setItem('uk-finance-history', JSON.stringify(history)); } catch(e) {}
+}
+
+function load() {
+  try {
+    var raw = localStorage.getItem('uk-finance-tracker');
+    if (raw) {
+      var d = JSON.parse(raw);
+      if (d.salary) document.getElementById('salary').value = d.salary;
+      if (d.togExpenses) { document.getElementById('tog-expenses').checked = true; toggleSection('expenses'); }
+      if (d.togMileage) { document.getElementById('tog-mileage').checked = true; toggleSection('mileage'); }
+      if (d.togOvertime) { document.getElementById('tog-overtime').checked = true; toggleSection('overtime'); }
+      if (d.workExpenses) document.getElementById('work-expenses').value = d.workExpenses;
+      if (d.miles) document.getElementById('miles').value = d.miles;
+      if (d.overtime) document.getElementById('overtime').value = d.overtime;
+      if (d.pots && d.pots.length) {
+        pots = d.pots.map(function(p) {
+          return { name: p.name || '', amount: p.amount || '', account: p.account || '' };
+        });
+        renderPots();
+      }
+    }
+  } catch(e) {}
+
+  try {
+    var hraw = localStorage.getItem('uk-finance-history');
+    if (hraw) history = JSON.parse(hraw);
+  } catch(e) {}
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeAccounts();
+});
+
+load();
+initMonthPicker();
+calc();
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js');
+}
+</script>
+
+</body>
+</html>
