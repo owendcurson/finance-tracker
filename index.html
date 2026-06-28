@@ -12,6 +12,9 @@
 <title>UK Personal Finance Tracker 2026/27</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -20,6 +23,13 @@
   --green: #0d904f; --green-bg: #e6f4ea; --red: #c5221f; --red-bg: #fce8e6;
   --amber: #e37400; --amber-bg: #fef7e0; --navy: #0d1b2a;
   --radius: 12px; --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+}
+[data-theme="dark"] {
+  --bg: #1a1a2e; --card: #16213e; --primary: #4d8cf5; --primary-light: #1e2d4d;
+  --text: #e0e0e0; --text-secondary: #a0a0b0; --border: #2a2a4a;
+  --green: #3fbf7f; --green-bg: #14302a; --red: #ff6b68; --red-bg: #3a1e1d;
+  --amber: #f0a843; --amber-bg: #3a2e14; --navy: #0a0f1a;
+  --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
 }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; min-height: 100vh; }
 .container { max-width: 720px; margin: 0 auto; padding: 16px; }
@@ -235,8 +245,45 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
 .showcase-cta p { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 16px; }
 .showcase-cta button { padding: 12px 32px; font-size: 1rem; }
 
+/* Payday countdown */
+.countdown-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px 20px; margin-bottom: 16px; border-left: 4px solid var(--primary); display: flex; align-items: center; gap: 12px; }
+.countdown-card .cd-icon { font-size: 1.6rem; line-height: 1; color: var(--primary); }
+.countdown-card .cd-main { flex: 1; }
+.countdown-card .cd-title { font-weight: 700; font-size: 1.05rem; }
+.countdown-card .cd-date { font-size: 0.85rem; color: var(--text-secondary); margin-top: 2px; }
+.countdown-card.cd-today { border-left-color: var(--green); }
+.countdown-card.cd-today .cd-icon, .countdown-card.cd-today .cd-title { color: var(--green); }
+
+/* Budget progress bars */
+.pot-progress { height: 6px; border-radius: 3px; background: var(--border); margin-top: 4px; overflow: hidden; }
+.pot-progress-fill { height: 100%; border-radius: 3px; transition: width 0.2s; }
+.pot-over-note { font-size: 0.75rem; color: var(--red); font-weight: 600; margin-top: 2px; }
+.pot-row .input-wrap.target-wrap { width: 100px; }
+
+/* Savings + YTD summary cards */
+.metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+.metric-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.metric-stat { background: var(--bg); border-radius: 8px; padding: 12px 14px; }
+.metric-stat .stat-label { font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 4px; }
+.metric-stat .stat-value { font-size: 1.1rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.metric-stat .stat-value.positive { color: var(--green); }
+.metric-stat .stat-value.negative { color: var(--red); }
+.section-note { font-size: 0.78rem; color: var(--text-secondary); margin-top: 10px; font-style: italic; }
+
+/* Salary calculator */
+.salcalc-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+.salcalc-table th, .salcalc-table td { padding: 8px 10px; font-size: 0.88rem; text-align: right; font-variant-numeric: tabular-nums; }
+.salcalc-table th:first-child, .salcalc-table td:first-child { text-align: left; color: var(--text-secondary); }
+.salcalc-table thead th { font-weight: 700; color: var(--text); border-bottom: 2px solid var(--border); }
+.salcalc-table tbody tr { border-bottom: 1px solid var(--border); }
+.salcalc-table tr.salcalc-diff td { font-weight: 700; color: var(--green); border-top: 2px solid var(--text); padding-top: 10px; }
+
+/* Splash theme toggle */
+.splash-theme-toggle { position: fixed; top: 16px; right: 16px; z-index: 10; background: var(--card); border: 1.5px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow); }
+
 @media (max-width: 600px) {
   .container { padding: 10px; }
+  .metric-grid, .metric-grid.cols-4 { grid-template-columns: 1fr 1fr; }
   .card { padding: 16px; }
   .step-label { display: none; }
   .step-line { width: 28px; margin: 0 4px; }
@@ -271,6 +318,7 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
 
 <!-- Splash / Landing -->
 <div class="splash" id="auth-screen">
+  <button class="splash-theme-toggle" id="splash-theme-btn" title="Toggle dark mode"><i class="ti ti-moon"></i></button>
   <div class="splash-inner">
     <div class="splash-left">
       <h1>Finance Tracker</h1>
@@ -396,6 +444,7 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
     <button class="header-back" id="header-back">&larr; Dashboard</button>
     <span class="header-title">Finance Tracker</span>
     <span class="user-name" id="user-display"></span>
+    <button class="header-icon" id="theme-btn" title="Toggle dark mode"><i class="ti ti-moon"></i></button>
     <button class="header-icon" id="settings-btn" title="Settings">&#9881;</button>
     <button class="header-btn" id="signout-btn">Sign Out</button>
   </div>
@@ -404,8 +453,12 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
   <div id="dashboard-screen">
     <div class="container">
       <div id="dash-greeting" style="margin-bottom:20px"></div>
-      <button class="btn btn-primary btn-lg" id="new-month-btn" style="margin-bottom:20px">+ New Month</button>
+      <div class="action-row">
+        <button class="btn btn-primary btn-lg" id="new-month-btn" style="flex:1">+ New Month</button>
+        <button class="btn btn-outline btn-lg" id="salcalc-btn" style="flex:1"><i class="ti ti-calculator"></i> Salary Calculator</button>
+      </div>
       <div id="dash-overview"></div>
+      <div id="dash-countdown"></div>
 
       <div class="card chart-card chart-card-full">
         <h3>Monthly Take-Home Pay</h3>
@@ -422,6 +475,12 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
           <canvas id="chart-free"></canvas>
         </div>
       </div>
+
+      <div class="card chart-card chart-card-full" id="chart-stacked-wrap"><h3>Spending by Category</h3><canvas id="chart-stacked"></canvas></div>
+
+      <div id="dash-savings"></div>
+
+      <div id="dash-ytd"></div>
 
       <div class="card">
         <h2>Monthly History</h2>
@@ -496,7 +555,21 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
 <!-- Modals -->
 <div class="modal-overlay" id="accounts-modal"><div class="modal"><button class="modal-close" id="close-accounts-btn">&times;</button><h2>Payday Account Breakdown</h2><p class="modal-subtitle">Where to transfer your money on payday</p><div id="accounts-body"></div></div></div>
 <div class="modal-overlay" id="detail-modal"><div class="modal" style="max-width:600px"><button class="modal-close" id="close-detail-btn">&times;</button><div id="detail-modal-body"></div></div></div>
-<div class="modal-overlay" id="settings-modal"><div class="modal" style="max-width:420px"><button class="modal-close" id="close-settings-btn">&times;</button><h2>Settings</h2><p class="modal-subtitle">Customise your finance tracker</p><div class="settings-field"><label for="payday-select">Pay Day</label><select id="payday-select"></select><p class="settings-note">If the selected day doesn't exist in a given month (e.g. 31st in February), you'll be paid on the last day of that month instead. Weekends and UK bank holidays are adjusted to the nearest working day before.</p></div></div></div>
+<div class="modal-overlay" id="settings-modal"><div class="modal" style="max-width:420px"><button class="modal-close" id="close-settings-btn">&times;</button><h2>Settings</h2><p class="modal-subtitle">Customise your finance tracker</p><div class="settings-field"><label for="payday-select">Pay Day</label><select id="payday-select"></select><p class="settings-note">If the selected day doesn't exist in a given month (e.g. 31st in February), you'll be paid on the last day of that month instead. Weekends and UK bank holidays are adjusted to the nearest working day before.</p></div>
+<div class="settings-field" style="border-top:1px solid var(--border);padding-top:18px">
+  <label>Payday Email Summary</label>
+  <input type="email" id="email-input" class="splash-input" placeholder="your@email.com" style="margin-bottom:10px">
+  <label class="toggle-row" style="margin-bottom:10px"><input type="checkbox" id="email-toggle"><span class="toggle-label">Send me a summary on payday</span></label>
+  <button class="btn btn-outline" id="email-test-btn" style="width:100%">Send test email</button>
+  <p class="settings-note">A summary of your latest saved month is emailed on your pay date. Requires EmailJS credentials configured in the app.</p>
+</div></div></div>
+<div class="modal-overlay" id="salcalc-modal"><div class="modal" style="max-width:560px"><button class="modal-close" id="close-salcalc-btn">&times;</button><h2>Salary Increase Calculator</h2><p class="modal-subtitle">Compare your take-home pay across two salaries</p>
+  <div style="display:flex;gap:12px;margin-bottom:6px">
+    <div class="field" style="flex:1;margin-bottom:0"><label for="salcalc-current">Current salary</label><div class="input-wrap"><span class="prefix">&pound;</span><input type="number" id="salcalc-current" class="has-prefix" placeholder="0" min="0" step="100"></div></div>
+    <div class="field" style="flex:1;margin-bottom:0"><label for="salcalc-proposed">Proposed salary</label><div class="input-wrap"><span class="prefix">&pound;</span><input type="number" id="salcalc-proposed" class="has-prefix" placeholder="0" min="0" step="100"></div></div>
+  </div>
+  <div id="salcalc-result"></div>
+</div></div>
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -510,7 +583,15 @@ const auth=getAuth(app),db=getFirestore(app),googleProvider=new GoogleAuthProvid
 var currentUser=null,payDay=parseInt(localStorage.getItem('finance_payDay'))||23;
 var currentStep=1,pots=[],financeHistory=[],lastTakeHome=0,lastMileage=0;
 var editingId=null;
-var chartTH=null,chartSpend=null,chartFree=null;
+var chartTH=null,chartSpend=null,chartFree=null,chartStacked=null,chartSavings=null;
+
+// REPLACE WITH YOUR EMAILJS SERVICE ID, TEMPLATE ID AND PUBLIC KEY
+var EMAILJS_SERVICE = 'YOUR_SERVICE_ID';
+var EMAILJS_TEMPLATE = 'YOUR_TEMPLATE_ID';
+var EMAILJS_KEY = 'YOUR_PUBLIC_KEY';
+
+var SAVINGS_CATS=['Emergency Fund','Holiday Savings','House Deposit','Car Savings','General Savings','Stocks & Shares ISA','Cash ISA','Pension Top-Up','Christmas Fund'];
+function isSavingsPot(p){var n=(p.name||'').toLowerCase(),a=p.account||'';if(SAVINGS_CATS.indexOf(a)!==-1)return true;return n.indexOf('saving')!==-1;}
 
 // ===== CONSTANTS =====
 var PA=12570,BU=50270,HU=125140,TS=100000,BR=0.20,HR=0.40,AR=0.45;
@@ -529,6 +610,9 @@ var ACCOUNT_GROUPS=[
 ['Other',['Holiday Spending','Home Improvements','Technology','Hobbies','Wedding Fund','Pocket Money','Custom']]
 ];
 var ALL_ACCOUNTS=[];ACCOUNT_GROUPS.forEach(function(g){g[1].forEach(function(a){ALL_ACCOUNTS.push(a);});});
+var ACCT_TO_GROUP={};ACCOUNT_GROUPS.forEach(function(g){g[1].forEach(function(a){ACCT_TO_GROUP[a]=g[0];});});
+function groupForPot(p){if(p.account==='Direct Payment')return'Direct Payment';if(p.account&&ACCT_TO_GROUP[p.account])return ACCT_TO_GROUP[p.account];if(p.account)return'Other';return'Unassigned';}
+var GROUP_COLORS={'Housing':'#1a73e8','Utilities':'#00897b','Transport':'#546e7a','Food':'#e37400','Subscriptions':'#8430ce','Savings':'#0d904f','Family & Personal':'#d81b60','Health':'#00acc1','Debt':'#c5221f','Motor':'#5d4037','Other':'#9e9e9e','Direct Payment':'#ff6d00','Unassigned':'#b0bec5'};
 var BH={};
 ['2024-01-01','2024-03-29','2024-04-01','2024-05-06','2024-05-27','2024-08-26','2024-12-25','2024-12-26','2025-01-01','2025-04-18','2025-04-21','2025-05-05','2025-05-26','2025-08-25','2025-12-25','2025-12-26','2026-01-01','2026-04-03','2026-04-06','2026-05-04','2026-05-25','2026-08-31','2026-12-25','2026-12-28','2027-01-01','2027-03-26','2027-03-29','2027-05-03','2027-05-31','2027-08-30','2027-12-27','2027-12-28','2028-01-03','2028-04-14','2028-04-17','2028-05-01','2028-05-29','2028-08-28','2028-12-25','2028-12-26'].forEach(function(d){BH[d]=true;});
 var BHN={'01-01':"New Year's Day",'01-03':"New Year's Day (sub)",'03-26':'Good Friday','03-29':'Good Friday','04-01':'Easter Monday','04-03':'Good Friday','04-06':'Easter Monday','04-14':'Good Friday','04-17':'Easter Monday','04-18':'Good Friday','04-21':'Easter Monday','05-01':'Early May','05-03':'Early May','05-04':'Early May','05-05':'Early May','05-06':'Early May','05-25':'Spring','05-26':'Spring','05-27':'Spring','05-29':'Spring','05-31':'Spring','08-25':'Summer','08-26':'Summer','08-28':'Summer','08-30':'Summer','08-31':'Summer','12-25':'Christmas Day','12-26':'Boxing Day','12-27':'Christmas Day (sub)','12-28':'Boxing Day (sub)'};
@@ -550,6 +634,16 @@ function st(l,v){return'<div class="summary-stat"><div class="stat-label">'+l+'<
 function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2500);}
 function $(id){return document.getElementById(id);}
 
+// ===== THEME =====
+function isDark(){return document.documentElement.getAttribute('data-theme')==='dark';}
+function chartTextColor(){return isDark()?'#a0a0b0':'#5f6368';}
+function chartGridColor(){return isDark()?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.06)';}
+function chartZeroColor(){return isDark()?'rgba(255,255,255,0.3)':'rgba(0,0,0,0.3)';}
+function updThemeIcons(){var ic=isDark()?'ti ti-sun':'ti ti-moon';var tb=$('theme-btn'),sb=$('splash-theme-btn');if(tb)tb.innerHTML='<i class="'+ic+'"></i>';if(sb)sb.innerHTML='<i class="'+ic+'"></i>';}
+function applyTheme(t){if(t==='dark')document.documentElement.setAttribute('data-theme','dark');else document.documentElement.removeAttribute('data-theme');document.querySelector('meta[name="theme-color"]').setAttribute('content',t==='dark'?'#0a0f1a':'#0d1b2a');updThemeIcons();}
+function initTheme(){var saved=localStorage.getItem('finance_theme');var t=saved||((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');applyTheme(t);}
+function toggleTheme(){var t=isDark()?'light':'dark';localStorage.setItem('finance_theme',t);applyTheme(t);if($('app-container').style.display!=='none')renderCharts();}
+
 // ===== PAY DATE =====
 function getPD(y,m,pd){pd=pd||payDay;var lastDay=new Date(y,m+1,0).getDate();var actualDay=Math.min(pd,lastDay);var t=new Date(y,m,actualDay),o=new Date(t);while(!isWD(t))t.setDate(t.getDate()-1);return{payDate:t,original:o,moved:t.getTime()!==o.getTime()};}
 function getNextPD(y,m,pd){var nm=m+1,ny=y;if(nm>11){nm=0;ny++;}return getPD(ny,nm,pd);}
@@ -570,10 +664,19 @@ function updPD(){var m=parseInt($('pick-month').value),y=parseInt($('pick-year')
 function initPDS(){var s=$('payday-select');s.innerHTML='';for(var d=1;d<=31;d++){var o=document.createElement('option');o.value=d;o.textContent=d+os(d)+' of each month';if(d===payDay)o.selected=true;s.appendChild(o);}}
 async function onPDC(){payDay=parseInt($('payday-select').value);localStorage.setItem('finance_payDay',payDay);updPD();if(currentUser){try{await setDoc(doc(db,'users',currentUser.uid,'settings','config'),{payDay:payDay},{merge:true});}catch(e){}}toast('Pay day set to '+payDay+os(payDay));}
 
+// ===== EMAIL SUMMARY =====
+var emailPrefs={email:'',enabled:false};
+function loadEmailPrefs(){try{var r=localStorage.getItem('finance_email_prefs');if(r)emailPrefs=JSON.parse(r);}catch(e){}if(!emailPrefs.email&&currentUser)emailPrefs.email=currentUser.email||'';$('email-input').value=emailPrefs.email||'';$('email-toggle').checked=!!emailPrefs.enabled;}
+async function saveEmailPrefs(){emailPrefs.email=$('email-input').value.trim();emailPrefs.enabled=$('email-toggle').checked;localStorage.setItem('finance_email_prefs',JSON.stringify(emailPrefs));if(currentUser){try{await setDoc(doc(db,'users',currentUser.uid,'settings','config'),{emailSummary:emailPrefs},{merge:true});}catch(e){}}}
+function buildEmailParams(h){var pots='';(h.pots||[]).forEach(function(p){pots+=p.name+': '+fmt(p.amount)+(p.account?(' ('+p.account+')'):'')+'\n';});return{to_email:emailPrefs.email,pay_date:h.payDateLong||h.payDate,take_home:fmt(h.takeHome),outgoings:fmt(h.outgoings),free_money:(h.freeMoney<0?'-':'')+fmt(h.freeMoney),mileage:fmt(h.mileage),pots_list:pots||'No pots recorded'};}
+async function sendSummaryEmail(h,silent){if(!window.emailjs){if(!silent)toast('EmailJS not loaded');return false;}if(EMAILJS_KEY==='YOUR_PUBLIC_KEY'){if(!silent)toast('Add your EmailJS credentials first');return false;}try{emailjs.init({publicKey:EMAILJS_KEY});await emailjs.send(EMAILJS_SERVICE,EMAILJS_TEMPLATE,buildEmailParams(h));if(!silent)toast('Email sent to '+emailPrefs.email);return true;}catch(e){if(!silent)toast('Email failed — check credentials');console.error('Email:',e);return false;}}
+async function sendTestEmail(){await saveEmailPrefs();if(!emailPrefs.email){toast('Enter an email address');return;}var h=financeHistory.length?financeHistory[0]:{payDateLong:'(no saved month)',takeHome:0,outgoings:0,freeMoney:0,mileage:0,pots:[]};await sendSummaryEmail(h,false);}
+async function maybeSendPaydayEmail(){if(!emailPrefs.enabled||!emailPrefs.email)return;if(!financeHistory.length)return;var now=new Date();now.setHours(0,0,0,0);var pd=getPD(now.getFullYear(),now.getMonth()).payDate;pd.setHours(0,0,0,0);if(pd.getTime()!==now.getTime())return;var key='finance_email_sent_'+now.getMonth()+'-'+now.getFullYear();if(localStorage.getItem(key))return;var sent=await sendSummaryEmail(financeHistory[0],true);if(sent)localStorage.setItem(key,'1');}
+
 // ===== CALC =====
 function calc(){var sal=parseFloat($('salary').value)||0,tE=$('tog-expenses').checked,tM=$('tog-mileage').checked,tO=$('tog-overtime').checked;var wE=tE?(parseFloat($('work-expenses').value)||0):0,mi=tM?(parseFloat($('miles').value)||0):0,ot=tO?(parseFloat($('overtime').value)||0):0,mA=mi*MR;if(tM)$('mileage-calc').innerHTML=mi.toLocaleString('en-GB')+' miles × 55p = '+fmt(mA);var aT=cTax(sal),aN=cNI(sal),aNet=sal-aT-aN,eff=sal>0?((aT+aN)/sal*100):0;var mG=sal/12,mT=aT/12,mN=aN/12,adjT=cTax(Math.max(0,sal-(wE*12)))/12,tS=mT-adjT;var oT=(cTax(sal+ot*12)-cTax(sal))/12,oN=(cNI(sal+ot*12)-cNI(sal))/12;var fT=adjT+oT,fN=mN+oN,th=mG+ot-fT-fN;lastTakeHome=th;lastMileage=mA;var sh=sal>0;$('tax-card').style.display=sh?'block':'none';$('annual-card').style.display=sh?'block':'none';var mh=row('Gross salary',mG);if(ot>0)mh+=row('Overtime / bonus',ot,'addition');mh+=row('Income tax',-fT,'deduction')+row('National Insurance',-fN,'deduction');if(wE>0)mh+=row('Tax relief on expenses',tS,'addition');mh+=rowT('Monthly take-home',th);$('monthly-table').innerHTML=mh;var ah=row('Gross salary',sal)+'<tr><td class="label-secondary">Personal allowance</td><td class="label-secondary" style="text-align:right">'+fmt(gPA(sal))+'</td></tr>'+row('Income tax',-aT,'deduction')+row('National Insurance',-aN,'deduction')+rowT('Annual net pay',aNet)+'<tr><td class="label-secondary">Effective deduction rate</td><td class="label-secondary" style="text-align:right">'+eff.toFixed(1)+'%</td></tr>';$('annual-table').innerHTML=ah;renderSum(th,mA);saveLocal();}
 
-function renderSum(th,mi){var tp=pots.reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0),fr=th+mi-tp;var h=fr>=0?'<div class="banner banner-green">'+fmt(fr)+' free money this month</div>':'<div class="banner banner-red">'+fmt(fr)+' over budget this month</div>';h+='<div class="summary-grid">'+st('Take-Home Pay',fmt(th))+st('Mileage Received',fmt(mi))+st('Total Outgoings',fmt(tp))+st('Free Money',(fr<0?'−':'')+fmt(fr))+'</div>';h+='<div class="action-row"><button class="btn btn-success" id="save-month-btn">Save Month</button><button class="btn btn-amber" id="form-accounts-btn">Form Accounts</button></div>';h+='<div class="card"><h3>Itemised Breakdown</h3><table class="breakdown">'+row('Monthly take-home pay',th);if(mi>0)h+=row('Mileage expenses (tax-free)',mi,'addition');h+='<tr class="divider"><td colspan="2" style="font-weight:600;padding-top:12px">Outgoings</td></tr>';pots.forEach(function(p){var a=parseFloat(p.amount)||0;if(p.name||a>0){var l=p.name||'Unnamed pot';if(p.account)l+=' <span class="label-secondary">('+esc(p.account)+')</span>';h+=row(l,-a,'deduction');}});h+=rowT('Remaining',fr)+'</table></div>';$('summary-section').innerHTML=h;$('save-month-btn').addEventListener('click',saveMonth);$('form-accounts-btn').addEventListener('click',openAccounts);}
+function renderSum(th,mi){var tp=pots.reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0),fr=th+mi-tp;var h=fr>=0?'<div class="banner banner-green">'+fmt(fr)+' free money this month</div>':'<div class="banner banner-red">'+fmt(fr)+' over budget this month</div>';h+='<div class="summary-grid">'+st('Take-Home Pay',fmt(th))+st('Mileage Received',fmt(mi))+st('Total Outgoings',fmt(tp))+st('Free Money',(fr<0?'−':'')+fmt(fr))+'</div>';h+='<div class="action-row"><button class="btn btn-success" id="save-month-btn">Save Month</button><button class="btn btn-amber" id="form-accounts-btn">Form Accounts</button></div>';h+='<div class="card"><h3>Itemised Breakdown</h3><table class="breakdown">'+row('Monthly take-home pay',th);if(mi>0)h+=row('Mileage expenses (tax-free)',mi,'addition');h+='<tr class="divider"><td colspan="2" style="font-weight:600;padding-top:12px">Outgoings</td></tr>';pots.forEach(function(p){var a=parseFloat(p.amount)||0;if(p.name||a>0){var l=p.name||'Unnamed pot';if(p.account)l+=' <span class="label-secondary">('+esc(p.account)+')</span>';var tg=parseFloat(p.target)||0;var pb=potProgressHTML(a,tg);if(pb)l+='<div style="margin-top:4px">'+pb+'</div>';h+=row(l,-a,'deduction');}});h+=rowT('Remaining',fr)+'</table></div>';$('summary-section').innerHTML=h;$('save-month-btn').addEventListener('click',saveMonth);$('form-accounts-btn').addEventListener('click',openAccounts);}
 
 // ===== NAVIGATION =====
 var GREETINGS=['Time to track your money!','Let\'s save some money!','Here comes the money!','Bling bling!','We\'re here to help!','Are we rich yet?','Show me the money!','Every penny counts!','Budget like a boss!','Money moves!','Stack that cash!','Payday vibes!'];
@@ -583,35 +686,40 @@ function goStep(n){currentStep=n;for(var i=1;i<=3;i++){$('panel'+i).classList.to
 function toggleSection(n){$('sec-'+n).classList.toggle('open',$('tog-'+n).checked);}
 
 // ===== POTS =====
-function addPot(n,a,ac){pots.push({name:n||'',amount:a||'',account:ac||''});renderPots();calc();}
+function addPot(n,a,ac,tg){pots.push({name:n||'',amount:a||'',account:ac||'',target:tg||''});renderPots();calc();}
 function removePot(i){pots.splice(i,1);renderPots();calc();}
 function updatePot(i,f,v){pots[i][f]=v;calc();}
 window._uP=updatePot;window._rP=removePot;
 function buildCatOpts(sel){var o='<option value="">No account</option><option value="Direct Payment"'+(sel==='Direct Payment'?' selected':'')+'>Direct Payment</option>';ACCOUNT_GROUPS.forEach(function(g){o+='<optgroup label="'+esc(g[0])+'">';g[1].forEach(function(a){o+='<option value="'+esc(a)+'"'+(sel===a?' selected':'')+'>'+esc(a)+'</option>';});o+='</optgroup>';});if(sel&&sel!=='Direct Payment'&&ALL_ACCOUNTS.indexOf(sel)===-1){o+='<optgroup label="Other"><option value="'+esc(sel)+'" selected>'+esc(sel)+'</option></optgroup>';}return o;}
-function renderPots(){var h='';pots.forEach(function(p,i){h+='<div class="pot-row"><input type="text" placeholder="Pot name" value="'+esc(p.name)+'" oninput="window._uP('+i+',\'name\',this.value)"><div class="input-wrap"><span class="prefix">£</span><input type="number" class="has-prefix" placeholder="0" min="0" step="10" value="'+p.amount+'" oninput="window._uP('+i+',\'amount\',this.value)"></div><select onchange="window._uP('+i+',\'account\',this.value)">'+buildCatOpts(p.account)+'</select><button class="btn btn-danger" onclick="window._rP('+i+')" title="Remove">×</button></div>';});$('pots-list').innerHTML=h;}
+function renderPots(){var h='';pots.forEach(function(p,i){h+='<div class="pot-row"><input type="text" placeholder="Pot name" value="'+esc(p.name)+'" oninput="window._uP('+i+',\'name\',this.value)"><div class="input-wrap"><span class="prefix">£</span><input type="number" class="has-prefix" placeholder="0" min="0" step="10" value="'+p.amount+'" oninput="window._uP('+i+',\'amount\',this.value)"></div><div class="input-wrap target-wrap"><span class="prefix">£</span><input type="number" class="has-prefix" placeholder="Budget" min="0" step="10" value="'+(p.target||'')+'" oninput="window._uP('+i+',\'target\',this.value)"></div><select onchange="window._uP('+i+',\'account\',this.value)">'+buildCatOpts(p.account)+'</select><button class="btn btn-danger" onclick="window._rP('+i+')" title="Remove">×</button></div>';});$('pots-list').innerHTML=h;}
+function potProgressHTML(amount,target){if(!target||target<=0)return'';var pct=amount/target*100,w=Math.min(100,pct),color;if(amount>target)color='var(--red)';else if(pct>=90)color='var(--amber)';else color='var(--green)';var h='<div class="pot-progress"><div class="pot-progress-fill" style="width:'+w+'%;background:'+color+'"></div></div>';if(amount>target)h+='<div class="pot-over-note">+'+fmt(amount-target)+' over</div>';return h;}
 
 // ===== FORM ACCOUNTS =====
 function openAccounts(){var h=buildAccountsBreakdown(pots);$('accounts-body').innerHTML=h||'<p class="history-empty">No pots to assign.</p>';$('accounts-modal').classList.add('open');}
 function closeAccounts(){$('accounts-modal').classList.remove('open');}
 
 // ===== SAVE MONTH =====
-async function saveMonth(){var sal=parseFloat($('salary').value)||0;if(sal===0){toast('Enter a salary before saving');return;}var sm=parseInt($('pick-month').value),sy=parseInt($('pick-year').value),pr=getPD(sy,sm),tp=pots.reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);var entryId=editingId||Date.now();var entry={id:entryId,month:sm,year:sy,label:MS[sm]+' '+sy,payDate:ds(pr.payDate),payDateLong:fdl(pr.payDate),payDateMoved:pr.moved,payDateReason:pr.moved?movedReason(pr.original):'',payDayUsed:payDay,salary:sal,togExpenses:$('tog-expenses').checked,workExpenses:parseFloat($('work-expenses').value)||0,togMileage:$('tog-mileage').checked,miles:parseFloat($('miles').value)||0,togOvertime:$('tog-overtime').checked,overtime:parseFloat($('overtime').value)||0,takeHome:Math.round(lastTakeHome*100)/100,mileage:Math.round(lastMileage*100)/100,outgoings:Math.round(tp*100)/100,freeMoney:Math.round((lastTakeHome+lastMileage-tp)*100)/100,pots:pots.filter(function(p){return p.name||(parseFloat(p.amount)||0)>0;}).map(function(p){return{name:p.name||'Unnamed',amount:parseFloat(p.amount)||0,account:p.account||''};})};if(editingId){financeHistory=financeHistory.map(function(e){return e.id===editingId?entry:e;});}else{financeHistory.unshift(entry);}editingId=null;persistHL();if(currentUser){try{await setDoc(doc(db,'users',currentUser.uid,'months',String(entry.id)),entry);}catch(e){}}clearTracker();showDashboard();toast('Saved '+entry.label);}
+async function saveMonth(){var sal=parseFloat($('salary').value)||0;if(sal===0){toast('Enter a salary before saving');return;}var sm=parseInt($('pick-month').value),sy=parseInt($('pick-year').value),pr=getPD(sy,sm),tp=pots.reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);var entryId=editingId||Date.now();var entry={id:entryId,month:sm,year:sy,label:MS[sm]+' '+sy,payDate:ds(pr.payDate),payDateLong:fdl(pr.payDate),payDateMoved:pr.moved,payDateReason:pr.moved?movedReason(pr.original):'',payDayUsed:payDay,salary:sal,togExpenses:$('tog-expenses').checked,workExpenses:parseFloat($('work-expenses').value)||0,togMileage:$('tog-mileage').checked,miles:parseFloat($('miles').value)||0,togOvertime:$('tog-overtime').checked,overtime:parseFloat($('overtime').value)||0,takeHome:Math.round(lastTakeHome*100)/100,mileage:Math.round(lastMileage*100)/100,outgoings:Math.round(tp*100)/100,freeMoney:Math.round((lastTakeHome+lastMileage-tp)*100)/100,pots:pots.filter(function(p){return p.name||(parseFloat(p.amount)||0)>0;}).map(function(p){return{name:p.name||'Unnamed',amount:parseFloat(p.amount)||0,account:p.account||'',target:parseFloat(p.target)||0};})};if(editingId){financeHistory=financeHistory.map(function(e){return e.id===editingId?entry:e;});}else{financeHistory.unshift(entry);}editingId=null;persistHL();if(currentUser){try{await setDoc(doc(db,'users',currentUser.uid,'months',String(entry.id)),entry);}catch(e){}}clearTracker();showDashboard();toast('Saved '+entry.label);}
 
 function clearTracker(){pots=[];renderPots();$('salary').value='';$('work-expenses').value='';$('miles').value='';$('overtime').value='';$('tog-expenses').checked=false;$('tog-mileage').checked=false;$('tog-overtime').checked=false;$('sec-expenses').classList.remove('open');$('sec-mileage').classList.remove('open');$('sec-overtime').classList.remove('open');lastTakeHome=0;lastMileage=0;saveLocal();var n=new Date();$('pick-month').value=n.getMonth();$('pick-year').value=n.getFullYear();updPD();}
 
 // ===== DASHBOARD =====
-function renderDashboard(){renderOverview();renderCharts();renderDashHistory();}
+function renderDashboard(){renderOverview();renderCountdown();renderCharts();renderSavings();renderYTD();renderDashHistory();}
 
-function renderOverview(){var el=$('dash-overview');if(!financeHistory.length){el.innerHTML='<div class="card" style="text-align:center;padding:32px"><h2 style="margin-bottom:8px">Welcome!</h2><p style="color:var(--text-secondary)">Click "New Month" to add your first month and start tracking your finances.</p></div>';return;}var h=financeHistory[0],cls=h.freeMoney>=0?'positive':'negative';el.innerHTML='<div class="dash-overview"><div class="dash-stat"><div class="stat-label">Take-Home Pay</div><div class="stat-value">'+fmt(h.takeHome)+'</div></div><div class="dash-stat"><div class="stat-label">Total Outgoings</div><div class="stat-value">'+fmt(h.outgoings)+'</div></div><div class="dash-stat"><div class="stat-label">Free Money</div><div class="stat-value '+cls+'">'+(h.freeMoney<0?'−':'')+fmt(h.freeMoney)+'</div></div><div class="dash-stat"><div class="stat-label">Mileage Claimed</div><div class="stat-value">'+fmt(h.mileage)+'</div></div></div>';}
+// ===== PAYDAY COUNTDOWN =====
+function renderCountdown(){var el=$('dash-countdown');if(!el)return;var now=new Date();now.setHours(0,0,0,0);var y=now.getFullYear(),m=now.getMonth();var pd=getPD(y,m).payDate;pd.setHours(0,0,0,0);if(pd<now){var nx=getNextPD(y,m).payDate;nx.setHours(0,0,0,0);var daysAgo=Math.round((now-pd)/86400000);if(daysAgo<=3){el.innerHTML='<div class="countdown-card cd-today"><span class="cd-icon">🎉</span><div class="cd-main"><div class="cd-title">Payday was '+daysAgo+' day'+(daysAgo===1?'':'s')+' ago</div><div class="cd-date">Next payday: '+fdl(nx)+'</div></div></div>';return;}pd=nx;}var days=Math.round((pd-now)/86400000);if(days===0){el.innerHTML='<div class="countdown-card cd-today"><span class="cd-icon">🎉</span><div class="cd-main"><div class="cd-title">It\'s payday today! 🎉</div><div class="cd-date">'+fdl(pd)+'</div></div></div>';return;}el.innerHTML='<div class="countdown-card"><span class="cd-icon"><i class="ti ti-calendar-event"></i></span><div class="cd-main"><div class="cd-title">Payday in '+days+' day'+(days===1?'':'s')+'</div><div class="cd-date">'+fdl(pd)+'</div></div></div>';}
+
+function renderOverview(){var el=$('dash-overview');if(!financeHistory.length){el.innerHTML='<div class="card" style="text-align:center;padding:32px"><h2 style="margin-bottom:8px">Welcome!</h2><p style="color:var(--text-secondary)">Click "New Month" to add your first month and start tracking your finances.</p></div>';return;}var h=financeHistory[0],cls=h.freeMoney>=0?'positive':'negative';var bh='';var withT=(h.pots||[]).filter(function(p){return(parseFloat(p.target)||0)>0;});if(withT.length){var onTrack=0,near=0,over=0;withT.forEach(function(p){var a=parseFloat(p.amount)||0,t=parseFloat(p.target)||0,pct=a/t*100;if(a>t)over++;else if(pct>=90)near++;else onTrack++;});bh='<div class="dash-stat"><div class="stat-label">Budget Health</div><div class="stat-value" style="font-size:1rem"><span style="color:var(--green)">'+onTrack+' on track</span> · <span style="color:var(--amber)">'+near+' near</span> · <span style="color:var(--red)">'+over+' over</span></div></div>';}el.innerHTML='<div class="dash-overview"><div class="dash-stat"><div class="stat-label">Take-Home Pay</div><div class="stat-value">'+fmt(h.takeHome)+'</div></div><div class="dash-stat"><div class="stat-label">Total Outgoings</div><div class="stat-value">'+fmt(h.outgoings)+'</div></div><div class="dash-stat"><div class="stat-label">Free Money</div><div class="stat-value '+cls+'">'+(h.freeMoney<0?'−':'')+fmt(h.freeMoney)+'</div></div><div class="dash-stat"><div class="stat-label">Mileage Claimed</div><div class="stat-value">'+fmt(h.mileage)+'</div></div>'+bh+'</div>';}
 
 function renderCharts(){var C=window.Chart;if(!C||!financeHistory.length)return;
+  var tc=chartTextColor(),gc=chartGridColor();
   // Take-home bar chart — last 12, oldest first
   var last12=financeHistory.slice(0,12).reverse();
   var labels=last12.map(function(h){return MS[h.month]+' '+String(h.year).slice(2);});
   var thData=last12.map(function(h){return h.takeHome;});
   var barColors=last12.map(function(h){return h.freeMoney>100?'#0d904f':h.freeMoney>=0?'#e37400':'#c5221f';});
   if(chartTH)chartTH.destroy();
-  chartTH=new C($('chart-takehome'),{type:'bar',data:{labels:labels,datasets:[{data:thData,backgroundColor:barColors,borderRadius:4}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return'£'+c.raw.toLocaleString('en-GB',{minimumFractionDigits:2});}}}},scales:{y:{beginAtZero:true,ticks:{callback:function(v){return'£'+v.toLocaleString();}}},x:{grid:{display:false}}}}});
+  chartTH=new C($('chart-takehome'),{type:'bar',data:{labels:labels,datasets:[{data:thData,backgroundColor:barColors,borderRadius:4}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return'£'+c.raw.toLocaleString('en-GB',{minimumFractionDigits:2});}}}},scales:{y:{beginAtZero:true,ticks:{color:tc,callback:function(v){return'£'+v.toLocaleString();}},grid:{color:gc}},x:{grid:{display:false},ticks:{color:tc}}}}});
 
   // Spending donut — most recent month's pots
   var latest=financeHistory[0];
@@ -620,7 +728,7 @@ function renderCharts(){var C=window.Chart;if(!C||!financeHistory.length)return;
     var pLabels=latest.pots.map(function(p){return p.name;});
     var pData=latest.pots.map(function(p){return p.amount;});
     var colors=['#1a73e8','#0d904f','#e37400','#c5221f','#8430ce','#00897b','#d81b60','#546e7a','#ff6d00','#2962ff'];
-    chartSpend=new C($('chart-spending'),{type:'doughnut',data:{labels:pLabels,datasets:[{data:pData,backgroundColor:colors.slice(0,pData.length)}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}},tooltip:{callbacks:{label:function(c){var total=c.dataset.data.reduce(function(a,b){return a+b;},0);var pct=total>0?Math.round(c.raw/total*100):0;return c.label+': £'+c.raw.toLocaleString('en-GB',{minimumFractionDigits:2})+' ('+pct+'%)';}}}}}}); }
+    chartSpend=new C($('chart-spending'),{type:'doughnut',data:{labels:pLabels,datasets:[{data:pData,backgroundColor:colors.slice(0,pData.length)}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:tc,boxWidth:12,font:{size:11}}},tooltip:{callbacks:{label:function(c){var total=c.dataset.data.reduce(function(a,b){return a+b;},0);var pct=total>0?Math.round(c.raw/total*100):0;return c.label+': £'+c.raw.toLocaleString('en-GB',{minimumFractionDigits:2})+' ('+pct+'%)';}}}}}}); }
   else{$('chart-spending').parentElement.innerHTML='<h3 style="font-size:0.9rem;font-weight:600;color:var(--text-secondary);margin-bottom:12px">Spending Breakdown</h3><p class="history-empty">No pots recorded</p>';}
 
   // Free money line chart
@@ -628,11 +736,98 @@ function renderCharts(){var C=window.Chart;if(!C||!financeHistory.length)return;
   var fLabels=all.map(function(h){return MS[h.month]+' '+String(h.year).slice(2);});
   var fData=all.map(function(h){return h.freeMoney;});
   if(chartFree)chartFree.destroy();
-  chartFree=new C($('chart-free'),{type:'line',data:{labels:fLabels,datasets:[{data:fData,borderColor:'#1a73e8',backgroundColor:'rgba(26,115,232,0.1)',fill:true,tension:0.3,pointRadius:4,pointBackgroundColor:fData.map(function(v){return v>=0?'#0d904f':'#c5221f';})}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return'£'+c.raw.toLocaleString('en-GB',{minimumFractionDigits:2});}}}},scales:{y:{ticks:{callback:function(v){return'£'+v.toLocaleString();}},grid:{color:function(c){return c.tick.value===0?'rgba(0,0,0,0.3)':'rgba(0,0,0,0.06)';},lineWidth:function(c){return c.tick.value===0?2:1;}}},x:{grid:{display:false}}}}});}
+  chartFree=new C($('chart-free'),{type:'line',data:{labels:fLabels,datasets:[{data:fData,borderColor:'#1a73e8',backgroundColor:'rgba(26,115,232,0.1)',fill:true,tension:0.3,pointRadius:4,pointBackgroundColor:fData.map(function(v){return v>=0?'#0d904f':'#c5221f';})}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return'£'+c.raw.toLocaleString('en-GB',{minimumFractionDigits:2});}}}},scales:{y:{ticks:{color:tc,callback:function(v){return'£'+v.toLocaleString();}},grid:{color:function(c){return c.tick.value===0?chartZeroColor():gc;},lineWidth:function(c){return c.tick.value===0?2:1;}}},x:{grid:{display:false},ticks:{color:tc}}}}});
+
+  renderStackedChart(tc,gc);
+}
+
+// ===== STACKED SPENDING CHART =====
+function renderStackedChart(tc,gc){var C=window.Chart;var wrap=$('chart-stacked-wrap');if(!wrap)return;var last12=financeHistory.slice(0,12).reverse();if(chartStacked){chartStacked.destroy();chartStacked=null;}if(last12.length<2){wrap.innerHTML='<h3>Spending by Category</h3><p class="history-empty">Save at least 2 months to see your spending by category over time.</p>';return;}
+  if(!$('chart-stacked')){wrap.innerHTML='<h3>Spending by Category</h3><canvas id="chart-stacked"></canvas>';}
+  var labels=last12.map(function(h){return MS[h.month]+' '+String(h.year).slice(2);});
+  var groupOrder=[];ACCOUNT_GROUPS.forEach(function(g){groupOrder.push(g[0]);});groupOrder.push('Direct Payment');groupOrder.push('Unassigned');
+  var datasets=[];groupOrder.forEach(function(gn){var data=last12.map(function(h){var sum=0;(h.pots||[]).forEach(function(p){if(groupForPot(p)===gn)sum+=(parseFloat(p.amount)||0);});return sum;});if(data.some(function(v){return v>0;}))datasets.push({label:gn,data:data,backgroundColor:GROUP_COLORS[gn]||'#9e9e9e'});});
+  chartStacked=new C($('chart-stacked'),{type:'bar',data:{labels:labels,datasets:datasets},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:tc,boxWidth:12,font:{size:11}}},tooltip:{callbacks:{label:function(c){return c.dataset.label+': £'+c.raw.toLocaleString('en-GB',{minimumFractionDigits:2});}}}},scales:{x:{stacked:true,grid:{display:false},ticks:{color:tc}},y:{stacked:true,beginAtZero:true,ticks:{color:tc,callback:function(v){return'£'+v.toLocaleString();}},grid:{color:gc}}}}});
+}
 
 window._viewE=viewEntry;window._delE=deleteEntry;window._loadT=loadTemplate;window._editE=editEntry;window._renderDash=renderDashboard;window._showTracker=showTracker;window._finHist=function(v){if(v)financeHistory=v;return financeHistory;};
 
+// ===== SAVINGS RATE =====
+function monthSavings(h){var s=0;(h.pots||[]).forEach(function(p){if(isSavingsPot(p))s+=(parseFloat(p.amount)||0);});return s;}
+function renderSavings(){var el=$('dash-savings');if(!el)return;var any=financeHistory.some(function(h){return monthSavings(h)>0;});if(!financeHistory.length||!any){el.innerHTML='<div class="card"><h2>Savings Rate</h2><p class="history-empty">No savings pots found yet. Add a pot named "Savings" or assign one to a savings category to track your savings rate.</p></div>';if(chartSavings){chartSavings.destroy();chartSavings=null;}return;}
+  var all=financeHistory.slice().reverse();
+  var rates=all.map(function(h){var sv=monthSavings(h);var th=h.takeHome||0;return th>0?(sv/th*100):0;});
+  var nonZero=rates.filter(function(r){return r>0;});
+  var cur=rates[rates.length-1]||0;var avg=nonZero.length?nonZero.reduce(function(a,b){return a+b;},0)/nonZero.length:0;var high=rates.length?Math.max.apply(null,rates):0;
+  el.innerHTML='<div class="card"><h2>Savings Rate</h2><div class="metric-grid">'+
+    '<div class="metric-stat"><div class="stat-label">Current Rate</div><div class="stat-value positive">'+cur.toFixed(1)+'%</div></div>'+
+    '<div class="metric-stat"><div class="stat-label">Average Rate</div><div class="stat-value">'+avg.toFixed(1)+'%</div></div>'+
+    '<div class="metric-stat"><div class="stat-label">Highest Rate</div><div class="stat-value positive">'+high.toFixed(1)+'%</div></div>'+
+    '</div><canvas id="chart-savings" style="max-height:220px"></canvas></div>';
+  var C=window.Chart;if(!C)return;var tc=chartTextColor(),gc=chartGridColor();var labels=all.map(function(h){return MS[h.month]+' '+String(h.year).slice(2);});var target=labels.map(function(){return 20;});
+  if(chartSavings)chartSavings.destroy();
+  chartSavings=new C($('chart-savings'),{type:'line',data:{labels:labels,datasets:[{label:'Savings rate',data:rates,borderColor:'#0d904f',backgroundColor:'rgba(13,144,79,0.1)',fill:true,tension:0.3,pointRadius:3},{label:'20% target',data:target,borderColor:'#e37400',borderDash:[6,4],pointRadius:0,fill:false}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:tc,boxWidth:12,font:{size:11}}},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+c.raw.toFixed(1)+'%';}}}},scales:{y:{beginAtZero:true,ticks:{color:tc,callback:function(v){return v+'%';}},grid:{color:gc}},x:{grid:{display:false},ticks:{color:tc}}}}});}
+
+// ===== YEAR TO DATE =====
+function taxYearStart(d){var y=d.getFullYear();var start=new Date(y,3,6);if(d<start)start=new Date(y-1,3,6);return start;}
+function inTaxYear(h,start){var end=new Date(start.getFullYear()+1,3,5);var hd=new Date(h.year,h.month,15);return hd>=new Date(start.getFullYear(),start.getMonth(),1)&&hd<=end;}
+function ytdMonths(){var start=taxYearStart(new Date());return financeHistory.filter(function(h){return inTaxYear(h,start);});}
+function renderYTD(){var el=$('dash-ytd');if(!el)return;var start=taxYearStart(new Date());var months=ytdMonths();var tyLabel=start.getFullYear()+'/'+String(start.getFullYear()+1).slice(2);if(months.length<1){el.innerHTML='<div class="card"><h2>Year to Date ('+tyLabel+')</h2><p class="history-empty">No saved months in the current tax year yet (6 Apr '+start.getFullYear()+' – 5 Apr '+(start.getFullYear()+1)+').</p></div>';return;}
+  var tot={gross:0,tax:0,ni:0,th:0,miles:0,mileage:0,out:0,saved:0,free:0};
+  months.forEach(function(h){var g=(h.salary||0)/12+(h.togOvertime?(h.overtime||0):0);tot.gross+=g;tot.tax+=cTax(h.salary||0)/12;tot.ni+=cNI(h.salary||0)/12;tot.th+=h.takeHome||0;tot.miles+=h.togMileage?(h.miles||0):0;tot.mileage+=h.mileage||0;tot.out+=h.outgoings||0;tot.saved+=monthSavings(h);tot.free+=h.freeMoney||0;});
+  var avgFree=tot.free/months.length;
+  el.innerHTML='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><h2 style="margin:0">Year to Date ('+tyLabel+')</h2><button class="btn btn-outline" id="ytd-export-btn"><i class="ti ti-file-spreadsheet"></i> Export</button></div><div class="metric-grid cols-4" style="margin-top:14px">'+
+    '<div class="metric-stat"><div class="stat-label">Total Gross</div><div class="stat-value">'+fmt(tot.gross)+'</div></div>'+
+    '<div class="metric-stat"><div class="stat-label">Total Tax</div><div class="stat-value negative">'+fmt(tot.tax)+'</div></div>'+
+    '<div class="metric-stat"><div class="stat-label">Total NI</div><div class="stat-value negative">'+fmt(tot.ni)+'</div></div>'+
+    '<div class="metric-stat"><div class="stat-label">Total Take-Home</div><div class="stat-value">'+fmt(tot.th)+'</div></div>'+
+    '<div class="metric-stat"><div class="stat-label">Total Miles</div><div class="stat-value">'+tot.miles.toLocaleString('en-GB')+'</div></div>'+
+    '<div class="metric-stat"><div class="stat-label">Mileage Value</div><div class="stat-value">'+fmt(tot.mileage)+'</div></div>'+
+    '<div class="metric-stat"><div class="stat-label">Total Outgoings</div><div class="stat-value">'+fmt(tot.out)+'</div></div>'+
+    '<div class="metric-stat"><div class="stat-label">Total Saved</div><div class="stat-value positive">'+fmt(tot.saved)+'</div></div>'+
+    '<div class="metric-stat"><div class="stat-label">Avg Free Money</div><div class="stat-value '+(avgFree>=0?'positive':'negative')+'">'+(avgFree<0?'−':'')+fmt(avgFree)+'</div></div>'+
+    '</div><p class="section-note">Based on your saved months — figures are estimates based on your inputs.</p></div>';
+  var eb=$('ytd-export-btn');if(eb)eb.addEventListener('click',function(){exportYTDExcel();});}
+
 function renderDashHistory(){var el=$('dash-history');if(!financeHistory.length){el.innerHTML='<p class="history-empty">No saved months yet.</p>';return;}var h='';financeHistory.forEach(function(e){var cls=e.freeMoney>=0?'positive':'negative',fs=(e.freeMoney<0?'−':'')+fmt(e.freeMoney);h+='<div class="dash-history-row" onclick="window._viewE('+e.id+')"><div class="dh-main"><div class="dh-month">'+esc(MF[e.month]+' '+e.year)+'</div><div class="dh-paydate">Paid: '+esc(e.payDateLong||e.payDate)+'</div><div class="dh-stats"><span>Take-home: '+fmt(e.takeHome)+'</span><span>Out: '+fmt(e.outgoings)+'</span>'+(e.mileage>0?'<span>Mileage: '+fmt(e.mileage)+'</span>':'')+'</div></div><div class="dh-free '+cls+'">'+fs+'</div><div class="dh-actions"><button class="btn btn-outline" onclick="event.stopPropagation();window._editE('+e.id+')" title="Edit month">Edit</button><button class="btn btn-danger" onclick="event.stopPropagation();window._delE('+e.id+')" title="Delete">×</button></div></div>';});el.innerHTML=h;}
+
+// ===== SALARY CALCULATOR =====
+function openSalCalc(){var cur='';if(financeHistory.length&&financeHistory[0].salary)cur=financeHistory[0].salary;$('salcalc-current').value=cur;$('salcalc-proposed').value='';renderSalCalc();$('salcalc-modal').classList.add('open');}
+function salCalcCol(sal){var tax=cTax(sal),ni=cNI(sal),net=sal-tax-ni;return{gross:sal/12,tax:tax/12,ni:ni/12,th:net/12,eff:sal>0?((tax+ni)/sal*100):0,annualNet:net};}
+function renderSalCalc(){var a=parseFloat($('salcalc-current').value)||0,b=parseFloat($('salcalc-proposed').value)||0;var ca=salCalcCol(a),cb=salCalcCol(b);var diffMonthly=cb.th-ca.th,diffAnnual=cb.annualNet-ca.annualNet;var h='<table class="salcalc-table"><thead><tr><th></th><th>Current</th><th>Proposed</th></tr></thead><tbody>'+
+  '<tr><td>Monthly gross</td><td>'+fmt(ca.gross)+'</td><td>'+fmt(cb.gross)+'</td></tr>'+
+  '<tr><td>Monthly tax</td><td>'+fmt(ca.tax)+'</td><td>'+fmt(cb.tax)+'</td></tr>'+
+  '<tr><td>Monthly NI</td><td>'+fmt(ca.ni)+'</td><td>'+fmt(cb.ni)+'</td></tr>'+
+  '<tr><td>Monthly take-home</td><td><strong>'+fmt(ca.th)+'</strong></td><td><strong>'+fmt(cb.th)+'</strong></td></tr>'+
+  '<tr><td>Effective deduction rate</td><td>'+ca.eff.toFixed(1)+'%</td><td>'+cb.eff.toFixed(1)+'%</td></tr>'+
+  '<tr class="salcalc-diff"><td>Extra take-home / month</td><td colspan="2" style="text-align:right">'+(diffMonthly>=0?'+':'−')+fmt(diffMonthly)+'</td></tr>'+
+  '<tr class="salcalc-diff"><td>Extra take-home / year</td><td colspan="2" style="text-align:right">'+(diffAnnual>=0?'+':'−')+fmt(diffAnnual)+'</td></tr>'+
+  '</tbody></table>';$('salcalc-result').innerHTML=h;}
+
+// ===== EXPORT (EXCEL / PDF) =====
+function exportMonthExcel(id){var h=financeHistory.find(function(e){return e.id===id;});if(!h||!window.XLSX){toast('Export unavailable');return;}var wb=XLSX.utils.book_new();
+  var summary=[['Month',MF[h.month]+' '+h.year],['Pay date',h.payDateLong||h.payDate],['Gross salary (annual)',h.salary],['Take-home',h.takeHome],['Mileage',h.mileage],['Outgoings',h.outgoings],['Free money',h.freeMoney]];
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(summary),'Summary');
+  var potRows=[['Pot','Amount','Budget','Account']];(h.pots||[]).forEach(function(p){potRows.push([p.name,p.amount,p.target||'',p.account||'']);});
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(potRows),'Pots');
+  XLSX.writeFile(wb,'finance-tracker-'+MS[h.month].toLowerCase()+'-'+h.year+'.xlsx');}
+function exportYTDExcel(){if(!window.XLSX){toast('Export unavailable');return;}var start=taxYearStart(new Date());var months=ytdMonths();if(!months.length){toast('No months in this tax year');return;}var wb=XLSX.utils.book_new();
+  var sorted=months.slice().sort(function(a,b){return new Date(a.year,a.month)-new Date(b.year,b.month);});
+  var rows=[['Month','Take-Home','Mileage','Outgoings','Free Money']];var t={th:0,mi:0,out:0,fr:0};sorted.forEach(function(h){rows.push([MF[h.month]+' '+h.year,h.takeHome,h.mileage,h.outgoings,h.freeMoney]);t.th+=h.takeHome||0;t.mi+=h.mileage||0;t.out+=h.outgoings||0;t.fr+=h.freeMoney||0;});rows.push(['TOTAL',t.th,t.mi,t.out,t.fr]);
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Tax Year',start.getFullYear()+'/'+String(start.getFullYear()+1).slice(2)]]),'Summary');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rows),'Months');
+  XLSX.writeFile(wb,'finance-tracker-ytd-'+start.getFullYear()+'.xlsx');}
+function exportMonthPDF(id){var h=financeHistory.find(function(e){return e.id===id;});if(!h||!window.jspdf){toast('Export unavailable');return;}var jsPDF=window.jspdf.jsPDF;var d=new jsPDF();var y=18;
+  d.setFontSize(18);d.text('Finance Tracker — '+MF[h.month]+' '+h.year,14,y);y+=8;
+  d.setFontSize(10);d.setTextColor(120);d.text('Pay date: '+(h.payDateLong||h.payDate),14,y);y+=10;d.setTextColor(0);
+  function sec(title){d.setFontSize(12);d.setFont(undefined,'bold');d.text(title,14,y);d.setFont(undefined,'normal');y+=6;d.setFontSize(10);}
+  function line(l,v){d.text(l,16,y);d.text(v,190,y,{align:'right'});y+=6;}
+  sec('Pay Information');line('Gross salary (annual)',fmt(h.salary));line('Take-home pay',fmt(h.takeHome));if(h.mileage>0)line('Mileage (tax-free)',fmt(h.mileage));y+=2;
+  sec('Income Breakdown');if(h.togExpenses&&h.workExpenses>0)line('Work expenses',fmt(h.workExpenses));if(h.togMileage&&h.miles>0)line('Business miles',h.miles+' miles');if(h.togOvertime&&h.overtime>0)line('Overtime / bonus',fmt(h.overtime));y+=2;
+  sec('Pots');(h.pots||[]).forEach(function(p){var l=p.name+(p.target?' (budget '+fmt(p.target)+')':'');line(l,fmt(p.amount));if(y>270){d.addPage();y=18;}});y+=2;
+  sec('Summary');line('Total outgoings',fmt(h.outgoings));line('Free money',(h.freeMoney<0?'−':'')+fmt(h.freeMoney));
+  d.save('finance-tracker-'+MS[h.month].toLowerCase()+'-'+h.year+'.pdf');}
+window._xlMonth=exportMonthExcel;window._pdfMonth=exportMonthPDF;window._xlYTD=exportYTDExcel;
 
 // ===== HISTORY DETAIL MODAL =====
 function buildAccountsBreakdown(potsList){var g={},dp=[],un=[];potsList.forEach(function(p){var a=parseFloat(p.amount)||0;if(!p.name&&a===0)return;var n=p.name||'Unnamed pot';if(p.account==='Direct Payment')dp.push({name:n,amount:a});else if(p.account){if(!g[p.account])g[p.account]={items:[],total:0};g[p.account].items.push({name:n,amount:a});g[p.account].total+=a;}else un.push({name:n,amount:a});});var html='',gt=0;if(dp.length){var t=dp.reduce(function(s,i){return s+i.amount;},0);gt+=t;html+='<div class="account-group" style="border-left:3px solid var(--red);background:var(--red-bg)"><div class="account-group-header"><span class="account-group-name" style="color:var(--red)">Pay Immediately</span><span class="account-group-total" style="color:var(--red)">'+fmt(t)+'</span></div><div class="account-group-items">';dp.forEach(function(i){html+='<div><span>'+esc(i.name)+'</span><span>'+fmt(i.amount)+'</span></div>';});html+='</div></div>';}
@@ -640,22 +835,22 @@ ACCOUNT_GROUPS.forEach(function(grp){var gName=grp[0],gItems=grp[1],groupTotal=0
 var usedCats={};ACCOUNT_GROUPS.forEach(function(gr){gr[1].forEach(function(a){usedCats[a]=true;});});var otherPots=[];Object.keys(g).forEach(function(k){if(!usedCats[k]){otherPots=otherPots.concat(g[k].items);gt+=g[k].total;}});if(otherPots.length){var ot2=otherPots.reduce(function(s,i){return s+i.amount;},0);html+='<div class="account-group"><div class="account-group-header"><span class="account-group-name">Other</span><span class="account-group-total">'+fmt(ot2)+'</span></div><div class="account-group-items">';otherPots.forEach(function(i){html+='<div><span>'+esc(i.name)+'</span><span>'+fmt(i.amount)+'</span></div>';});html+='</div></div>';}
 if(un.length){var t=un.reduce(function(s,i){return s+i.amount;},0);gt+=t;html+='<div class="account-group"><div class="account-group-header"><span class="account-group-name" style="color:var(--text-secondary)">Main Account / Unassigned</span><span class="account-group-total">'+fmt(t)+'</span></div><div class="account-group-items">';un.forEach(function(i){html+='<div><span>'+esc(i.name)+'</span><span>'+fmt(i.amount)+'</span></div>';});html+='</div></div>';}if(html)html+='<div class="account-grand-total"><span>Total Outgoings</span><span>'+fmt(gt)+'</span></div>';return html;}
 
-function viewEntry(id){var h=financeHistory.find(function(e){return e.id===id;});if(!h)return;var b=$('detail-modal-body');var html='<h2>'+esc(MF[h.month]+' '+h.year)+'</h2>';html+='<div class="paydate-card" style="margin:12px 0 16px;box-shadow:none"><div class="paydate-date" style="font-size:1.1rem;margin:0">'+esc(h.payDateLong||h.payDate)+'</div>';if(h.payDateMoved&&h.payDateReason)html+='<div class="paydate-note">'+esc(h.payDateReason)+'</div>';html+='</div>';html+=h.freeMoney>=0?'<div class="banner banner-green" style="font-size:1rem;padding:12px">'+fmt(h.freeMoney)+' free money</div>':'<div class="banner banner-red" style="font-size:1rem;padding:12px">'+fmt(h.freeMoney)+' over budget</div>';html+='<div class="summary-grid" style="margin-bottom:12px">'+st('Salary',fmt(h.salary)+'/yr')+st('Take-Home',fmt(h.takeHome))+st('Mileage',fmt(h.mileage))+st('Outgoings',fmt(h.outgoings))+'</div>';if(h.togExpenses||h.togMileage||h.togOvertime){html+='<div class="account-group" style="margin-bottom:12px"><div style="font-weight:600;margin-bottom:6px">Adjustments</div><div class="account-group-items">';if(h.togExpenses&&h.workExpenses>0)html+='<div><span>Work expenses</span><span>'+fmt(h.workExpenses)+'</span></div>';if(h.togMileage&&h.miles>0)html+='<div><span>Mileage ('+h.miles+' miles × 55p)</span><span>'+fmt(h.mileage)+'</span></div>';if(h.togOvertime&&h.overtime>0)html+='<div><span>Overtime / bonus (gross)</span><span>'+fmt(h.overtime)+'</span></div>';html+='</div></div>';}if(h.pots&&h.pots.length){var acctHtml=buildAccountsBreakdown(h.pots);if(acctHtml){html+='<div style="font-weight:700;font-size:0.95rem;margin-bottom:8px">Account Breakdown</div>'+acctHtml;}}html+='<div class="action-row" style="margin-top:16px"><button class="btn btn-primary" onclick="window._editE('+h.id+')">Edit Month</button><button class="btn btn-outline" onclick="window._loadT('+h.id+')">Use as Template</button><button class="btn btn-danger-solid" onclick="window._delE('+h.id+')">Delete</button></div>';b.innerHTML=html;$('detail-modal').classList.add('open');}
+function viewEntry(id){var h=financeHistory.find(function(e){return e.id===id;});if(!h)return;var b=$('detail-modal-body');var html='<h2>'+esc(MF[h.month]+' '+h.year)+'</h2>';html+='<div class="paydate-card" style="margin:12px 0 16px;box-shadow:none"><div class="paydate-date" style="font-size:1.1rem;margin:0">'+esc(h.payDateLong||h.payDate)+'</div>';if(h.payDateMoved&&h.payDateReason)html+='<div class="paydate-note">'+esc(h.payDateReason)+'</div>';html+='</div>';html+=h.freeMoney>=0?'<div class="banner banner-green" style="font-size:1rem;padding:12px">'+fmt(h.freeMoney)+' free money</div>':'<div class="banner banner-red" style="font-size:1rem;padding:12px">'+fmt(h.freeMoney)+' over budget</div>';html+='<div class="summary-grid" style="margin-bottom:12px">'+st('Salary',fmt(h.salary)+'/yr')+st('Take-Home',fmt(h.takeHome))+st('Mileage',fmt(h.mileage))+st('Outgoings',fmt(h.outgoings))+'</div>';if(h.togExpenses||h.togMileage||h.togOvertime){html+='<div class="account-group" style="margin-bottom:12px"><div style="font-weight:600;margin-bottom:6px">Adjustments</div><div class="account-group-items">';if(h.togExpenses&&h.workExpenses>0)html+='<div><span>Work expenses</span><span>'+fmt(h.workExpenses)+'</span></div>';if(h.togMileage&&h.miles>0)html+='<div><span>Mileage ('+h.miles+' miles × 55p)</span><span>'+fmt(h.mileage)+'</span></div>';if(h.togOvertime&&h.overtime>0)html+='<div><span>Overtime / bonus (gross)</span><span>'+fmt(h.overtime)+'</span></div>';html+='</div></div>';}if(h.pots&&h.pots.length){var withTarget=h.pots.filter(function(p){return(parseFloat(p.target)||0)>0;});if(withTarget.length){html+='<div style="font-weight:700;font-size:0.95rem;margin:14px 0 8px">Budget Targets</div><div class="account-group"><div class="account-group-items">';withTarget.forEach(function(p){var a=parseFloat(p.amount)||0,t=parseFloat(p.target)||0;html+='<div style="display:block;padding:6px 0"><div style="display:flex;justify-content:space-between"><span>'+esc(p.name)+'</span><span>'+fmt(a)+' / '+fmt(t)+'</span></div>'+potProgressHTML(a,t)+'</div>';});html+='</div></div>';}var acctHtml=buildAccountsBreakdown(h.pots);if(acctHtml){html+='<div style="font-weight:700;font-size:0.95rem;margin:14px 0 8px">Account Breakdown</div>'+acctHtml;}}html+='<div class="action-row" style="margin-top:16px"><button class="btn btn-primary" onclick="window._editE('+h.id+')">Edit Month</button><button class="btn btn-outline" onclick="window._loadT('+h.id+')">Use as Template</button><button class="btn btn-danger-solid" onclick="window._delE('+h.id+')">Delete</button></div><div class="action-row"><button class="btn btn-outline" onclick="window._xlMonth('+h.id+')"><i class="ti ti-file-spreadsheet"></i> Excel</button><button class="btn btn-outline" onclick="window._pdfMonth('+h.id+')"><i class="ti ti-file-type-pdf"></i> PDF</button></div>';b.innerHTML=html;$('detail-modal').classList.add('open');}
 
 async function deleteEntry(id){var h=financeHistory.find(function(e){return e.id===id;});if(!h)return;if(!confirm('Delete '+MF[h.month]+' '+h.year+'?'))return;financeHistory=financeHistory.filter(function(e){return e.id!==id;});persistHL();if(currentUser){try{await deleteDoc(doc(db,'users',currentUser.uid,'months',String(id)));}catch(e){}}$('detail-modal').classList.remove('open');renderDashboard();toast('Deleted '+h.label);}
 
-function loadTemplate(id){var h=financeHistory.find(function(e){return e.id===id;});if(!h)return;editingId=null;$('salary').value=h.salary;pots=h.pots.map(function(p){return{name:p.name||'',amount:p.amount||'',account:p.account||''};});renderPots();$('work-expenses').value='';$('miles').value='';$('overtime').value='';$('tog-expenses').checked=false;$('tog-mileage').checked=false;$('tog-overtime').checked=false;$('sec-expenses').classList.remove('open');$('sec-mileage').classList.remove('open');$('sec-overtime').classList.remove('open');var n=new Date();$('pick-month').value=n.getMonth();$('pick-year').value=n.getFullYear();updPD();$('detail-modal').classList.remove('open');showTracker();calc();var b=$('template-banner');b.textContent='Template loaded from '+MF[h.month]+' '+h.year+' — salary and pots ready, fill in this month\'s adjustments';b.style.display='block';setTimeout(function(){b.style.display='none';},8000);}
+function loadTemplate(id){var h=financeHistory.find(function(e){return e.id===id;});if(!h)return;editingId=null;$('salary').value=h.salary;pots=h.pots.map(function(p){return{name:p.name||'',amount:p.amount||'',account:p.account||'',target:p.target||''};});renderPots();$('work-expenses').value='';$('miles').value='';$('overtime').value='';$('tog-expenses').checked=false;$('tog-mileage').checked=false;$('tog-overtime').checked=false;$('sec-expenses').classList.remove('open');$('sec-mileage').classList.remove('open');$('sec-overtime').classList.remove('open');var n=new Date();$('pick-month').value=n.getMonth();$('pick-year').value=n.getFullYear();updPD();$('detail-modal').classList.remove('open');showTracker();calc();var b=$('template-banner');b.textContent='Template loaded from '+MF[h.month]+' '+h.year+' — salary and pots ready, fill in this month\'s adjustments';b.style.display='block';setTimeout(function(){b.style.display='none';},8000);}
 
-function editEntry(id){var h=financeHistory.find(function(e){return e.id===id;});if(!h)return;editingId=id;$('salary').value=h.salary;pots=h.pots.map(function(p){return{name:p.name||'',amount:p.amount||'',account:p.account||''};});renderPots();if(h.togExpenses&&h.workExpenses>0){$('tog-expenses').checked=true;toggleSection('expenses');$('work-expenses').value=h.workExpenses;}else{$('tog-expenses').checked=false;$('sec-expenses').classList.remove('open');$('work-expenses').value='';}if(h.togMileage&&h.miles>0){$('tog-mileage').checked=true;toggleSection('mileage');$('miles').value=h.miles;}else{$('tog-mileage').checked=false;$('sec-mileage').classList.remove('open');$('miles').value='';}if(h.togOvertime&&h.overtime>0){$('tog-overtime').checked=true;toggleSection('overtime');$('overtime').value=h.overtime;}else{$('tog-overtime').checked=false;$('sec-overtime').classList.remove('open');$('overtime').value='';}$('pick-month').value=h.month;$('pick-year').value=h.year;updPD();$('detail-modal').classList.remove('open');showTracker();calc();var b=$('template-banner');b.textContent='Editing '+MF[h.month]+' '+h.year+' — make your changes then save';b.style.display='block';}
+function editEntry(id){var h=financeHistory.find(function(e){return e.id===id;});if(!h)return;editingId=id;$('salary').value=h.salary;pots=h.pots.map(function(p){return{name:p.name||'',amount:p.amount||'',account:p.account||'',target:p.target||''};});renderPots();if(h.togExpenses&&h.workExpenses>0){$('tog-expenses').checked=true;toggleSection('expenses');$('work-expenses').value=h.workExpenses;}else{$('tog-expenses').checked=false;$('sec-expenses').classList.remove('open');$('work-expenses').value='';}if(h.togMileage&&h.miles>0){$('tog-mileage').checked=true;toggleSection('mileage');$('miles').value=h.miles;}else{$('tog-mileage').checked=false;$('sec-mileage').classList.remove('open');$('miles').value='';}if(h.togOvertime&&h.overtime>0){$('tog-overtime').checked=true;toggleSection('overtime');$('overtime').value=h.overtime;}else{$('tog-overtime').checked=false;$('sec-overtime').classList.remove('open');$('overtime').value='';}$('pick-month').value=h.month;$('pick-year').value=h.year;updPD();$('detail-modal').classList.remove('open');showTracker();calc();var b=$('template-banner');b.textContent='Editing '+MF[h.month]+' '+h.year+' — make your changes then save';b.style.display='block';}
 
 // ===== PERSISTENCE =====
 function saveLocal(){try{localStorage.setItem('uk-finance-tracker',JSON.stringify({salary:$('salary').value,togExpenses:$('tog-expenses').checked,togMileage:$('tog-mileage').checked,togOvertime:$('tog-overtime').checked,workExpenses:$('work-expenses').value,miles:$('miles').value,overtime:$('overtime').value,pots:pots}));}catch(e){}}
 function persistHL(){try{localStorage.setItem('finance_history',JSON.stringify(financeHistory));}catch(e){}}
-function loadLocal(){try{var r=localStorage.getItem('uk-finance-tracker');if(r){var d=JSON.parse(r);if(d.salary)$('salary').value=d.salary;if(d.togExpenses){$('tog-expenses').checked=true;toggleSection('expenses');}if(d.togMileage){$('tog-mileage').checked=true;toggleSection('mileage');}if(d.togOvertime){$('tog-overtime').checked=true;toggleSection('overtime');}if(d.workExpenses)$('work-expenses').value=d.workExpenses;if(d.miles)$('miles').value=d.miles;if(d.overtime)$('overtime').value=d.overtime;if(d.pots&&d.pots.length){pots=d.pots.map(function(p){return{name:p.name||'',amount:p.amount||'',account:p.account||''};});renderPots();}}}catch(e){}try{var o=localStorage.getItem('uk-finance-history'),n=localStorage.getItem('finance_history');if(o&&!n){localStorage.setItem('finance_history',o);localStorage.removeItem('uk-finance-history');}var h=localStorage.getItem('finance_history');if(h)financeHistory=JSON.parse(h);}catch(e){}}
+function loadLocal(){try{var r=localStorage.getItem('uk-finance-tracker');if(r){var d=JSON.parse(r);if(d.salary)$('salary').value=d.salary;if(d.togExpenses){$('tog-expenses').checked=true;toggleSection('expenses');}if(d.togMileage){$('tog-mileage').checked=true;toggleSection('mileage');}if(d.togOvertime){$('tog-overtime').checked=true;toggleSection('overtime');}if(d.workExpenses)$('work-expenses').value=d.workExpenses;if(d.miles)$('miles').value=d.miles;if(d.overtime)$('overtime').value=d.overtime;if(d.pots&&d.pots.length){pots=d.pots.map(function(p){return{name:p.name||'',amount:p.amount||'',account:p.account||'',target:p.target||''};});renderPots();}}}catch(e){}try{var o=localStorage.getItem('uk-finance-history'),n=localStorage.getItem('finance_history');if(o&&!n){localStorage.setItem('finance_history',o);localStorage.removeItem('uk-finance-history');}var h=localStorage.getItem('finance_history');if(h)financeHistory=JSON.parse(h);}catch(e){}}
 
 // ===== FIRESTORE =====
 async function syncFS(){if(!currentUser)return;try{var snap=await getDocs(collection(db,'users',currentUser.uid,'months'));var entries=[];snap.forEach(function(d){entries.push(d.data());});var fsIds=new Set(entries.map(function(e){return e.id;}));var lo=financeHistory.filter(function(e){return!fsIds.has(e.id);});for(var i=0;i<lo.length;i++){entries.push(lo[i]);try{await setDoc(doc(db,'users',currentUser.uid,'months',String(lo[i].id)),lo[i]);}catch(e){}}if(entries.length>0||financeHistory.length===0){financeHistory=entries.sort(function(a,b){return b.id-a.id;});persistHL();renderDashboard();}}catch(e){console.error('Sync:',e);}}
-async function loadSettingsFS(){if(!currentUser)return;try{var s=await getDoc(doc(db,'users',currentUser.uid,'settings','config'));if(s.exists()&&s.data().payDay){payDay=s.data().payDay;localStorage.setItem('finance_payDay',payDay);$('payday-select').value=payDay;updPD();}}catch(e){}}
+async function loadSettingsFS(){if(!currentUser)return;try{var s=await getDoc(doc(db,'users',currentUser.uid,'settings','config'));if(s.exists()){var d=s.data();if(d.payDay){payDay=d.payDay;localStorage.setItem('finance_payDay',payDay);$('payday-select').value=payDay;updPD();}if(d.emailSummary){emailPrefs=d.emailSummary;localStorage.setItem('finance_email_prefs',JSON.stringify(emailPrefs));$('email-input').value=emailPrefs.email||'';$('email-toggle').checked=!!emailPrefs.enabled;}}}catch(e){}}
 
 // ===== AUTH =====
 function showAuth(){$('loading-screen').style.display='none';$('auth-screen').style.display='block';$('app-container').style.display='none';}
@@ -675,9 +870,20 @@ $('form-signin').addEventListener('submit',async function(ev){ev.preventDefault(
 $('form-signup').addEventListener('submit',async function(ev){ev.preventDefault();$('auth-error').style.display='none';var pw=$('signup-password').value,cp=$('signup-confirm').value;if(pw!==cp){showAuthErr('Passwords do not match');return;}try{await createUserWithEmailAndPassword(auth,$('signup-email').value,pw);}catch(e){showAuthErr(authErrMsg(e));}});
 $('signout-btn').addEventListener('click',async function(){await fbSignOut(auth);});
 
-onAuthStateChanged(auth,async function(user){if(user){currentUser=user;loadLocal();initMP();initPDS();showApp();$('user-display').textContent=user.displayName||user.email;showDashboard();await loadSettingsFS();await syncFS();}else{currentUser=null;showAuth();}});
+onAuthStateChanged(auth,async function(user){if(user){currentUser=user;loadLocal();loadEmailPrefs();initMP();initPDS();showApp();$('user-display').textContent=user.displayName||user.email;showDashboard();await loadSettingsFS();await syncFS();await maybeSendPaydayEmail();}else{currentUser=null;showAuth();}});
 
 // ===== EVENTS =====
+initTheme();
+$('theme-btn').addEventListener('click',toggleTheme);
+$('splash-theme-btn').addEventListener('click',toggleTheme);
+$('salcalc-btn').addEventListener('click',openSalCalc);
+$('close-salcalc-btn').addEventListener('click',function(){$('salcalc-modal').classList.remove('open');});
+$('salcalc-modal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
+$('salcalc-current').addEventListener('input',renderSalCalc);
+$('salcalc-proposed').addEventListener('input',renderSalCalc);
+$('email-input').addEventListener('change',saveEmailPrefs);
+$('email-toggle').addEventListener('change',saveEmailPrefs);
+$('email-test-btn').addEventListener('click',sendTestEmail);
 $('salary').addEventListener('input',calc);$('work-expenses').addEventListener('input',calc);$('miles').addEventListener('input',calc);$('overtime').addEventListener('input',calc);
 $('tog-expenses').addEventListener('change',function(){toggleSection('expenses');calc();});$('tog-mileage').addEventListener('change',function(){toggleSection('mileage');calc();});$('tog-overtime').addEventListener('change',function(){toggleSection('overtime');calc();});
 $('pick-month').addEventListener('change',updPD);$('pick-year').addEventListener('change',updPD);
@@ -691,7 +897,7 @@ $('close-accounts-btn').addEventListener('click',closeAccounts);$('accounts-moda
 $('close-detail-btn').addEventListener('click',function(){$('detail-modal').classList.remove('open');});$('detail-modal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
 $('settings-btn').addEventListener('click',function(){$('settings-modal').classList.add('open');});$('close-settings-btn').addEventListener('click',function(){$('settings-modal').classList.remove('open');});$('settings-modal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
 $('payday-select').addEventListener('change',onPDC);
-document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeAccounts();$('detail-modal').classList.remove('open');$('settings-modal').classList.remove('open');}});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeAccounts();$('detail-modal').classList.remove('open');$('settings-modal').classList.remove('open');$('salcalc-modal').classList.remove('open');}});
 
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./service-worker.js');
 </script>
