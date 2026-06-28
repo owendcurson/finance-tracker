@@ -10,6 +10,7 @@
 <link rel="icon" href="./icon-192.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./icon-192.svg">
 <title>UK Personal Finance Tracker 2026/27</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -21,15 +22,11 @@
 }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; min-height: 100vh; }
 .container { max-width: 720px; margin: 0 auto; padding: 16px; }
-h1 { font-size: 1.5rem; font-weight: 700; text-align: center; padding: 20px 0 4px; }
-.subtitle { text-align: center; color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 24px; }
 
-/* Loading */
+/* Loading & Auth */
 .loading-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; flex-direction: column; gap: 12px; color: var(--text-secondary); }
 .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-
-/* Auth screen */
 .auth-screen { display: none; min-height: 100vh; align-items: center; justify-content: center; padding: 16px; background: var(--bg); }
 .auth-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 32px; width: 100%; max-width: 400px; }
 .auth-card h2 { text-align: center; font-size: 1.3rem; margin-bottom: 4px; }
@@ -47,15 +44,77 @@ h1 { font-size: 1.5rem; font-weight: 700; text-align: center; padding: 20px 0 4p
 .auth-toggle { text-align: center; margin-top: 16px; font-size: 0.85rem; color: var(--text-secondary); }
 .auth-toggle a { color: var(--primary); cursor: pointer; text-decoration: none; font-weight: 500; }
 
-/* App header */
-.app-header { background: var(--navy); color: #fff; padding: 8px 16px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.82rem; flex-wrap: wrap; }
-.app-header .user-name { opacity: 0.85; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Header */
+.app-header { background: var(--navy); color: #fff; padding: 8px 16px; display: flex; align-items: center; gap: 8px; font-size: 0.82rem; flex-wrap: wrap; }
+.app-header .header-title { font-weight: 700; font-size: 0.9rem; }
+.app-header .user-name { opacity: 0.85; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: right; }
 .header-btn { background: rgba(255,255,255,0.15); border: none; color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 0.8rem; font-family: inherit; cursor: pointer; white-space: nowrap; }
 .header-btn:hover { background: rgba(255,255,255,0.25); }
 .header-icon { background: none; border: none; color: #fff; cursor: pointer; padding: 4px; font-size: 1.1rem; line-height: 1; opacity: 0.8; }
 .header-icon:hover { opacity: 1; }
+.header-back { display: none; background: none; border: none; color: #fff; cursor: pointer; padding: 4px 8px; font-size: 0.85rem; font-family: inherit; opacity: 0.85; }
+.header-back:hover { opacity: 1; }
 
-/* Steps */
+/* Shared */
+.card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; margin-bottom: 16px; }
+.card h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; }
+.card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 12px; color: var(--text-secondary); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 8px 16px; border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 500; font-family: inherit; cursor: pointer; transition: background 0.15s, transform 0.1s; }
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: #1557b0; }
+.btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text-secondary); }
+.btn-outline:hover { background: var(--bg); }
+.btn-danger { background: transparent; color: var(--red); padding: 8px; font-size: 1.1rem; line-height: 1; border-radius: 6px; }
+.btn-danger:hover { background: var(--red-bg); }
+.btn-danger-solid { background: var(--red); color: #fff; }
+.btn-danger-solid:hover { background: #a91b19; }
+.btn-success { background: var(--green); color: #fff; }
+.btn-success:hover { background: #0a7a42; }
+.btn-amber { background: var(--amber); color: #fff; }
+.btn-amber:hover { background: #c86500; }
+.btn-lg { padding: 14px 24px; font-size: 1.05rem; width: 100%; }
+.nav-row { display: flex; justify-content: space-between; margin-top: 16px; }
+.action-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--text); color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 0.9rem; font-weight: 500; z-index: 1000; opacity: 0; transition: transform 0.3s, opacity 0.3s; pointer-events: none; }
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+.history-empty { text-align: center; color: var(--text-secondary); padding: 24px; font-size: 0.9rem; }
+
+/* Dashboard */
+.dash-overview { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.dash-stat { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+.dash-stat .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 4px; }
+.dash-stat .stat-value { font-size: 1.3rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.dash-stat .stat-value.positive { color: var(--green); }
+.dash-stat .stat-value.negative { color: var(--red); }
+.chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.chart-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
+.chart-card h3 { font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 12px; }
+.chart-card canvas { width: 100% !important; max-height: 220px; }
+.chart-card-full canvas { max-height: 260px; }
+.dash-history-row { display: flex; align-items: center; gap: 8px; padding: 12px 0; border-bottom: 1px solid var(--bg); cursor: pointer; transition: background 0.1s; }
+.dash-history-row:hover { background: var(--bg); margin: 0 -24px; padding: 12px 24px; }
+.dash-history-row:last-child { border-bottom: none; }
+.dh-main { flex: 1; min-width: 0; }
+.dh-month { font-weight: 600; font-size: 0.95rem; }
+.dh-paydate { font-size: 0.78rem; color: var(--text-secondary); }
+.dh-stats { display: flex; gap: 12px; font-size: 0.82rem; color: var(--text-secondary); margin-top: 2px; }
+.dh-free { font-weight: 700; font-size: 1rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.dh-free.positive { color: var(--green); }
+.dh-free.negative { color: var(--red); }
+.dh-actions { display: flex; gap: 4px; flex-shrink: 0; }
+.dh-actions .btn { font-size: 0.75rem; padding: 4px 10px; }
+
+/* Tracker */
+.banner { padding: 16px 20px; border-radius: var(--radius); font-weight: 600; font-size: 1.1rem; text-align: center; margin-bottom: 16px; }
+.banner-green { background: var(--green-bg); color: var(--green); border: 1.5px solid var(--green); }
+.banner-red { background: var(--red-bg); color: var(--red); border: 1.5px solid var(--red); }
+.banner-info { background: var(--primary-light); color: var(--primary); border: 1.5px solid var(--primary); padding: 12px 16px; border-radius: var(--radius); font-size: 0.9rem; font-weight: 500; margin-bottom: 16px; display: none; }
+.summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.summary-stat { background: var(--bg); border-radius: 8px; padding: 14px; }
+.summary-stat .stat-label { font-size: 0.78rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 4px; }
+.summary-stat .stat-value { font-size: 1.2rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+
 .steps-bar { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 28px; padding: 0 8px; }
 .step-item { display: flex; align-items: center; cursor: pointer; }
 .step-circle { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.9rem; border: 2px solid var(--border); color: var(--text-secondary); background: var(--card); transition: all 0.2s; flex-shrink: 0; }
@@ -64,10 +123,8 @@ h1 { font-size: 1.5rem; font-weight: 700; text-align: center; padding: 20px 0 4p
 .step-label { font-size: 0.75rem; color: var(--text-secondary); margin-left: 6px; white-space: nowrap; }
 .step-line { width: 40px; height: 2px; background: var(--border); margin: 0 8px; flex-shrink: 0; }
 .step-line.done { background: var(--green); }
-
-.card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; margin-bottom: 16px; }
-.card h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; }
-.card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 12px; color: var(--text-secondary); }
+.step-panel { display: none; }
+.step-panel.active { display: block; }
 
 .field { margin-bottom: 16px; }
 .field label { display: block; font-size: 0.85rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
@@ -102,54 +159,6 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
 .pot-row .input-wrap { width: 130px; flex-shrink: 0; }
 .pot-row select { width: 120px; flex-shrink: 0; padding: 10px 6px; font-size: 0.8rem; }
 
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 8px 16px; border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 500; font-family: inherit; cursor: pointer; transition: background 0.15s, transform 0.1s; }
-.btn:active { transform: scale(0.97); }
-.btn-primary { background: var(--primary); color: #fff; }
-.btn-primary:hover { background: #1557b0; }
-.btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text-secondary); }
-.btn-outline:hover { background: var(--bg); }
-.btn-danger { background: transparent; color: var(--red); padding: 8px; font-size: 1.1rem; line-height: 1; border-radius: 6px; }
-.btn-danger:hover { background: var(--red-bg); }
-.btn-danger-solid { background: var(--red); color: #fff; }
-.btn-danger-solid:hover { background: #a91b19; }
-.btn-success { background: var(--green); color: #fff; }
-.btn-success:hover { background: #0a7a42; }
-.btn-amber { background: var(--amber); color: #fff; }
-.btn-amber:hover { background: #c86500; }
-
-.nav-row { display: flex; justify-content: space-between; margin-top: 16px; }
-.banner { padding: 16px 20px; border-radius: var(--radius); font-weight: 600; font-size: 1.1rem; text-align: center; margin-bottom: 16px; }
-.banner-green { background: var(--green-bg); color: var(--green); border: 1.5px solid var(--green); }
-.banner-red { background: var(--red-bg); color: var(--red); border: 1.5px solid var(--red); }
-.banner-info { background: var(--primary-light); color: var(--primary); border: 1.5px solid var(--primary); padding: 12px 16px; border-radius: var(--radius); font-size: 0.9rem; font-weight: 500; margin-bottom: 16px; display: none; }
-
-.summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-.summary-stat { background: var(--bg); border-radius: 8px; padding: 14px; }
-.summary-stat .stat-label { font-size: 0.78rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 4px; }
-.summary-stat .stat-value { font-size: 1.2rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-.step-panel { display: none; }
-.step-panel.active { display: block; }
-.action-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--text); color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 0.9rem; font-weight: 500; z-index: 1000; opacity: 0; transition: transform 0.3s, opacity 0.3s; pointer-events: none; }
-.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-.history-empty { text-align: center; color: var(--text-secondary); padding: 24px; font-size: 0.9rem; }
-
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 900; display: flex; align-items: center; justify-content: center; padding: 16px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
-.modal-overlay.open { opacity: 1; pointer-events: auto; }
-.modal { background: var(--card); border-radius: var(--radius); box-shadow: 0 8px 30px rgba(0,0,0,0.15); width: 100%; max-width: 520px; max-height: 85vh; overflow-y: auto; padding: 28px; }
-.modal h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 6px; }
-.modal .modal-subtitle { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 20px; }
-.modal-close { float: right; background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text-secondary); padding: 0 4px; line-height: 1; }
-.modal-close:hover { color: var(--text); }
-
-.account-group { background: var(--bg); border-radius: 10px; padding: 16px; margin-bottom: 12px; }
-.account-group-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.account-group-name { font-weight: 700; font-size: 1rem; }
-.account-group-total { font-weight: 700; font-size: 1.1rem; font-variant-numeric: tabular-nums; color: var(--primary); }
-.account-group-items { font-size: 0.85rem; color: var(--text-secondary); }
-.account-group-items div { display: flex; justify-content: space-between; padding: 3px 0; }
-.account-grand-total { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: var(--primary-light); border-radius: 10px; font-weight: 700; font-size: 1.05rem; }
-
 .month-picker { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 24px; }
 .month-picker select { padding: 8px 12px; font-size: 0.95rem; font-weight: 500; }
 .month-picker .btn { padding: 8px 10px; font-size: 1rem; line-height: 1; }
@@ -163,51 +172,49 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
 .paydate-card .paydate-coverage { font-size: 0.85rem; color: var(--text-secondary); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
 .paydate-card .paydate-coverage strong { color: var(--text); }
 
-.history-card-item { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px 20px; margin-bottom: 10px; cursor: pointer; transition: box-shadow 0.15s; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.history-card-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
-.history-card-left { flex: 1; min-width: 0; }
-.history-card-month { font-weight: 700; font-size: 1rem; }
-.history-card-paydate { font-size: 0.8rem; color: var(--text-secondary); }
-.history-card-stats { display: flex; gap: 16px; font-size: 0.85rem; margin-top: 4px; }
-.history-card-stats span { font-variant-numeric: tabular-nums; }
-.history-card-free { font-weight: 700; font-size: 1.1rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.history-card-free.positive { color: var(--green); }
-.history-card-free.negative { color: var(--red); }
-.history-card-delete { flex-shrink: 0; }
-.view-history-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.85rem; font-weight: 500; color: var(--text-secondary); cursor: pointer; transition: background 0.15s; font-family: inherit; }
-.view-history-btn:hover { background: var(--border); }
-
-/* Settings */
+/* Modals */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 900; display: flex; align-items: center; justify-content: center; padding: 16px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+.modal { background: var(--card); border-radius: var(--radius); box-shadow: 0 8px 30px rgba(0,0,0,0.15); width: 100%; max-width: 520px; max-height: 85vh; overflow-y: auto; padding: 28px; }
+.modal h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 6px; }
+.modal .modal-subtitle { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 20px; }
+.modal-close { float: right; background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text-secondary); padding: 0 4px; line-height: 1; }
+.modal-close:hover { color: var(--text); }
+.account-group { background: var(--bg); border-radius: 10px; padding: 16px; margin-bottom: 12px; }
+.account-group-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.account-group-name { font-weight: 700; font-size: 1rem; }
+.account-group-total { font-weight: 700; font-size: 1.1rem; font-variant-numeric: tabular-nums; color: var(--primary); }
+.account-group-items { font-size: 0.85rem; color: var(--text-secondary); }
+.account-group-items div { display: flex; justify-content: space-between; padding: 3px 0; }
+.account-grand-total { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: var(--primary-light); border-radius: 10px; font-weight: 700; font-size: 1.05rem; }
 .settings-field { margin-bottom: 20px; }
 .settings-field label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
 .settings-field select { width: 100%; }
 .settings-note { font-size: 0.8rem; color: var(--text-secondary); margin-top: 6px; }
 
-@media (max-width: 500px) {
+@media (max-width: 600px) {
   .container { padding: 10px; }
   .card { padding: 16px; }
   .step-label { display: none; }
   .step-line { width: 28px; margin: 0 4px; }
-  .summary-grid { grid-template-columns: 1fr; }
+  .summary-grid, .dash-overview { grid-template-columns: 1fr; }
+  .chart-row { grid-template-columns: 1fr; }
   .pot-row { flex-wrap: wrap; }
   .pot-row .input-wrap { width: 100%; }
   .pot-row select { width: 100%; }
   .action-row { flex-direction: column; }
   .modal { padding: 20px; }
   .month-picker { flex-wrap: wrap; }
-  .history-card-stats { flex-wrap: wrap; gap: 8px; }
   .auth-card { padding: 24px 18px; }
   .app-header { font-size: 0.78rem; }
+  .dh-stats { flex-wrap: wrap; gap: 6px; }
 }
 </style>
 </head>
 <body>
 
 <!-- Loading -->
-<div class="loading-screen" id="loading-screen">
-  <div class="spinner"></div>
-  <span>Loading...</span>
-</div>
+<div class="loading-screen" id="loading-screen"><div class="spinner"></div><span>Loading...</span></div>
 
 <!-- Auth -->
 <div class="auth-screen" id="auth-screen">
@@ -225,726 +232,281 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
       <input class="auth-input" type="password" id="auth-password" placeholder="Password" required minlength="6">
       <button class="auth-submit" type="submit" id="email-submit-btn">Sign In</button>
     </form>
-    <div class="auth-toggle" id="auth-toggle">
-      Don't have an account? <a id="auth-switch">Create one</a>
-    </div>
+    <div class="auth-toggle" id="auth-toggle">Don't have an account? <a id="auth-switch">Create one</a></div>
   </div>
 </div>
 
 <!-- App -->
 <div id="app-container" style="display:none">
   <div class="app-header">
-    <button class="header-icon" id="settings-btn" title="Settings">&#9881;</button>
+    <button class="header-back" id="header-back">&larr; Dashboard</button>
+    <span class="header-title">Finance Tracker</span>
     <span class="user-name" id="user-display"></span>
+    <button class="header-icon" id="settings-btn" title="Settings">&#9881;</button>
     <button class="header-btn" id="signout-btn">Sign Out</button>
   </div>
 
-  <div class="container">
-    <h1>UK Finance Tracker</h1>
-    <p class="subtitle">Tax Year 2026/27 &middot; England, Wales &amp; NI</p>
+  <!-- DASHBOARD -->
+  <div id="dashboard-screen">
+    <div class="container">
+      <button class="btn btn-primary btn-lg" id="new-month-btn" style="margin-bottom:20px">+ New Month</button>
+      <div id="dash-overview"></div>
 
-    <div class="month-picker">
-      <button class="btn btn-outline" id="month-prev" title="Previous month">&larr;</button>
-      <select id="pick-month"></select>
-      <select id="pick-year"></select>
-      <button class="btn btn-outline" id="month-next" title="Next month">&rarr;</button>
-    </div>
+      <div class="card chart-card chart-card-full">
+        <h3>Monthly Take-Home Pay</h3>
+        <canvas id="chart-takehome"></canvas>
+      </div>
 
-    <div id="paydate-info"></div>
+      <div class="chart-row">
+        <div class="chart-card">
+          <h3>Spending Breakdown</h3>
+          <canvas id="chart-spending"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Free Money Trend</h3>
+          <canvas id="chart-free"></canvas>
+        </div>
+      </div>
 
-    <div class="steps-bar">
-      <div class="step-item" id="step-item-1"><div class="step-circle active" id="sc1">1</div><span class="step-label">Income</span></div>
-      <div class="step-line" id="sl1"></div>
-      <div class="step-item" id="step-item-2"><div class="step-circle" id="sc2">2</div><span class="step-label">Adjustments</span></div>
-      <div class="step-line" id="sl2"></div>
-      <div class="step-item" id="step-item-3"><div class="step-circle" id="sc3">3</div><span class="step-label">Pots &amp; Summary</span></div>
-    </div>
-
-    <!-- STEP 1 -->
-    <div class="step-panel active" id="panel1">
-      <div id="template-banner" class="banner-info"></div>
       <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-          <h2 style="margin:0">Gross Annual Salary</h2>
-          <button class="view-history-btn" id="view-history-btn">View History</button>
-        </div>
-        <div class="field">
-          <label for="salary">Enter your yearly gross salary</label>
-          <div class="input-wrap">
-            <span class="prefix">&pound;</span>
-            <input type="number" id="salary" class="has-prefix has-suffix" placeholder="0" min="0" step="100">
-            <span class="suffix">/year</span>
-          </div>
-        </div>
-      </div>
-      <div class="card" id="tax-card" style="display:none">
-        <h2>Monthly Pay Breakdown</h2>
-        <table class="breakdown" id="monthly-table"></table>
-      </div>
-      <div class="card" id="annual-card" style="display:none">
-        <h2>Annual Tax Summary</h2>
-        <table class="breakdown" id="annual-table"></table>
-      </div>
-      <div class="nav-row">
-        <div></div>
-        <button class="btn btn-primary" id="nav-next-1">Next &rarr;</button>
+        <h2>Monthly History</h2>
+        <div id="dash-history"></div>
       </div>
     </div>
+  </div>
 
-    <!-- STEP 2 -->
-    <div class="step-panel" id="panel2">
-      <div class="card">
-        <h2>Monthly Adjustments</h2>
-        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:14px;">Toggle any that apply this month.</p>
-        <label class="toggle-row"><input type="checkbox" id="tog-expenses"><span class="toggle-label">Work Expenses</span></label>
-        <div class="toggle-content" id="sec-expenses">
-          <div class="field"><label>Monthly work expenses (reduces taxable income)</label>
-            <div class="input-wrap"><span class="prefix">&pound;</span><input type="number" id="work-expenses" class="has-prefix" placeholder="0" min="0" step="10"></div>
-          </div>
-        </div>
-        <label class="toggle-row"><input type="checkbox" id="tog-mileage"><span class="toggle-label">Mileage / Fuel</span></label>
-        <div class="toggle-content" id="sec-mileage">
-          <div class="field"><label>Business miles driven this month</label>
-            <div class="input-wrap"><input type="number" id="miles" class="has-suffix" placeholder="0" min="0" step="1"><span class="suffix">miles</span></div>
-          </div>
-          <div class="live-calc" id="mileage-calc">0 miles &times; 55p = &pound;0.00</div>
-        </div>
-        <label class="toggle-row"><input type="checkbox" id="tog-overtime"><span class="toggle-label">Overtime / Bonus</span></label>
-        <div class="toggle-content" id="sec-overtime">
-          <div class="field"><label>Extra gross pay this month (before tax)</label>
-            <div class="input-wrap"><span class="prefix">&pound;</span><input type="number" id="overtime" class="has-prefix" placeholder="0" min="0" step="10"></div>
-          </div>
-        </div>
-      </div>
-      <div class="nav-row">
-        <button class="btn btn-outline" id="nav-back-2">&larr; Back</button>
-        <button class="btn btn-primary" id="nav-next-2">Next &rarr;</button>
-      </div>
-    </div>
+  <!-- TRACKER -->
+  <div id="tracker-screen" style="display:none">
+    <div class="container">
+      <h1 style="font-size:1.3rem;padding:16px 0 4px">New Month</h1>
+      <p class="subtitle" style="margin-bottom:16px">Tax Year 2026/27 &middot; England, Wales &amp; NI</p>
 
-    <!-- STEP 3 -->
-    <div class="step-panel" id="panel3">
-      <div class="card">
-        <h2>Monthly Pots</h2>
-        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:14px;">Add your regular monthly outgoings. Assign each to an account for payday planning.</p>
-        <div id="pots-list"></div>
-        <button class="btn btn-outline" id="add-pot-btn">+ Add Pot</button>
+      <div class="month-picker">
+        <button class="btn btn-outline" id="month-prev">&larr;</button>
+        <select id="pick-month"></select>
+        <select id="pick-year"></select>
+        <button class="btn btn-outline" id="month-next">&rarr;</button>
       </div>
-      <div id="summary-section"></div>
-      <div class="nav-row">
-        <button class="btn btn-outline" id="nav-back-3">&larr; Back</button>
-        <div></div>
+      <div id="paydate-info"></div>
+
+      <div class="steps-bar">
+        <div class="step-item" id="step-item-1"><div class="step-circle active" id="sc1">1</div><span class="step-label">Income</span></div>
+        <div class="step-line" id="sl1"></div>
+        <div class="step-item" id="step-item-2"><div class="step-circle" id="sc2">2</div><span class="step-label">Adjustments</span></div>
+        <div class="step-line" id="sl2"></div>
+        <div class="step-item" id="step-item-3"><div class="step-circle" id="sc3">3</div><span class="step-label">Pots &amp; Summary</span></div>
+      </div>
+
+      <div class="step-panel active" id="panel1">
+        <div id="template-banner" class="banner-info"></div>
+        <div class="card">
+          <h2>Gross Annual Salary</h2>
+          <div class="field"><label for="salary">Enter your yearly gross salary</label>
+            <div class="input-wrap"><span class="prefix">&pound;</span><input type="number" id="salary" class="has-prefix has-suffix" placeholder="0" min="0" step="100"><span class="suffix">/year</span></div>
+          </div>
+        </div>
+        <div class="card" id="tax-card" style="display:none"><h2>Monthly Pay Breakdown</h2><table class="breakdown" id="monthly-table"></table></div>
+        <div class="card" id="annual-card" style="display:none"><h2>Annual Tax Summary</h2><table class="breakdown" id="annual-table"></table></div>
+        <div class="nav-row"><div></div><button class="btn btn-primary" id="nav-next-1">Next &rarr;</button></div>
+      </div>
+
+      <div class="step-panel" id="panel2">
+        <div class="card">
+          <h2>Monthly Adjustments</h2>
+          <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:14px;">Toggle any that apply this month.</p>
+          <label class="toggle-row"><input type="checkbox" id="tog-expenses"><span class="toggle-label">Work Expenses</span></label>
+          <div class="toggle-content" id="sec-expenses"><div class="field"><label>Monthly work expenses (reduces taxable income)</label><div class="input-wrap"><span class="prefix">&pound;</span><input type="number" id="work-expenses" class="has-prefix" placeholder="0" min="0" step="10"></div></div></div>
+          <label class="toggle-row"><input type="checkbox" id="tog-mileage"><span class="toggle-label">Mileage / Fuel</span></label>
+          <div class="toggle-content" id="sec-mileage"><div class="field"><label>Business miles driven this month</label><div class="input-wrap"><input type="number" id="miles" class="has-suffix" placeholder="0" min="0" step="1"><span class="suffix">miles</span></div></div><div class="live-calc" id="mileage-calc">0 miles &times; 55p = &pound;0.00</div></div>
+          <label class="toggle-row"><input type="checkbox" id="tog-overtime"><span class="toggle-label">Overtime / Bonus</span></label>
+          <div class="toggle-content" id="sec-overtime"><div class="field"><label>Extra gross pay this month (before tax)</label><div class="input-wrap"><span class="prefix">&pound;</span><input type="number" id="overtime" class="has-prefix" placeholder="0" min="0" step="10"></div></div></div>
+        </div>
+        <div class="nav-row"><button class="btn btn-outline" id="nav-back-2">&larr; Back</button><button class="btn btn-primary" id="nav-next-2">Next &rarr;</button></div>
+      </div>
+
+      <div class="step-panel" id="panel3">
+        <div class="card">
+          <h2>Monthly Pots</h2>
+          <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:14px;">Add your regular monthly outgoings. Assign each to an account for payday planning.</p>
+          <div id="pots-list"></div>
+          <button class="btn btn-outline" id="add-pot-btn">+ Add Pot</button>
+        </div>
+        <div id="summary-section"></div>
+        <div class="nav-row"><button class="btn btn-outline" id="nav-back-3">&larr; Back</button><div></div></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Accounts modal -->
-<div class="modal-overlay" id="accounts-modal">
-  <div class="modal">
-    <button class="modal-close" id="close-accounts-btn">&times;</button>
-    <h2>Payday Account Breakdown</h2>
-    <p class="modal-subtitle">Where to transfer your money on payday</p>
-    <div id="accounts-body"></div>
-  </div>
-</div>
-
-<!-- History modal -->
-<div class="modal-overlay" id="history-modal">
-  <div class="modal" style="max-width:600px">
-    <button class="modal-close" id="close-history-btn">&times;</button>
-    <div id="history-modal-body"></div>
-  </div>
-</div>
-
-<!-- Settings modal -->
-<div class="modal-overlay" id="settings-modal">
-  <div class="modal" style="max-width:420px">
-    <button class="modal-close" id="close-settings-btn">&times;</button>
-    <h2>Settings</h2>
-    <p class="modal-subtitle">Customise your finance tracker</p>
-    <div class="settings-field">
-      <label for="payday-select">Pay Day</label>
-      <select id="payday-select"></select>
-      <p class="settings-note">Capped at 28th to avoid issues with shorter months (February has 28 days). If your pay day falls on a weekend or bank holiday, it will be moved to the nearest working day before.</p>
-    </div>
-  </div>
-</div>
-
+<!-- Modals -->
+<div class="modal-overlay" id="accounts-modal"><div class="modal"><button class="modal-close" id="close-accounts-btn">&times;</button><h2>Payday Account Breakdown</h2><p class="modal-subtitle">Where to transfer your money on payday</p><div id="accounts-body"></div></div></div>
+<div class="modal-overlay" id="detail-modal"><div class="modal" style="max-width:600px"><button class="modal-close" id="close-detail-btn">&times;</button><div id="detail-modal-body"></div></div></div>
+<div class="modal-overlay" id="settings-modal"><div class="modal" style="max-width:420px"><button class="modal-close" id="close-settings-btn">&times;</button><h2>Settings</h2><p class="modal-subtitle">Customise your finance tracker</p><div class="settings-field"><label for="payday-select">Pay Day</label><select id="payday-select"></select><p class="settings-note">Capped at 28th to avoid issues with shorter months (February has 28 days). If your pay day falls on a weekend or bank holiday, it will be moved to the nearest working day before.</p></div></div></div>
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js';
-import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as fbSignOut } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js';
-import { getFirestore, collection, doc, setDoc, getDoc, getDocs, deleteDoc } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
+import{initializeApp}from'https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js';
+import{getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,signInWithEmailAndPassword,createUserWithEmailAndPassword,signOut as fbSignOut}from'https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js';
+import{getFirestore,collection,doc,setDoc,getDoc,getDocs,deleteDoc}from'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCrh8OV_QoOeygio4LhqXWk10vQcxHHn4I",
-  authDomain: "financial-tracker-f8d47.firebaseapp.com",
-  projectId: "financial-tracker-f8d47",
-  storageBucket: "financial-tracker-f8d47.firebasestorage.app",
-  messagingSenderId: "626879548091",
-  appId: "1:626879548091:web:7cff4521a13b4744c6b79e",
-  measurementId: "G-N6Z2DLR94L"
-};
+const app=initializeApp({apiKey:"AIzaSyCrh8OV_QoOeygio4LhqXWk10vQcxHHn4I",authDomain:"financial-tracker-f8d47.firebaseapp.com",projectId:"financial-tracker-f8d47",storageBucket:"financial-tracker-f8d47.firebasestorage.app",messagingSenderId:"626879548091",appId:"1:626879548091:web:7cff4521a13b4744c6b79e",measurementId:"G-N6Z2DLR94L"});
+const auth=getAuth(app),db=getFirestore(app),googleProvider=new GoogleAuthProvider();
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const googleProvider = new GoogleAuthProvider();
+var currentUser=null,payDay=parseInt(localStorage.getItem('finance_payDay'))||23;
+var currentStep=1,pots=[],financeHistory=[],lastTakeHome=0,lastMileage=0,authIsSignUp=false;
+var chartTH=null,chartSpend=null,chartFree=null;
 
-var currentUser = null;
-var payDay = parseInt(localStorage.getItem('finance_payDay')) || 23;
-var currentStep = 1;
-var pots = [];
-var financeHistory = [];
-var lastTakeHome = 0, lastMileage = 0;
-var authIsSignUp = false;
+// ===== CONSTANTS =====
+var PA=12570,BU=50270,HU=125140,TS=100000,BR=0.20,HR=0.40,AR=0.45;
+var NL=12570,NU=50270,NM=0.08,NH=0.02,MR=0.55;
+var ACCOUNTS=['Bills','Train','Car Finance','Holiday Savings','Car Insurance'];
+var BH={};
+['2024-01-01','2024-03-29','2024-04-01','2024-05-06','2024-05-27','2024-08-26','2024-12-25','2024-12-26','2025-01-01','2025-04-18','2025-04-21','2025-05-05','2025-05-26','2025-08-25','2025-12-25','2025-12-26','2026-01-01','2026-04-03','2026-04-06','2026-05-04','2026-05-25','2026-08-31','2026-12-25','2026-12-28','2027-01-01','2027-03-26','2027-03-29','2027-05-03','2027-05-31','2027-08-30','2027-12-27','2027-12-28','2028-01-03','2028-04-14','2028-04-17','2028-05-01','2028-05-29','2028-08-28','2028-12-25','2028-12-26'].forEach(function(d){BH[d]=true;});
+var BHN={'01-01':"New Year's Day",'01-03':"New Year's Day (sub)",'03-26':'Good Friday','03-29':'Good Friday','04-01':'Easter Monday','04-03':'Good Friday','04-06':'Easter Monday','04-14':'Good Friday','04-17':'Easter Monday','04-18':'Good Friday','04-21':'Easter Monday','05-01':'Early May','05-03':'Early May','05-04':'Early May','05-05':'Early May','05-06':'Early May','05-25':'Spring','05-26':'Spring','05-27':'Spring','05-29':'Spring','05-31':'Spring','08-25':'Summer','08-26':'Summer','08-28':'Summer','08-30':'Summer','08-31':'Summer','12-25':'Christmas Day','12-26':'Boxing Day','12-27':'Christmas Day (sub)','12-28':'Boxing Day (sub)'};
+var MF=['January','February','March','April','May','June','July','August','September','October','November','December'];
+var MS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var DN=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
-// ===================== CONSTANTS =====================
-var PERSONAL_ALLOWANCE = 12570, BASIC_UPPER = 50270, HIGHER_UPPER = 125140, TAPER_START = 100000;
-var BASIC_RATE = 0.20, HIGHER_RATE = 0.40, ADDITIONAL_RATE = 0.45;
-var NI_LOWER = 12570, NI_UPPER = 50270, NI_MAIN = 0.08, NI_HIGHER = 0.02;
-var MILEAGE_RATE = 0.55;
-var ACCOUNTS = ['Bills', 'Train', 'Car Finance', 'Holiday Savings', 'Car Insurance'];
-var UK_BANK_HOLIDAYS = [
-  '2024-01-01','2024-03-29','2024-04-01','2024-05-06','2024-05-27','2024-08-26','2024-12-25','2024-12-26',
-  '2025-01-01','2025-04-18','2025-04-21','2025-05-05','2025-05-26','2025-08-25','2025-12-25','2025-12-26',
-  '2026-01-01','2026-04-03','2026-04-06','2026-05-04','2026-05-25','2026-08-31','2026-12-25','2026-12-28',
-  '2027-01-01','2027-03-26','2027-03-29','2027-05-03','2027-05-31','2027-08-30','2027-12-27','2027-12-28',
-  '2028-01-03','2028-04-14','2028-04-17','2028-05-01','2028-05-29','2028-08-28','2028-12-25','2028-12-26'
-];
-var BANK_HOLIDAY_SET = {};
-UK_BANK_HOLIDAYS.forEach(function(d) { BANK_HOLIDAY_SET[d] = true; });
-var BANK_HOLIDAY_NAMES = {
-  '01-01':'New Year\'s Day','01-03':'New Year\'s Day (substitute)',
-  '03-26':'Good Friday','03-29':'Good Friday',
-  '04-01':'Easter Monday','04-03':'Good Friday','04-06':'Easter Monday',
-  '04-14':'Good Friday','04-17':'Easter Monday','04-18':'Good Friday','04-21':'Easter Monday',
-  '05-01':'Early May bank holiday','05-03':'Early May bank holiday','05-04':'Early May bank holiday',
-  '05-05':'Early May bank holiday','05-06':'Early May bank holiday',
-  '05-25':'Spring bank holiday','05-26':'Spring bank holiday','05-27':'Spring bank holiday',
-  '05-29':'Spring bank holiday','05-31':'Spring bank holiday',
-  '08-25':'Summer bank holiday','08-26':'Summer bank holiday','08-28':'Summer bank holiday',
-  '08-30':'Summer bank holiday','08-31':'Summer bank holiday',
-  '12-25':'Christmas Day','12-26':'Boxing Day','12-27':'Christmas Day (substitute)','12-28':'Boxing Day (substitute)'
-};
-var MONTH_NAMES_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-var MONTH_NAMES_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-var DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+// ===== UTILITIES =====
+function ds(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function isWD(d){var day=d.getDay();return day>=1&&day<=5&&!BH[ds(d)];}
+function os(d){if(d===1||d===21||d===31)return'st';if(d===2||d===22)return'nd';if(d===3||d===23)return'rd';return'th';}
+function fdl(d){return DN[d.getDay()]+' '+d.getDate()+os(d.getDate())+' '+MF[d.getMonth()]+' '+d.getFullYear();}
+function fds(d){return d.getDate()+' '+MS[d.getMonth()]+' '+d.getFullYear();}
+function fmt(n){return'£'+Math.abs(n).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function row(l,v,c){return'<tr><td>'+l+'</td><td class="'+(c||'')+'">'+(v<0?'−'+fmt(v):fmt(v))+'</td></tr>';}
+function rowT(l,v){return'<tr class="total"><td>'+l+'</td><td>'+fmt(v)+'</td></tr>';}
+function st(l,v){return'<div class="summary-stat"><div class="stat-label">'+l+'</div><div class="stat-value">'+v+'</div></div>';}
+function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2500);}
+function $(id){return document.getElementById(id);}
 
-// ===================== UTILITIES =====================
-function dateToStr(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-function isBankHoliday(d) { return BANK_HOLIDAY_SET[dateToStr(d)]===true; }
-function isWorkingDay(d) { var day=d.getDay(); return day>=1&&day<=5&&!isBankHoliday(d); }
-function ordSuffix(d) { if(d===1||d===21||d===31) return 'st'; if(d===2||d===22) return 'nd'; if(d===3||d===23) return 'rd'; return 'th'; }
-function formatDateLong(d) { return DAY_NAMES[d.getDay()]+' '+d.getDate()+ordSuffix(d.getDate())+' '+MONTH_NAMES_FULL[d.getMonth()]+' '+d.getFullYear(); }
-function formatDateShort(d) { return d.getDate()+' '+MONTH_NAMES_SHORT[d.getMonth()]+' '+d.getFullYear(); }
-function fmt(n) { return '£'+Math.abs(n).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-function esc(s) { return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function row(label,value,cls) { var v=value<0?('−'+fmt(value)):fmt(value); return '<tr><td>'+label+'</td><td class="'+(cls||'')+'">'+v+'</td></tr>'; }
-function rowTotal(label,value) { return '<tr class="total"><td>'+label+'</td><td>'+fmt(value)+'</td></tr>'; }
-function stat(label,value) { return '<div class="summary-stat"><div class="stat-label">'+label+'</div><div class="stat-value">'+value+'</div></div>'; }
-function showToast(msg) { var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},2500); }
+// ===== PAY DATE =====
+function getPD(y,m,pd){pd=pd||payDay;var t=new Date(y,m,pd),o=new Date(t);while(!isWD(t))t.setDate(t.getDate()-1);return{payDate:t,original:o,moved:t.getTime()!==o.getTime()};}
+function getNextPD(y,m,pd){var nm=m+1,ny=y;if(nm>11){nm=0;ny++;}return getPD(ny,nm,pd);}
+function movedReason(o,pd){pd=pd||payDay;var s=pd+os(pd),d=o.getDay(),k=ds(o);if(d===0)return s+' falls on a Sunday';if(d===6)return s+' falls on a Saturday';if(BH[k])return s+' is '+(BHN[k.substring(5)]||'a bank holiday');return s+' is a non-working day';}
 
-// ===================== PAY DATE =====================
-function getPayDate(year, month, pd) {
-  pd = pd || payDay;
-  var target = new Date(year, month, pd);
-  var original = new Date(target);
-  while (!isWorkingDay(target)) target.setDate(target.getDate()-1);
-  return { payDate: target, original: original, moved: target.getTime()!==original.getTime() };
-}
-function getNextPayDate(year, month, pd) {
-  var nm=month+1, ny=year; if(nm>11){nm=0;ny++;}
-  return getPayDate(ny, nm, pd);
-}
-function getMovedReason(original, pd) {
-  pd = pd || payDay;
-  var dayStr = pd+ordSuffix(pd);
-  var day = original.getDay();
-  var ds = dateToStr(original);
-  if (day===0) return dayStr+' falls on a Sunday';
-  if (day===6) return dayStr+' falls on a Saturday';
-  if (BANK_HOLIDAY_SET[ds]) { return dayStr+' is '+(BANK_HOLIDAY_NAMES[ds.substring(5)]||'a bank holiday'); }
-  return dayStr+' is a non-working day';
-}
+// ===== TAX =====
+function gPA(g){if(g<=TS)return PA;return Math.max(0,PA-Math.floor((g-TS)/2));}
+function cTax(g){var pa=gPA(g),tx=Math.max(0,g-pa),t=0,b=Math.min(tx,Math.max(0,BU-pa));t+=b*BR;tx-=b;var h=Math.min(tx,HU-BU);t+=h*HR;tx-=h;return t+tx*AR;}
+function cNI(g){if(g<=NL)return 0;return Math.max(0,Math.min(g,NU)-NL)*NM+(g>NU?(g-NU)*NH:0);}
 
-// ===================== TAX =====================
-function getPA(gross) { if(gross<=TAPER_START) return PERSONAL_ALLOWANCE; return Math.max(0,PERSONAL_ALLOWANCE-Math.floor((gross-TAPER_START)/2)); }
-function calcTax(gross) {
-  var pa=getPA(gross), taxable=Math.max(0,gross-pa), tax=0;
-  var bt=Math.min(taxable,Math.max(0,BASIC_UPPER-pa)); tax+=bt*BASIC_RATE; taxable-=bt;
-  var ht=Math.min(taxable,HIGHER_UPPER-BASIC_UPPER); tax+=ht*HIGHER_RATE; taxable-=ht;
-  return tax+taxable*ADDITIONAL_RATE;
-}
-function calcNI(gross) {
-  if(gross<=NI_LOWER) return 0;
-  return Math.max(0,Math.min(gross,NI_UPPER)-NI_LOWER)*NI_MAIN + (gross>NI_UPPER?(gross-NI_UPPER)*NI_HIGHER:0);
-}
+// ===== MONTH PICKER =====
+var mpInit=false;
+function initMP(){var ms=$('pick-month'),ys=$('pick-year');if(!mpInit){var n=new Date();for(var m=0;m<12;m++){var o=document.createElement('option');o.value=m;o.textContent=MF[m];if(m===n.getMonth())o.selected=true;ms.appendChild(o);}for(var y=2024;y<=2028;y++){var o=document.createElement('option');o.value=y;o.textContent=y;if(y===n.getFullYear())o.selected=true;ys.appendChild(o);}mpInit=true;}updPD();}
+function shiftM(d){var ms=$('pick-month'),ys=$('pick-year'),m=parseInt(ms.value)+d,y=parseInt(ys.value);if(m>11){m=0;y++;}if(m<0){m=11;y--;}if(y<2024)y=2024;if(y>2028)y=2028;ms.value=m;ys.value=y;updPD();}
+function updPD(){var m=parseInt($('pick-month').value),y=parseInt($('pick-year').value),r=getPD(y,m),nx=getNextPD(y,m),cs=new Date(r.payDate);cs.setDate(cs.getDate()+1);var h='<div class="paydate-card"><div class="paydate-header"><span class="paydate-icon">&#128197;</span><span class="paydate-title">Pay Date for '+MF[m]+' '+y+'</span></div><div class="paydate-date">'+fdl(r.payDate)+'</div>';if(r.moved)h+='<div class="paydate-note">'+movedReason(r.original)+' — paid '+DN[r.payDate.getDay()]+' '+r.payDate.getDate()+os(r.payDate.getDate())+' instead</div>';h+='<div class="paydate-coverage"><strong>Budget coverage:</strong> '+fds(cs)+' — '+fds(nx.payDate)+' <span style="color:var(--primary);font-weight:600">('+Math.round((nx.payDate-cs)/86400000)+' days)</span></div></div>';$('paydate-info').innerHTML=h;}
 
-// ===================== MONTH PICKER =====================
-var monthPickerInited = false;
-function initMonthPicker() {
-  var mSel=document.getElementById('pick-month'), ySel=document.getElementById('pick-year');
-  if (!monthPickerInited) {
-    var now=new Date();
-    for(var m=0;m<12;m++){var o=document.createElement('option');o.value=m;o.textContent=MONTH_NAMES_FULL[m];if(m===now.getMonth())o.selected=true;mSel.appendChild(o);}
-    for(var y=2024;y<=2028;y++){var o=document.createElement('option');o.value=y;o.textContent=y;if(y===now.getFullYear())o.selected=true;ySel.appendChild(o);}
-    monthPickerInited = true;
-  }
-  updatePaydate();
-}
-function shiftMonth(dir) {
-  var mSel=document.getElementById('pick-month'), ySel=document.getElementById('pick-year');
-  var m=parseInt(mSel.value)+dir, y=parseInt(ySel.value);
-  if(m>11){m=0;y++;} if(m<0){m=11;y--;}
-  if(y<2024)y=2024; if(y>2028)y=2028;
-  mSel.value=m; ySel.value=y; updatePaydate();
-}
-function updatePaydate() {
-  var m=parseInt(document.getElementById('pick-month').value), y=parseInt(document.getElementById('pick-year').value);
-  var result=getPayDate(y,m), next=getNextPayDate(y,m);
-  var cs=new Date(result.payDate); cs.setDate(cs.getDate()+1);
-  var html='<div class="paydate-card"><div class="paydate-header"><span class="paydate-icon">&#128197;</span>';
-  html+='<span class="paydate-title">Pay Date for '+MONTH_NAMES_FULL[m]+' '+y+'</span></div>';
-  html+='<div class="paydate-date">'+formatDateLong(result.payDate)+'</div>';
-  if(result.moved) html+='<div class="paydate-note">'+getMovedReason(result.original)+' — paid '+DAY_NAMES[result.payDate.getDay()]+' '+result.payDate.getDate()+ordSuffix(result.payDate.getDate())+' instead</div>';
-  html+='<div class="paydate-coverage"><strong>Budget coverage:</strong> '+formatDateShort(cs)+' — '+formatDateShort(next.payDate);
-  html+=' <span style="color:var(--primary);font-weight:600">('+Math.round((next.payDate-cs)/86400000)+' days)</span></div></div>';
-  document.getElementById('paydate-info').innerHTML=html;
-}
+// ===== SETTINGS =====
+function initPDS(){var s=$('payday-select');s.innerHTML='';for(var d=1;d<=28;d++){var o=document.createElement('option');o.value=d;o.textContent=d+os(d)+' of each month';if(d===payDay)o.selected=true;s.appendChild(o);}}
+async function onPDC(){payDay=parseInt($('payday-select').value);localStorage.setItem('finance_payDay',payDay);updPD();if(currentUser){try{await setDoc(doc(db,'users',currentUser.uid,'settings','config'),{payDay:payDay},{merge:true});}catch(e){}}toast('Pay day set to '+payDay+os(payDay));}
 
-// ===================== SETTINGS =====================
-function initPaydaySelect() {
-  var sel=document.getElementById('payday-select');
-  sel.innerHTML='';
-  for(var d=1;d<=28;d++){
-    var o=document.createElement('option');
-    o.value=d; o.textContent=d+ordSuffix(d)+' of each month';
-    if(d===payDay) o.selected=true;
-    sel.appendChild(o);
-  }
-}
-async function onPayDayChange() {
-  payDay=parseInt(document.getElementById('payday-select').value);
-  localStorage.setItem('finance_payDay', payDay);
-  updatePaydate();
-  if(currentUser) {
-    try { await setDoc(doc(db,'users',currentUser.uid,'settings','config'),{payDay:payDay},{merge:true}); }
-    catch(e) { console.error('Settings save failed:',e); }
-  }
-  showToast('Pay day set to '+payDay+ordSuffix(payDay));
-}
+// ===== CALC =====
+function calc(){var sal=parseFloat($('salary').value)||0,tE=$('tog-expenses').checked,tM=$('tog-mileage').checked,tO=$('tog-overtime').checked;var wE=tE?(parseFloat($('work-expenses').value)||0):0,mi=tM?(parseFloat($('miles').value)||0):0,ot=tO?(parseFloat($('overtime').value)||0):0,mA=mi*MR;if(tM)$('mileage-calc').innerHTML=mi.toLocaleString('en-GB')+' miles × 55p = '+fmt(mA);var aT=cTax(sal),aN=cNI(sal),aNet=sal-aT-aN,eff=sal>0?((aT+aN)/sal*100):0;var mG=sal/12,mT=aT/12,mN=aN/12,adjT=cTax(Math.max(0,sal-(wE*12)))/12,tS=mT-adjT;var oT=(cTax(sal+ot*12)-cTax(sal))/12,oN=(cNI(sal+ot*12)-cNI(sal))/12;var fT=adjT+oT,fN=mN+oN,th=mG+ot-fT-fN;lastTakeHome=th;lastMileage=mA;var sh=sal>0;$('tax-card').style.display=sh?'block':'none';$('annual-card').style.display=sh?'block':'none';var mh=row('Gross salary',mG);if(ot>0)mh+=row('Overtime / bonus',ot,'addition');mh+=row('Income tax',-fT,'deduction')+row('National Insurance',-fN,'deduction');if(wE>0)mh+=row('Tax relief on expenses',tS,'addition');mh+=rowT('Monthly take-home',th);$('monthly-table').innerHTML=mh;var ah=row('Gross salary',sal)+'<tr><td class="label-secondary">Personal allowance</td><td class="label-secondary" style="text-align:right">'+fmt(gPA(sal))+'</td></tr>'+row('Income tax',-aT,'deduction')+row('National Insurance',-aN,'deduction')+rowT('Annual net pay',aNet)+'<tr><td class="label-secondary">Effective deduction rate</td><td class="label-secondary" style="text-align:right">'+eff.toFixed(1)+'%</td></tr>';$('annual-table').innerHTML=ah;renderSum(th,mA);saveLocal();}
 
-// ===================== CALC =====================
-function calc() {
-  var salary=parseFloat(document.getElementById('salary').value)||0;
-  var togE=document.getElementById('tog-expenses').checked;
-  var togM=document.getElementById('tog-mileage').checked;
-  var togO=document.getElementById('tog-overtime').checked;
-  var workExp=togE?(parseFloat(document.getElementById('work-expenses').value)||0):0;
-  var miles=togM?(parseFloat(document.getElementById('miles').value)||0):0;
-  var ot=togO?(parseFloat(document.getElementById('overtime').value)||0):0;
-  var mileageAmt=miles*MILEAGE_RATE;
-  if(togM) document.getElementById('mileage-calc').innerHTML=miles.toLocaleString('en-GB')+' miles × 55p = '+fmt(mileageAmt);
-  var aTax=calcTax(salary),aNI=calcNI(salary),aNet=salary-aTax-aNI;
-  var effRate=salary>0?((aTax+aNI)/salary*100):0;
-  var mGross=salary/12,mTax=aTax/12,mNI=aNI/12;
-  var adjTax=calcTax(Math.max(0,salary-(workExp*12)))/12, taxSav=mTax-adjTax;
-  var otTax=(calcTax(salary+ot*12)-calcTax(salary))/12;
-  var otNI=(calcNI(salary+ot*12)-calcNI(salary))/12;
-  var fTax=adjTax+otTax, fNI=mNI+otNI;
-  var takeHome=mGross+ot-fTax-fNI;
-  lastTakeHome=takeHome; lastMileage=mileageAmt;
-  var show=salary>0;
-  document.getElementById('tax-card').style.display=show?'block':'none';
-  document.getElementById('annual-card').style.display=show?'block':'none';
-  var mh=row('Gross salary',mGross);
-  if(ot>0) mh+=row('Overtime / bonus',ot,'addition');
-  mh+=row('Income tax',-fTax,'deduction')+row('National Insurance',-fNI,'deduction');
-  if(workExp>0) mh+=row('Tax relief on expenses',taxSav,'addition');
-  mh+=rowTotal('Monthly take-home',takeHome);
-  document.getElementById('monthly-table').innerHTML=mh;
-  var ah=row('Gross salary',salary);
-  ah+='<tr><td class="label-secondary">Personal allowance</td><td class="label-secondary" style="text-align:right">'+fmt(getPA(salary))+'</td></tr>';
-  ah+=row('Income tax',-aTax,'deduction')+row('National Insurance',-aNI,'deduction');
-  ah+=rowTotal('Annual net pay',aNet);
-  ah+='<tr><td class="label-secondary">Effective deduction rate</td><td class="label-secondary" style="text-align:right">'+effRate.toFixed(1)+'%</td></tr>';
-  document.getElementById('annual-table').innerHTML=ah;
-  renderSummary(takeHome,mileageAmt);
-  saveLocal();
-}
+function renderSum(th,mi){var tp=pots.reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0),fr=th+mi-tp;var h=fr>=0?'<div class="banner banner-green">'+fmt(fr)+' free money this month</div>':'<div class="banner banner-red">'+fmt(fr)+' over budget this month</div>';h+='<div class="summary-grid">'+st('Take-Home Pay',fmt(th))+st('Mileage Received',fmt(mi))+st('Total Outgoings',fmt(tp))+st('Free Money',(fr<0?'−':'')+fmt(fr))+'</div>';h+='<div class="action-row"><button class="btn btn-success" id="save-month-btn">Save Month</button><button class="btn btn-amber" id="form-accounts-btn">Form Accounts</button></div>';h+='<div class="card"><h3>Itemised Breakdown</h3><table class="breakdown">'+row('Monthly take-home pay',th);if(mi>0)h+=row('Mileage expenses (tax-free)',mi,'addition');h+='<tr class="divider"><td colspan="2" style="font-weight:600;padding-top:12px">Outgoings</td></tr>';pots.forEach(function(p){var a=parseFloat(p.amount)||0;if(p.name||a>0){var l=p.name||'Unnamed pot';if(p.account)l+=' <span class="label-secondary">('+esc(p.account)+')</span>';h+=row(l,-a,'deduction');}});h+=rowT('Remaining',fr)+'</table></div>';$('summary-section').innerHTML=h;$('save-month-btn').addEventListener('click',saveMonth);$('form-accounts-btn').addEventListener('click',openAccounts);}
 
-function renderSummary(takeHome,mileage) {
-  var totalPots=pots.reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);
-  var free=takeHome+mileage-totalPots;
-  var html='';
-  html+=free>=0?'<div class="banner banner-green">'+fmt(free)+' free money this month</div>':'<div class="banner banner-red">'+fmt(free)+' over budget this month</div>';
-  html+='<div class="summary-grid">'+stat('Take-Home Pay',fmt(takeHome))+stat('Mileage Received',fmt(mileage))+stat('Total Outgoings',fmt(totalPots))+stat('Free Money',(free<0?'−':'')+fmt(free))+'</div>';
-  html+='<div class="action-row"><button class="btn btn-success" id="save-month-btn">Save Month</button><button class="btn btn-amber" id="form-accounts-btn">Form Accounts</button></div>';
-  html+='<div class="card"><h3>Itemised Breakdown</h3><table class="breakdown">';
-  html+=row('Monthly take-home pay',takeHome);
-  if(mileage>0) html+=row('Mileage expenses (tax-free)',mileage,'addition');
-  html+='<tr class="divider"><td colspan="2" style="font-weight:600;padding-top:12px">Outgoings</td></tr>';
-  pots.forEach(function(p){var a=parseFloat(p.amount)||0;if(p.name||a>0){var l=p.name||'Unnamed pot';if(p.account)l+=' <span class="label-secondary">('+esc(p.account)+')</span>';html+=row(l,-a,'deduction');}});
-  html+=rowTotal('Remaining',free)+'</table></div>';
-  document.getElementById('summary-section').innerHTML=html;
-  document.getElementById('save-month-btn').addEventListener('click',saveMonth);
-  document.getElementById('form-accounts-btn').addEventListener('click',openAccounts);
-}
+// ===== NAVIGATION =====
+function showDashboard(){$('dashboard-screen').style.display='block';$('tracker-screen').style.display='none';$('header-back').style.display='none';renderDashboard();window.scrollTo({top:0});}
+function showTracker(){$('dashboard-screen').style.display='none';$('tracker-screen').style.display='block';$('header-back').style.display='inline';goStep(1);window.scrollTo({top:0});}
+function goStep(n){currentStep=n;for(var i=1;i<=3;i++){$('panel'+i).classList.toggle('active',i===n);var sc=$('sc'+i);sc.classList.remove('active','done');if(i<n){sc.classList.add('done');sc.textContent='✓';}else if(i===n){sc.classList.add('active');sc.textContent=i;}else sc.textContent=i;}$('sl1').classList.toggle('done',n>1);$('sl2').classList.toggle('done',n>2);if(n===3)calc();window.scrollTo({top:0,behavior:'smooth'});}
+function toggleSection(n){$('sec-'+n).classList.toggle('open',$('tog-'+n).checked);}
 
-// ===================== NAVIGATION =====================
-function goStep(n) {
-  currentStep=n;
-  for(var i=1;i<=3;i++){
-    document.getElementById('panel'+i).classList.toggle('active',i===n);
-    var sc=document.getElementById('sc'+i);
-    sc.classList.remove('active','done');
-    if(i<n){sc.classList.add('done');sc.textContent='✓';}
-    else if(i===n){sc.classList.add('active');sc.textContent=i;}
-    else sc.textContent=i;
-  }
-  document.getElementById('sl1').classList.toggle('done',n>1);
-  document.getElementById('sl2').classList.toggle('done',n>2);
-  if(n===3) calc();
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-function toggleSection(name) { document.getElementById('sec-'+name).classList.toggle('open',document.getElementById('tog-'+name).checked); }
+// ===== POTS =====
+function addPot(n,a,ac){pots.push({name:n||'',amount:a||'',account:ac||''});renderPots();calc();}
+function removePot(i){pots.splice(i,1);renderPots();calc();}
+function updatePot(i,f,v){pots[i][f]=v;calc();}
+window._uP=updatePot;window._rP=removePot;
+function renderPots(){var h='';pots.forEach(function(p,i){var o='<option value="">No account</option><option value="Direct Payment"'+(p.account==='Direct Payment'?' selected':'')+'>Direct Payment</option>';ACCOUNTS.forEach(function(a){o+='<option value="'+esc(a)+'"'+(p.account===a?' selected':'')+'>'+esc(a)+'</option>';});h+='<div class="pot-row"><input type="text" placeholder="Pot name" value="'+esc(p.name)+'" oninput="window._uP('+i+',\'name\',this.value)"><div class="input-wrap"><span class="prefix">£</span><input type="number" class="has-prefix" placeholder="0" min="0" step="10" value="'+p.amount+'" oninput="window._uP('+i+',\'amount\',this.value)"></div><select onchange="window._uP('+i+',\'account\',this.value)">'+o+'</select><button class="btn btn-danger" onclick="window._rP('+i+')" title="Remove">×</button></div>';});$('pots-list').innerHTML=h;}
 
-// ===================== POTS =====================
-function addPot(name,amount,account) { pots.push({name:name||'',amount:amount||'',account:account||''}); renderPots(); calc(); }
-function removePot(i) { pots.splice(i,1); renderPots(); calc(); }
-function updatePot(i,field,value) { pots[i][field]=value; calc(); }
-window._updatePot=updatePot; window._removePot=removePot;
+// ===== FORM ACCOUNTS =====
+function openAccounts(){var g={},dp=[],un=[];pots.forEach(function(p){var a=parseFloat(p.amount)||0;if(!p.name&&a===0)return;var n=p.name||'Unnamed pot';if(p.account==='Direct Payment')dp.push({name:n,amount:a});else if(p.account){if(!g[p.account])g[p.account]={items:[],total:0};g[p.account].items.push({name:n,amount:a});g[p.account].total+=a;}else un.push({name:n,amount:a});});var h='',gt=0;if(dp.length){var t=dp.reduce(function(s,i){return s+i.amount;},0);gt+=t;h+='<div class="account-group" style="border-left:3px solid var(--red);background:var(--red-bg)"><div class="account-group-header"><span class="account-group-name" style="color:var(--red)">Pay Immediately</span><span class="account-group-total" style="color:var(--red)">'+fmt(t)+'</span></div><div style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:6px">Pay these off as soon as you\'re paid</div><div class="account-group-items">';dp.forEach(function(i){h+='<div><span>'+esc(i.name)+'</span><span>'+fmt(i.amount)+'</span></div>';});h+='</div></div>';}ACCOUNTS.forEach(function(ac){var x=g[ac];if(!x)return;gt+=x.total;h+='<div class="account-group"><div class="account-group-header"><span class="account-group-name">'+esc(ac)+'</span><span class="account-group-total">'+fmt(x.total)+'</span></div><div class="account-group-items">';x.items.forEach(function(i){h+='<div><span>'+esc(i.name)+'</span><span>'+fmt(i.amount)+'</span></div>';});h+='</div></div>';});if(un.length){var t=un.reduce(function(s,i){return s+i.amount;},0);gt+=t;h+='<div class="account-group"><div class="account-group-header"><span class="account-group-name" style="color:var(--text-secondary)">Main Account / Unassigned</span><span class="account-group-total">'+fmt(t)+'</span></div><div class="account-group-items">';un.forEach(function(i){h+='<div><span>'+esc(i.name)+'</span><span>'+fmt(i.amount)+'</span></div>';});h+='</div></div>';}if(!h)h='<p class="history-empty">No pots to assign.</p>';else h+='<div class="account-grand-total"><span>Total Outgoings</span><span>'+fmt(gt)+'</span></div>';$('accounts-body').innerHTML=h;$('accounts-modal').classList.add('open');}
+function closeAccounts(){$('accounts-modal').classList.remove('open');}
 
-function renderPots() {
-  var html='';
-  pots.forEach(function(p,i){
-    var opts='<option value="">No account</option><option value="Direct Payment"'+(p.account==='Direct Payment'?' selected':'')+'>Direct Payment</option>';
-    ACCOUNTS.forEach(function(a){opts+='<option value="'+esc(a)+'"'+(p.account===a?' selected':'')+'>'+esc(a)+'</option>';});
-    html+='<div class="pot-row"><input type="text" placeholder="Pot name" value="'+esc(p.name)+'" oninput="window._updatePot('+i+',\'name\',this.value)">';
-    html+='<div class="input-wrap"><span class="prefix">£</span><input type="number" class="has-prefix" placeholder="0" min="0" step="10" value="'+p.amount+'" oninput="window._updatePot('+i+',\'amount\',this.value)"></div>';
-    html+='<select onchange="window._updatePot('+i+',\'account\',this.value)">'+opts+'</select>';
-    html+='<button class="btn btn-danger" onclick="window._removePot('+i+')" title="Remove">×</button></div>';
-  });
-  document.getElementById('pots-list').innerHTML=html;
-}
+// ===== SAVE MONTH =====
+async function saveMonth(){var sal=parseFloat($('salary').value)||0;if(sal===0){toast('Enter a salary before saving');return;}var sm=parseInt($('pick-month').value),sy=parseInt($('pick-year').value),pr=getPD(sy,sm),tp=pots.reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);var entry={id:Date.now(),month:sm,year:sy,label:MS[sm]+' '+sy,payDate:ds(pr.payDate),payDateLong:fdl(pr.payDate),payDateMoved:pr.moved,payDateReason:pr.moved?movedReason(pr.original):'',payDayUsed:payDay,salary:sal,togExpenses:$('tog-expenses').checked,workExpenses:parseFloat($('work-expenses').value)||0,togMileage:$('tog-mileage').checked,miles:parseFloat($('miles').value)||0,togOvertime:$('tog-overtime').checked,overtime:parseFloat($('overtime').value)||0,takeHome:Math.round(lastTakeHome*100)/100,mileage:Math.round(lastMileage*100)/100,outgoings:Math.round(tp*100)/100,freeMoney:Math.round((lastTakeHome+lastMileage-tp)*100)/100,pots:pots.filter(function(p){return p.name||(parseFloat(p.amount)||0)>0;}).map(function(p){return{name:p.name||'Unnamed',amount:parseFloat(p.amount)||0,account:p.account||''};})};financeHistory.unshift(entry);persistHL();if(currentUser){try{await setDoc(doc(db,'users',currentUser.uid,'months',String(entry.id)),entry);}catch(e){}}clearTracker();showDashboard();toast('Saved '+entry.label);}
 
-// ===================== FORM ACCOUNTS =====================
-function openAccounts() {
-  var groups={},dp=[],un=[];
-  pots.forEach(function(p){var a=parseFloat(p.amount)||0;if(!p.name&&a===0)return;var n=p.name||'Unnamed pot';
-    if(p.account==='Direct Payment')dp.push({name:n,amount:a});
-    else if(p.account){if(!groups[p.account])groups[p.account]={items:[],total:0};groups[p.account].items.push({name:n,amount:a});groups[p.account].total+=a;}
-    else un.push({name:n,amount:a});});
-  var html='',gt=0;
-  if(dp.length){var t=dp.reduce(function(s,i){return s+i.amount;},0);gt+=t;
-    html+='<div class="account-group" style="border-left:3px solid var(--red);background:var(--red-bg)"><div class="account-group-header"><span class="account-group-name" style="color:var(--red)">Pay Immediately</span><span class="account-group-total" style="color:var(--red)">'+fmt(t)+'</span></div><div style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:6px">Pay these off as soon as you\'re paid</div><div class="account-group-items">';
-    dp.forEach(function(i){html+='<div><span>'+esc(i.name)+'</span><span>'+fmt(i.amount)+'</span></div>';});html+='</div></div>';}
-  ACCOUNTS.forEach(function(ac){var g=groups[ac];if(!g)return;gt+=g.total;
-    html+='<div class="account-group"><div class="account-group-header"><span class="account-group-name">'+esc(ac)+'</span><span class="account-group-total">'+fmt(g.total)+'</span></div><div class="account-group-items">';
-    g.items.forEach(function(i){html+='<div><span>'+esc(i.name)+'</span><span>'+fmt(i.amount)+'</span></div>';});html+='</div></div>';});
-  if(un.length){var t=un.reduce(function(s,i){return s+i.amount;},0);gt+=t;
-    html+='<div class="account-group"><div class="account-group-header"><span class="account-group-name" style="color:var(--text-secondary)">Main Account / Unassigned</span><span class="account-group-total">'+fmt(t)+'</span></div><div class="account-group-items">';
-    un.forEach(function(i){html+='<div><span>'+esc(i.name)+'</span><span>'+fmt(i.amount)+'</span></div>';});html+='</div></div>';}
-  if(!html) html='<p class="history-empty">No pots to assign.</p>';
-  else html+='<div class="account-grand-total"><span>Total Outgoings</span><span>'+fmt(gt)+'</span></div>';
-  document.getElementById('accounts-body').innerHTML=html;
-  document.getElementById('accounts-modal').classList.add('open');
-}
-function closeAccounts(){document.getElementById('accounts-modal').classList.remove('open');}
+function clearTracker(){pots=[];renderPots();$('salary').value='';$('work-expenses').value='';$('miles').value='';$('overtime').value='';$('tog-expenses').checked=false;$('tog-mileage').checked=false;$('tog-overtime').checked=false;$('sec-expenses').classList.remove('open');$('sec-mileage').classList.remove('open');$('sec-overtime').classList.remove('open');lastTakeHome=0;lastMileage=0;saveLocal();var n=new Date();$('pick-month').value=n.getMonth();$('pick-year').value=n.getFullYear();updPD();}
 
-// ===================== SAVE MONTH =====================
-async function saveMonth() {
-  var salary=parseFloat(document.getElementById('salary').value)||0;
-  if(salary===0){showToast('Enter a salary before saving');return;}
-  var sm=parseInt(document.getElementById('pick-month').value), sy=parseInt(document.getElementById('pick-year').value);
-  var pr=getPayDate(sy,sm), tp=pots.reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);
-  var entry={
-    id:Date.now(), month:sm, year:sy, label:MONTH_NAMES_SHORT[sm]+' '+sy,
-    payDate:dateToStr(pr.payDate), payDateLong:formatDateLong(pr.payDate),
-    payDateMoved:pr.moved, payDateReason:pr.moved?getMovedReason(pr.original):'',
-    payDayUsed:payDay, salary:salary,
-    togExpenses:document.getElementById('tog-expenses').checked,
-    workExpenses:parseFloat(document.getElementById('work-expenses').value)||0,
-    togMileage:document.getElementById('tog-mileage').checked,
-    miles:parseFloat(document.getElementById('miles').value)||0,
-    togOvertime:document.getElementById('tog-overtime').checked,
-    overtime:parseFloat(document.getElementById('overtime').value)||0,
-    takeHome:Math.round(lastTakeHome*100)/100, mileage:Math.round(lastMileage*100)/100,
-    outgoings:Math.round(tp*100)/100, freeMoney:Math.round((lastTakeHome+lastMileage-tp)*100)/100,
-    pots:pots.filter(function(p){return p.name||(parseFloat(p.amount)||0)>0;}).map(function(p){return{name:p.name||'Unnamed',amount:parseFloat(p.amount)||0,account:p.account||''};})
-  };
-  financeHistory.unshift(entry);
-  persistHistoryLocal();
-  if(currentUser){try{await setDoc(doc(db,'users',currentUser.uid,'months',String(entry.id)),entry);}catch(e){console.error('Firestore save:',e);}}
-  pots=[]; renderPots();
-  document.getElementById('salary').value='';
-  document.getElementById('work-expenses').value='';
-  document.getElementById('miles').value='';
-  document.getElementById('overtime').value='';
-  document.getElementById('tog-expenses').checked=false;
-  document.getElementById('tog-mileage').checked=false;
-  document.getElementById('tog-overtime').checked=false;
-  document.getElementById('sec-expenses').classList.remove('open');
-  document.getElementById('sec-mileage').classList.remove('open');
-  document.getElementById('sec-overtime').classList.remove('open');
-  lastTakeHome=0;lastMileage=0; saveLocal();
-  var now=new Date();
-  document.getElementById('pick-month').value=now.getMonth();
-  document.getElementById('pick-year').value=now.getFullYear();
-  updatePaydate(); goStep(1);
-  showToast('Saved '+entry.label+' — inputs cleared');
-}
+// ===== DASHBOARD =====
+function renderDashboard(){renderOverview();renderCharts();renderDashHistory();}
 
-// ===================== HISTORY =====================
-function openHistory(){renderHistoryList();document.getElementById('history-modal').classList.add('open');}
-function closeHistory(){document.getElementById('history-modal').classList.remove('open');}
-window._viewEntry=viewHistoryEntry; window._deleteEntry=deleteHistoryEntry; window._loadTemplate=loadAsTemplate; window._backToList=renderHistoryList;
+function renderOverview(){var el=$('dash-overview');if(!financeHistory.length){el.innerHTML='<div class="card" style="text-align:center;padding:32px"><h2 style="margin-bottom:8px">Welcome!</h2><p style="color:var(--text-secondary)">Click "New Month" to add your first month and start tracking your finances.</p></div>';return;}var h=financeHistory[0],cls=h.freeMoney>=0?'positive':'negative';el.innerHTML='<div class="dash-overview"><div class="dash-stat"><div class="stat-label">Take-Home Pay</div><div class="stat-value">'+fmt(h.takeHome)+'</div></div><div class="dash-stat"><div class="stat-label">Total Outgoings</div><div class="stat-value">'+fmt(h.outgoings)+'</div></div><div class="dash-stat"><div class="stat-label">Free Money</div><div class="stat-value '+cls+'">'+(h.freeMoney<0?'−':'')+fmt(h.freeMoney)+'</div></div><div class="dash-stat"><div class="stat-label">Mileage Claimed</div><div class="stat-value">'+fmt(h.mileage)+'</div></div></div>';}
 
-function renderHistoryList() {
-  var b=document.getElementById('history-modal-body');
-  var html='<h2>Saved Months</h2><p class="modal-subtitle">Click a month to view the full breakdown</p>';
-  if(!financeHistory.length){html+='<p class="history-empty">No saved months yet.</p>';b.innerHTML=html;return;}
-  financeHistory.forEach(function(h){
-    var cls=h.freeMoney>=0?'positive':'negative', fs=(h.freeMoney<0?'−':'')+fmt(h.freeMoney);
-    html+='<div class="history-card-item" onclick="window._viewEntry('+h.id+')"><div class="history-card-left">';
-    html+='<div class="history-card-month">'+esc(MONTH_NAMES_FULL[h.month]+' '+h.year)+'</div>';
-    html+='<div class="history-card-paydate">Paid: '+esc(h.payDateLong||h.payDate)+'</div>';
-    html+='<div class="history-card-stats"><span>Take-home: '+fmt(h.takeHome)+'</span><span>Out: '+fmt(h.outgoings)+'</span></div>';
-    html+='</div><div class="history-card-free '+cls+'">'+fs+'</div>';
-    html+='<div class="history-card-delete"><button class="btn btn-danger" onclick="event.stopPropagation();window._deleteEntry('+h.id+')" title="Delete">×</button></div></div>';
-  });
-  b.innerHTML=html;
-}
+function renderCharts(){var C=window.Chart;if(!C||!financeHistory.length)return;
+  // Take-home bar chart — last 12, oldest first
+  var last12=financeHistory.slice(0,12).reverse();
+  var labels=last12.map(function(h){return MS[h.month]+' '+String(h.year).slice(2);});
+  var thData=last12.map(function(h){return h.takeHome;});
+  var barColors=last12.map(function(h){return h.freeMoney>100?'#0d904f':h.freeMoney>=0?'#e37400':'#c5221f';});
+  if(chartTH)chartTH.destroy();
+  chartTH=new C($('chart-takehome'),{type:'bar',data:{labels:labels,datasets:[{data:thData,backgroundColor:barColors,borderRadius:4}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return'£'+c.raw.toLocaleString('en-GB',{minimumFractionDigits:2});}}}},scales:{y:{beginAtZero:true,ticks:{callback:function(v){return'£'+v.toLocaleString();}}},x:{grid:{display:false}}}}});
 
-function viewHistoryEntry(id) {
-  var h=financeHistory.find(function(e){return e.id===id;});if(!h)return;
-  var b=document.getElementById('history-modal-body');
-  var html='<div style="margin-bottom:16px"><button class="btn btn-outline" onclick="window._backToList()">&larr; Back to list</button></div>';
-  html+='<h2>'+esc(MONTH_NAMES_FULL[h.month]+' '+h.year)+'</h2>';
-  html+='<div class="paydate-card" style="margin:12px 0 16px;box-shadow:none"><div class="paydate-date" style="font-size:1.1rem;margin:0">'+esc(h.payDateLong||h.payDate)+'</div>';
-  if(h.payDateMoved&&h.payDateReason) html+='<div class="paydate-note">'+esc(h.payDateReason)+'</div>';
-  html+='</div>';
-  html+=h.freeMoney>=0?'<div class="banner banner-green" style="font-size:1rem;padding:12px">'+fmt(h.freeMoney)+' free money</div>':'<div class="banner banner-red" style="font-size:1rem;padding:12px">'+fmt(h.freeMoney)+' over budget</div>';
-  html+='<div class="summary-grid" style="margin-bottom:12px">'+stat('Salary',fmt(h.salary)+'/yr')+stat('Take-Home',fmt(h.takeHome))+stat('Mileage',fmt(h.mileage))+stat('Outgoings',fmt(h.outgoings))+'</div>';
-  if(h.togExpenses||h.togMileage||h.togOvertime){
-    html+='<div class="account-group" style="margin-bottom:12px"><div style="font-weight:600;margin-bottom:6px">Adjustments</div><div class="account-group-items">';
-    if(h.togExpenses&&h.workExpenses>0) html+='<div><span>Work expenses</span><span>'+fmt(h.workExpenses)+'</span></div>';
-    if(h.togMileage&&h.miles>0) html+='<div><span>Mileage ('+h.miles+' miles × 55p)</span><span>'+fmt(h.mileage)+'</span></div>';
-    if(h.togOvertime&&h.overtime>0) html+='<div><span>Overtime / bonus (gross)</span><span>'+fmt(h.overtime)+'</span></div>';
-    html+='</div></div>';}
-  if(h.pots&&h.pots.length){
-    html+='<div class="account-group"><div style="font-weight:600;margin-bottom:6px">Pots</div><div class="account-group-items">';
-    h.pots.forEach(function(p){var l=esc(p.name);if(p.account)l+=' <span style="color:var(--text-secondary)">('+esc(p.account)+')</span>';html+='<div><span>'+l+'</span><span>'+fmt(p.amount)+'</span></div>';});
-    html+='</div></div>';}
-  html+='<div class="action-row" style="margin-top:16px"><button class="btn btn-primary" onclick="window._loadTemplate('+h.id+')">Load as Template</button>';
-  html+='<button class="btn btn-danger-solid" onclick="window._deleteEntry('+h.id+')">Delete Month</button></div>';
-  b.innerHTML=html;
-}
+  // Spending donut — most recent month's pots
+  var latest=financeHistory[0];
+  if(chartSpend)chartSpend.destroy();
+  if(latest.pots&&latest.pots.length){
+    var pLabels=latest.pots.map(function(p){return p.name;});
+    var pData=latest.pots.map(function(p){return p.amount;});
+    var colors=['#1a73e8','#0d904f','#e37400','#c5221f','#8430ce','#00897b','#d81b60','#546e7a','#ff6d00','#2962ff'];
+    chartSpend=new C($('chart-spending'),{type:'doughnut',data:{labels:pLabels,datasets:[{data:pData,backgroundColor:colors.slice(0,pData.length)}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}},tooltip:{callbacks:{label:function(c){var total=c.dataset.data.reduce(function(a,b){return a+b;},0);var pct=total>0?Math.round(c.raw/total*100):0;return c.label+': £'+c.raw.toLocaleString('en-GB',{minimumFractionDigits:2})+' ('+pct+'%)';}}}}}}); }
+  else{$('chart-spending').parentElement.innerHTML='<h3 style="font-size:0.9rem;font-weight:600;color:var(--text-secondary);margin-bottom:12px">Spending Breakdown</h3><p class="history-empty">No pots recorded</p>';}
 
-async function deleteHistoryEntry(id) {
-  var h=financeHistory.find(function(e){return e.id===id;});if(!h)return;
-  if(!confirm('Delete '+MONTH_NAMES_FULL[h.month]+' '+h.year+'? This cannot be undone.'))return;
-  financeHistory=financeHistory.filter(function(e){return e.id!==id;});
-  persistHistoryLocal();
-  if(currentUser){try{await deleteDoc(doc(db,'users',currentUser.uid,'months',String(id)));}catch(e){console.error('Firestore delete:',e);}}
-  renderHistoryList();
-  showToast('Deleted '+h.label);
-}
+  // Free money line chart
+  var all=financeHistory.slice().reverse();
+  var fLabels=all.map(function(h){return MS[h.month]+' '+String(h.year).slice(2);});
+  var fData=all.map(function(h){return h.freeMoney;});
+  if(chartFree)chartFree.destroy();
+  chartFree=new C($('chart-free'),{type:'line',data:{labels:fLabels,datasets:[{data:fData,borderColor:'#1a73e8',backgroundColor:'rgba(26,115,232,0.1)',fill:true,tension:0.3,pointRadius:4,pointBackgroundColor:fData.map(function(v){return v>=0?'#0d904f':'#c5221f';})}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return'£'+c.raw.toLocaleString('en-GB',{minimumFractionDigits:2});}}}},scales:{y:{ticks:{callback:function(v){return'£'+v.toLocaleString();}},grid:{color:function(c){return c.tick.value===0?'rgba(0,0,0,0.3)':'rgba(0,0,0,0.06)';},lineWidth:function(c){return c.tick.value===0?2:1;}}},x:{grid:{display:false}}}}});}
 
-function loadAsTemplate(id) {
-  var h=financeHistory.find(function(e){return e.id===id;});if(!h)return;
-  document.getElementById('salary').value=h.salary;
-  pots=h.pots.map(function(p){return{name:p.name||'',amount:p.amount||'',account:p.account||''};});
-  renderPots();
-  document.getElementById('work-expenses').value='';
-  document.getElementById('miles').value='';
-  document.getElementById('overtime').value='';
-  document.getElementById('tog-expenses').checked=false;
-  document.getElementById('tog-mileage').checked=false;
-  document.getElementById('tog-overtime').checked=false;
-  document.getElementById('sec-expenses').classList.remove('open');
-  document.getElementById('sec-mileage').classList.remove('open');
-  document.getElementById('sec-overtime').classList.remove('open');
-  var now=new Date();
-  document.getElementById('pick-month').value=now.getMonth();
-  document.getElementById('pick-year').value=now.getFullYear();
-  updatePaydate(); closeHistory(); goStep(1); calc();
-  var banner=document.getElementById('template-banner');
-  banner.textContent='Template loaded from '+MONTH_NAMES_FULL[h.month]+' '+h.year+' — salary and pots ready, fill in this month\'s adjustments';
-  banner.style.display='block';
-  setTimeout(function(){banner.style.display='none';},8000);
-}
+window._viewE=viewEntry;window._delE=deleteEntry;window._loadT=loadTemplate;window._renderDash=renderDashboard;window._showTracker=showTracker;window._finHist=function(v){if(v)financeHistory=v;return financeHistory;};
 
-// ===================== LOCAL PERSISTENCE =====================
-function saveLocal() {
-  try{localStorage.setItem('uk-finance-tracker',JSON.stringify({
-    salary:document.getElementById('salary').value,
-    togExpenses:document.getElementById('tog-expenses').checked,
-    togMileage:document.getElementById('tog-mileage').checked,
-    togOvertime:document.getElementById('tog-overtime').checked,
-    workExpenses:document.getElementById('work-expenses').value,
-    miles:document.getElementById('miles').value,
-    overtime:document.getElementById('overtime').value,
-    pots:pots
-  }));}catch(e){}
-}
-function persistHistoryLocal(){try{localStorage.setItem('finance_history',JSON.stringify(financeHistory));}catch(e){}}
-function loadLocal() {
-  try{var r=localStorage.getItem('uk-finance-tracker');if(r){var d=JSON.parse(r);
-    if(d.salary)document.getElementById('salary').value=d.salary;
-    if(d.togExpenses){document.getElementById('tog-expenses').checked=true;toggleSection('expenses');}
-    if(d.togMileage){document.getElementById('tog-mileage').checked=true;toggleSection('mileage');}
-    if(d.togOvertime){document.getElementById('tog-overtime').checked=true;toggleSection('overtime');}
-    if(d.workExpenses)document.getElementById('work-expenses').value=d.workExpenses;
-    if(d.miles)document.getElementById('miles').value=d.miles;
-    if(d.overtime)document.getElementById('overtime').value=d.overtime;
-    if(d.pots&&d.pots.length){pots=d.pots.map(function(p){return{name:p.name||'',amount:p.amount||'',account:p.account||''};});renderPots();}
-  }}catch(e){}
-  try{var old=localStorage.getItem('uk-finance-history');var nw=localStorage.getItem('finance_history');
-    if(old&&!nw){localStorage.setItem('finance_history',old);localStorage.removeItem('uk-finance-history');}
-    var h=localStorage.getItem('finance_history');if(h)financeHistory=JSON.parse(h);
-  }catch(e){}
-}
+function renderDashHistory(){var el=$('dash-history');if(!financeHistory.length){el.innerHTML='<p class="history-empty">No saved months yet.</p>';return;}var h='';financeHistory.forEach(function(e){var cls=e.freeMoney>=0?'positive':'negative',fs=(e.freeMoney<0?'−':'')+fmt(e.freeMoney);h+='<div class="dash-history-row" onclick="window._viewE('+e.id+')"><div class="dh-main"><div class="dh-month">'+esc(MF[e.month]+' '+e.year)+'</div><div class="dh-paydate">Paid: '+esc(e.payDateLong||e.payDate)+'</div><div class="dh-stats"><span>Take-home: '+fmt(e.takeHome)+'</span><span>Out: '+fmt(e.outgoings)+'</span>'+(e.mileage>0?'<span>Mileage: '+fmt(e.mileage)+'</span>':'')+'</div></div><div class="dh-free '+cls+'">'+fs+'</div><div class="dh-actions"><button class="btn btn-outline" onclick="event.stopPropagation();window._loadT('+e.id+')" title="Use as template">Use</button><button class="btn btn-danger" onclick="event.stopPropagation();window._delE('+e.id+')" title="Delete">×</button></div></div>';});el.innerHTML=h;}
 
-// ===================== FIRESTORE SYNC =====================
-async function syncFromFirestore() {
-  if(!currentUser) return;
-  try {
-    var snap=await getDocs(collection(db,'users',currentUser.uid,'months'));
-    var entries=[];
-    snap.forEach(function(d){entries.push(d.data());});
-    if(entries.length>0||financeHistory.length===0){
-      // Merge: if Firestore has data, use it. If local has entries not in Firestore, push them up.
-      var fsIds=new Set(entries.map(function(e){return e.id;}));
-      var localOnly=financeHistory.filter(function(e){return !fsIds.has(e.id);});
-      for(var i=0;i<localOnly.length;i++){
-        entries.push(localOnly[i]);
-        try{await setDoc(doc(db,'users',currentUser.uid,'months',String(localOnly[i].id)),localOnly[i]);}catch(e){}
-      }
-      financeHistory=entries.sort(function(a,b){return b.id-a.id;});
-      persistHistoryLocal();
-    }
-  } catch(e){ console.error('Firestore sync:',e); }
-}
+// ===== HISTORY DETAIL MODAL =====
+function viewEntry(id){var h=financeHistory.find(function(e){return e.id===id;});if(!h)return;var b=$('detail-modal-body');var html='<h2>'+esc(MF[h.month]+' '+h.year)+'</h2>';html+='<div class="paydate-card" style="margin:12px 0 16px;box-shadow:none"><div class="paydate-date" style="font-size:1.1rem;margin:0">'+esc(h.payDateLong||h.payDate)+'</div>';if(h.payDateMoved&&h.payDateReason)html+='<div class="paydate-note">'+esc(h.payDateReason)+'</div>';html+='</div>';html+=h.freeMoney>=0?'<div class="banner banner-green" style="font-size:1rem;padding:12px">'+fmt(h.freeMoney)+' free money</div>':'<div class="banner banner-red" style="font-size:1rem;padding:12px">'+fmt(h.freeMoney)+' over budget</div>';html+='<div class="summary-grid" style="margin-bottom:12px">'+st('Salary',fmt(h.salary)+'/yr')+st('Take-Home',fmt(h.takeHome))+st('Mileage',fmt(h.mileage))+st('Outgoings',fmt(h.outgoings))+'</div>';if(h.togExpenses||h.togMileage||h.togOvertime){html+='<div class="account-group" style="margin-bottom:12px"><div style="font-weight:600;margin-bottom:6px">Adjustments</div><div class="account-group-items">';if(h.togExpenses&&h.workExpenses>0)html+='<div><span>Work expenses</span><span>'+fmt(h.workExpenses)+'</span></div>';if(h.togMileage&&h.miles>0)html+='<div><span>Mileage ('+h.miles+' miles × 55p)</span><span>'+fmt(h.mileage)+'</span></div>';if(h.togOvertime&&h.overtime>0)html+='<div><span>Overtime / bonus (gross)</span><span>'+fmt(h.overtime)+'</span></div>';html+='</div></div>';}if(h.pots&&h.pots.length){html+='<div class="account-group"><div style="font-weight:600;margin-bottom:6px">Pots</div><div class="account-group-items">';h.pots.forEach(function(p){var l=esc(p.name);if(p.account)l+=' <span style="color:var(--text-secondary)">('+esc(p.account)+')</span>';html+='<div><span>'+l+'</span><span>'+fmt(p.amount)+'</span></div>';});html+='</div></div>';}html+='<div class="action-row" style="margin-top:16px"><button class="btn btn-primary" onclick="window._loadT('+h.id+')">Load as Template</button><button class="btn btn-danger-solid" onclick="window._delE('+h.id+')">Delete Month</button></div>';b.innerHTML=html;$('detail-modal').classList.add('open');}
 
-async function loadSettingsFromFirestore() {
-  if(!currentUser) return;
-  try {
-    var snap=await getDoc(doc(db,'users',currentUser.uid,'settings','config'));
-    if(snap.exists()){
-      var data=snap.data();
-      if(data.payDay){payDay=data.payDay;localStorage.setItem('finance_payDay',payDay);document.getElementById('payday-select').value=payDay;updatePaydate();}
-    }
-  } catch(e){console.error('Settings load:',e);}
-}
+async function deleteEntry(id){var h=financeHistory.find(function(e){return e.id===id;});if(!h)return;if(!confirm('Delete '+MF[h.month]+' '+h.year+'?'))return;financeHistory=financeHistory.filter(function(e){return e.id!==id;});persistHL();if(currentUser){try{await deleteDoc(doc(db,'users',currentUser.uid,'months',String(id)));}catch(e){}}$('detail-modal').classList.remove('open');renderDashboard();toast('Deleted '+h.label);}
 
-// ===================== AUTH =====================
-function showAuthScreen() {
-  document.getElementById('loading-screen').style.display='none';
-  document.getElementById('auth-screen').style.display='flex';
-  document.getElementById('app-container').style.display='none';
-}
-function showApp() {
-  document.getElementById('loading-screen').style.display='none';
-  document.getElementById('auth-screen').style.display='none';
-  document.getElementById('app-container').style.display='block';
-}
-function updateUserDisplay() {
-  if(!currentUser) return;
-  document.getElementById('user-display').textContent=currentUser.displayName||currentUser.email;
-}
-function showAuthError(msg) {
-  var el=document.getElementById('auth-error');
-  el.textContent=msg; el.style.display='block';
-}
+function loadTemplate(id){var h=financeHistory.find(function(e){return e.id===id;});if(!h)return;$('salary').value=h.salary;pots=h.pots.map(function(p){return{name:p.name||'',amount:p.amount||'',account:p.account||''};});renderPots();$('work-expenses').value='';$('miles').value='';$('overtime').value='';$('tog-expenses').checked=false;$('tog-mileage').checked=false;$('tog-overtime').checked=false;$('sec-expenses').classList.remove('open');$('sec-mileage').classList.remove('open');$('sec-overtime').classList.remove('open');var n=new Date();$('pick-month').value=n.getMonth();$('pick-year').value=n.getFullYear();updPD();$('detail-modal').classList.remove('open');showTracker();calc();var b=$('template-banner');b.textContent='Template loaded from '+MF[h.month]+' '+h.year+' — salary and pots ready, fill in this month\'s adjustments';b.style.display='block';setTimeout(function(){b.style.display='none';},8000);}
 
-document.getElementById('google-btn').addEventListener('click', async function(){
-  document.getElementById('auth-error').style.display='none';
-  try{await signInWithPopup(auth,googleProvider);}
-  catch(e){showAuthError(e.message);}
-});
+// ===== PERSISTENCE =====
+function saveLocal(){try{localStorage.setItem('uk-finance-tracker',JSON.stringify({salary:$('salary').value,togExpenses:$('tog-expenses').checked,togMileage:$('tog-mileage').checked,togOvertime:$('tog-overtime').checked,workExpenses:$('work-expenses').value,miles:$('miles').value,overtime:$('overtime').value,pots:pots}));}catch(e){}}
+function persistHL(){try{localStorage.setItem('finance_history',JSON.stringify(financeHistory));}catch(e){}}
+function loadLocal(){try{var r=localStorage.getItem('uk-finance-tracker');if(r){var d=JSON.parse(r);if(d.salary)$('salary').value=d.salary;if(d.togExpenses){$('tog-expenses').checked=true;toggleSection('expenses');}if(d.togMileage){$('tog-mileage').checked=true;toggleSection('mileage');}if(d.togOvertime){$('tog-overtime').checked=true;toggleSection('overtime');}if(d.workExpenses)$('work-expenses').value=d.workExpenses;if(d.miles)$('miles').value=d.miles;if(d.overtime)$('overtime').value=d.overtime;if(d.pots&&d.pots.length){pots=d.pots.map(function(p){return{name:p.name||'',amount:p.amount||'',account:p.account||''};});renderPots();}}}catch(e){}try{var o=localStorage.getItem('uk-finance-history'),n=localStorage.getItem('finance_history');if(o&&!n){localStorage.setItem('finance_history',o);localStorage.removeItem('uk-finance-history');}var h=localStorage.getItem('finance_history');if(h)financeHistory=JSON.parse(h);}catch(e){}}
 
-document.getElementById('email-form').addEventListener('submit', async function(ev){
-  ev.preventDefault();
-  document.getElementById('auth-error').style.display='none';
-  var email=document.getElementById('auth-email').value;
-  var pass=document.getElementById('auth-password').value;
-  try{
-    if(authIsSignUp) await createUserWithEmailAndPassword(auth,email,pass);
-    else await signInWithEmailAndPassword(auth,email,pass);
-  }catch(e){
-    var msg=e.code==='auth/user-not-found'?'No account found — try creating one':
-            e.code==='auth/wrong-password'||e.code==='auth/invalid-credential'?'Incorrect email or password':
-            e.code==='auth/email-already-in-use'?'Email already in use — try signing in':
-            e.code==='auth/weak-password'?'Password must be at least 6 characters':e.message;
-    showAuthError(msg);
-  }
-});
+// ===== FIRESTORE =====
+async function syncFS(){if(!currentUser)return;try{var snap=await getDocs(collection(db,'users',currentUser.uid,'months'));var entries=[];snap.forEach(function(d){entries.push(d.data());});var fsIds=new Set(entries.map(function(e){return e.id;}));var lo=financeHistory.filter(function(e){return!fsIds.has(e.id);});for(var i=0;i<lo.length;i++){entries.push(lo[i]);try{await setDoc(doc(db,'users',currentUser.uid,'months',String(lo[i].id)),lo[i]);}catch(e){}}if(entries.length>0||financeHistory.length===0){financeHistory=entries.sort(function(a,b){return b.id-a.id;});persistHL();renderDashboard();}}catch(e){console.error('Sync:',e);}}
+async function loadSettingsFS(){if(!currentUser)return;try{var s=await getDoc(doc(db,'users',currentUser.uid,'settings','config'));if(s.exists()&&s.data().payDay){payDay=s.data().payDay;localStorage.setItem('finance_payDay',payDay);$('payday-select').value=payDay;updPD();}}catch(e){}}
 
-document.getElementById('auth-switch').addEventListener('click', function(){
-  authIsSignUp=!authIsSignUp;
-  document.getElementById('email-submit-btn').textContent=authIsSignUp?'Create Account':'Sign In';
-  document.getElementById('auth-toggle').innerHTML=authIsSignUp?'Already have an account? <a id="auth-switch">Sign in</a>':'Don\'t have an account? <a id="auth-switch">Create one</a>';
-  document.getElementById('auth-switch').addEventListener('click',arguments.callee);
-  document.getElementById('auth-error').style.display='none';
-});
+// ===== AUTH =====
+function showAuth(){$('loading-screen').style.display='none';$('auth-screen').style.display='flex';$('app-container').style.display='none';}
+function showApp(){$('loading-screen').style.display='none';$('auth-screen').style.display='none';$('app-container').style.display='block';}
 
-document.getElementById('signout-btn').addEventListener('click', async function(){
-  await fbSignOut(auth);
-});
+$('google-btn').addEventListener('click',async function(){$('auth-error').style.display='none';try{await signInWithPopup(auth,googleProvider);}catch(e){var el=$('auth-error');el.textContent=e.message;el.style.display='block';}});
+$('email-form').addEventListener('submit',async function(ev){ev.preventDefault();$('auth-error').style.display='none';var em=$('auth-email').value,pw=$('auth-password').value;try{if(authIsSignUp)await createUserWithEmailAndPassword(auth,em,pw);else await signInWithEmailAndPassword(auth,em,pw);}catch(e){var m=e.code==='auth/user-not-found'?'No account found':e.code==='auth/wrong-password'||e.code==='auth/invalid-credential'?'Incorrect email or password':e.code==='auth/email-already-in-use'?'Email already in use':e.code==='auth/weak-password'?'Password must be 6+ characters':e.message;var el=$('auth-error');el.textContent=m;el.style.display='block';}});
+$('auth-switch').addEventListener('click',function fn(){authIsSignUp=!authIsSignUp;$('email-submit-btn').textContent=authIsSignUp?'Create Account':'Sign In';$('auth-toggle').innerHTML=authIsSignUp?'Already have an account? <a id="auth-switch">Sign in</a>':"Don't have an account? <a id=\"auth-switch\">Create one</a>";$('auth-switch').addEventListener('click',fn);$('auth-error').style.display='none';});
+$('signout-btn').addEventListener('click',async function(){await fbSignOut(auth);});
 
-onAuthStateChanged(auth, async function(user){
-  if(user){
-    currentUser=user;
-    loadLocal();
-    initMonthPicker();
-    initPaydaySelect();
-    showApp();
-    updateUserDisplay();
-    calc();
-    await loadSettingsFromFirestore();
-    await syncFromFirestore();
-  } else {
-    currentUser=null;
-    showAuthScreen();
-  }
-});
+onAuthStateChanged(auth,async function(user){if(user){currentUser=user;loadLocal();initMP();initPDS();showApp();$('user-display').textContent=user.displayName||user.email;showDashboard();await loadSettingsFS();await syncFS();}else{currentUser=null;showAuth();}});
 
-// ===================== EVENT LISTENERS =====================
-document.getElementById('salary').addEventListener('input',calc);
-document.getElementById('work-expenses').addEventListener('input',calc);
-document.getElementById('miles').addEventListener('input',calc);
-document.getElementById('overtime').addEventListener('input',calc);
-document.getElementById('tog-expenses').addEventListener('change',function(){toggleSection('expenses');calc();});
-document.getElementById('tog-mileage').addEventListener('change',function(){toggleSection('mileage');calc();});
-document.getElementById('tog-overtime').addEventListener('change',function(){toggleSection('overtime');calc();});
-document.getElementById('pick-month').addEventListener('change',updatePaydate);
-document.getElementById('pick-year').addEventListener('change',updatePaydate);
-document.getElementById('month-prev').addEventListener('click',function(){shiftMonth(-1);});
-document.getElementById('month-next').addEventListener('click',function(){shiftMonth(1);});
-document.getElementById('step-item-1').addEventListener('click',function(){goStep(1);});
-document.getElementById('step-item-2').addEventListener('click',function(){goStep(2);});
-document.getElementById('step-item-3').addEventListener('click',function(){goStep(3);});
-document.getElementById('nav-next-1').addEventListener('click',function(){goStep(2);});
-document.getElementById('nav-back-2').addEventListener('click',function(){goStep(1);});
-document.getElementById('nav-next-2').addEventListener('click',function(){goStep(3);});
-document.getElementById('nav-back-3').addEventListener('click',function(){goStep(2);});
-document.getElementById('add-pot-btn').addEventListener('click',function(){addPot();});
-document.getElementById('view-history-btn').addEventListener('click',openHistory);
-document.getElementById('close-history-btn').addEventListener('click',closeHistory);
-document.getElementById('close-accounts-btn').addEventListener('click',closeAccounts);
-document.getElementById('settings-btn').addEventListener('click',function(){document.getElementById('settings-modal').classList.add('open');});
-document.getElementById('close-settings-btn').addEventListener('click',function(){document.getElementById('settings-modal').classList.remove('open');});
-document.getElementById('payday-select').addEventListener('change',onPayDayChange);
-document.getElementById('accounts-modal').addEventListener('click',function(e){if(e.target===this)closeAccounts();});
-document.getElementById('history-modal').addEventListener('click',function(e){if(e.target===this)closeHistory();});
-document.getElementById('settings-modal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
-document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeAccounts();closeHistory();document.getElementById('settings-modal').classList.remove('open');}});
+// ===== EVENTS =====
+$('salary').addEventListener('input',calc);$('work-expenses').addEventListener('input',calc);$('miles').addEventListener('input',calc);$('overtime').addEventListener('input',calc);
+$('tog-expenses').addEventListener('change',function(){toggleSection('expenses');calc();});$('tog-mileage').addEventListener('change',function(){toggleSection('mileage');calc();});$('tog-overtime').addEventListener('change',function(){toggleSection('overtime');calc();});
+$('pick-month').addEventListener('change',updPD);$('pick-year').addEventListener('change',updPD);
+$('month-prev').addEventListener('click',function(){shiftM(-1);});$('month-next').addEventListener('click',function(){shiftM(1);});
+$('step-item-1').addEventListener('click',function(){goStep(1);});$('step-item-2').addEventListener('click',function(){goStep(2);});$('step-item-3').addEventListener('click',function(){goStep(3);});
+$('nav-next-1').addEventListener('click',function(){goStep(2);});$('nav-back-2').addEventListener('click',function(){goStep(1);});$('nav-next-2').addEventListener('click',function(){goStep(3);});$('nav-back-3').addEventListener('click',function(){goStep(2);});
+$('add-pot-btn').addEventListener('click',function(){addPot();});
+$('new-month-btn').addEventListener('click',function(){clearTracker();showTracker();});
+$('header-back').addEventListener('click',showDashboard);
+$('close-accounts-btn').addEventListener('click',closeAccounts);$('accounts-modal').addEventListener('click',function(e){if(e.target===this)closeAccounts();});
+$('close-detail-btn').addEventListener('click',function(){$('detail-modal').classList.remove('open');});$('detail-modal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
+$('settings-btn').addEventListener('click',function(){$('settings-modal').classList.add('open');});$('close-settings-btn').addEventListener('click',function(){$('settings-modal').classList.remove('open');});$('settings-modal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
+$('payday-select').addEventListener('change',onPDC);
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeAccounts();$('detail-modal').classList.remove('open');$('settings-modal').classList.remove('open');}});
 
-if('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./service-worker.js');
 </script>
 </body>
 </html>
