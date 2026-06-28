@@ -204,6 +204,37 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
 .splash-google:hover { background: var(--bg); }
 .splash-google svg { width: 20px; height: 20px; }
 
+/* Splash features showcase */
+.splash-showcase { background: var(--card); padding: 60px 24px; }
+.showcase-inner { max-width: 960px; margin: 0 auto; }
+.showcase-inner h2 { text-align: center; font-size: 1.6rem; font-weight: 700; margin-bottom: 6px; }
+.showcase-sub { text-align: center; color: var(--text-secondary); font-size: 1rem; margin-bottom: 40px; }
+.showcase-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px; }
+.showcase-card { background: var(--bg); border-radius: var(--radius); padding: 24px; transition: box-shadow 0.2s; }
+.showcase-card:hover { box-shadow: var(--shadow); }
+.showcase-card i { font-size: 1.8rem; color: var(--primary); margin-bottom: 12px; display: block; }
+.showcase-card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
+.showcase-card p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; }
+
+.showcase-preview { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 40px; }
+.preview-card { background: var(--bg); border-radius: var(--radius); padding: 20px; }
+.preview-card h4 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); margin-bottom: 12px; }
+.preview-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 0.88rem; border-bottom: 1px solid var(--border); }
+.preview-row:last-child { border-bottom: none; }
+.preview-row .val { font-weight: 600; font-variant-numeric: tabular-nums; }
+.preview-row .val.green { color: var(--green); }
+.preview-row .val.red { color: var(--red); }
+.preview-bar { height: 8px; border-radius: 4px; margin-top: 4px; }
+.preview-acct { display: flex; justify-content: space-between; padding: 8px 0; font-size: 0.88rem; }
+.preview-acct-name { font-weight: 600; }
+.preview-acct-val { font-variant-numeric: tabular-nums; color: var(--primary); font-weight: 600; }
+.preview-acct-bar { display: flex; gap: 3px; margin-bottom: 16px; height: 6px; }
+.preview-acct-bar span { border-radius: 3px; flex: 1; }
+
+.showcase-cta { text-align: center; }
+.showcase-cta p { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 16px; }
+.showcase-cta button { padding: 12px 32px; font-size: 1rem; }
+
 @media (max-width: 600px) {
   .container { padding: 10px; }
   .card { padding: 16px; }
@@ -226,6 +257,10 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
   .splash-features li { font-size: 0.85rem; }
   .splash-right { padding: 0 16px 40px; }
   .splash-card { padding: 24px 18px; }
+  .showcase-grid { grid-template-columns: 1fr; }
+  .showcase-preview { grid-template-columns: 1fr; }
+  .splash-showcase { padding: 40px 16px; }
+  .showcase-inner h2 { font-size: 1.3rem; }
 }
 </style>
 </head>
@@ -278,6 +313,78 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
           <svg viewBox="0 0 21 21" width="20" height="20"><rect x="1" y="1" width="9" height="9" fill="#f25022"/><rect x="11" y="1" width="9" height="9" fill="#7fba00"/><rect x="1" y="11" width="9" height="9" fill="#00a4ef"/><rect x="11" y="11" width="9" height="9" fill="#ffb900"/></svg>
           Continue with Microsoft
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features showcase -->
+  <div class="splash-showcase">
+    <div class="showcase-inner">
+      <h2>Everything you need to manage your money</h2>
+      <p class="showcase-sub">Built for UK employees — accurate tax, simple budgeting, zero hassle.</p>
+
+      <div class="showcase-grid">
+        <div class="showcase-card">
+          <i class="ti ti-receipt-tax"></i>
+          <h3>Accurate UK Tax Calculations</h3>
+          <p>Income tax bands, personal allowance tapering, and employee NI — all calculated automatically using 2026/27 rates. See exactly what you take home.</p>
+        </div>
+        <div class="showcase-card">
+          <i class="ti ti-pig-money"></i>
+          <h3>Budget With Pots</h3>
+          <p>Split your outgoings into named pots — rent, bills, food, savings — and see at a glance whether you're on track or over budget.</p>
+        </div>
+        <div class="showcase-card">
+          <i class="ti ti-building-bank"></i>
+          <h3>Form Your Accounts</h3>
+          <p>Assign each pot to a bank account so you know exactly how much to transfer on payday. Direct payments, bills, savings — all sorted.</p>
+        </div>
+        <div class="showcase-card">
+          <i class="ti ti-car"></i>
+          <h3>Mileage Claims</h3>
+          <p>Log your business miles and get the tax-free amount calculated instantly at 55p per mile. Added on top of your take-home, not taxed.</p>
+        </div>
+        <div class="showcase-card">
+          <i class="ti ti-calendar-event"></i>
+          <h3>Smart Payday Logic</h3>
+          <p>Set your pay day and the app figures out weekends and UK bank holidays automatically. Shows your actual pay date and budget coverage window.</p>
+        </div>
+        <div class="showcase-card">
+          <i class="ti ti-chart-area-line"></i>
+          <h3>Charts &amp; History</h3>
+          <p>Save each month and build up a picture over time. Bar charts, spending breakdowns, and free money trends — all on your dashboard.</p>
+        </div>
+      </div>
+
+      <div class="showcase-preview">
+        <div class="preview-card">
+          <h4>Example monthly breakdown</h4>
+          <div class="preview-row"><span>Gross salary</span><span class="val">£3,750.00</span></div>
+          <div class="preview-row"><span>Income tax</span><span class="val red">−£540.50</span></div>
+          <div class="preview-row"><span>National Insurance</span><span class="val red">−£216.20</span></div>
+          <div class="preview-row"><span>Mileage (200 miles)</span><span class="val green">+£110.00</span></div>
+          <div class="preview-row" style="font-weight:700;border-top:2px solid var(--text);padding-top:8px"><span>Take-home + mileage</span><span class="val">£3,103.30</span></div>
+        </div>
+        <div class="preview-card">
+          <h4>Payday account split</h4>
+          <div class="preview-acct-bar">
+            <span style="background:var(--red);flex:2"></span>
+            <span style="background:var(--primary);flex:3"></span>
+            <span style="background:var(--green);flex:1.5"></span>
+            <span style="background:var(--amber);flex:1"></span>
+            <span style="background:var(--text-secondary);flex:2"></span>
+          </div>
+          <div class="preview-acct"><span class="preview-acct-name">Pay Immediately</span><span class="preview-acct-val">£200.00</span></div>
+          <div class="preview-acct"><span class="preview-acct-name">Bills</span><span class="preview-acct-val">£1,350.00</span></div>
+          <div class="preview-acct"><span class="preview-acct-name">Savings</span><span class="preview-acct-val">£300.00</span></div>
+          <div class="preview-acct"><span class="preview-acct-name">Car Finance</span><span class="preview-acct-val">£250.00</span></div>
+          <div class="preview-acct"><span class="preview-acct-name">Remaining</span><span class="preview-acct-val" style="color:var(--green)">£573.30</span></div>
+        </div>
+      </div>
+
+      <div class="showcase-cta">
+        <p>Free to use. Sign up in seconds.</p>
+        <button class="btn btn-primary" onclick="window.scrollTo({top:0,behavior:'smooth'})">Get Started</button>
       </div>
     </div>
   </div>
