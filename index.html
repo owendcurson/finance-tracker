@@ -496,7 +496,7 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
 <!-- Modals -->
 <div class="modal-overlay" id="accounts-modal"><div class="modal"><button class="modal-close" id="close-accounts-btn">&times;</button><h2>Payday Account Breakdown</h2><p class="modal-subtitle">Where to transfer your money on payday</p><div id="accounts-body"></div></div></div>
 <div class="modal-overlay" id="detail-modal"><div class="modal" style="max-width:600px"><button class="modal-close" id="close-detail-btn">&times;</button><div id="detail-modal-body"></div></div></div>
-<div class="modal-overlay" id="settings-modal"><div class="modal" style="max-width:420px"><button class="modal-close" id="close-settings-btn">&times;</button><h2>Settings</h2><p class="modal-subtitle">Customise your finance tracker</p><div class="settings-field"><label for="payday-select">Pay Day</label><select id="payday-select"></select><p class="settings-note">Capped at 28th to avoid issues with shorter months (February has 28 days). If your pay day falls on a weekend or bank holiday, it will be moved to the nearest working day before.</p></div></div></div>
+<div class="modal-overlay" id="settings-modal"><div class="modal" style="max-width:420px"><button class="modal-close" id="close-settings-btn">&times;</button><h2>Settings</h2><p class="modal-subtitle">Customise your finance tracker</p><div class="settings-field"><label for="payday-select">Pay Day</label><select id="payday-select"></select><p class="settings-note">If the selected day doesn't exist in a given month (e.g. 31st in February), you'll be paid on the last day of that month instead. Weekends and UK bank holidays are adjusted to the nearest working day before.</p></div></div></div>
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -538,9 +538,9 @@ function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');setTi
 function $(id){return document.getElementById(id);}
 
 // ===== PAY DATE =====
-function getPD(y,m,pd){pd=pd||payDay;var t=new Date(y,m,pd),o=new Date(t);while(!isWD(t))t.setDate(t.getDate()-1);return{payDate:t,original:o,moved:t.getTime()!==o.getTime()};}
+function getPD(y,m,pd){pd=pd||payDay;var lastDay=new Date(y,m+1,0).getDate();var actualDay=Math.min(pd,lastDay);var t=new Date(y,m,actualDay),o=new Date(t);while(!isWD(t))t.setDate(t.getDate()-1);return{payDate:t,original:o,moved:t.getTime()!==o.getTime()};}
 function getNextPD(y,m,pd){var nm=m+1,ny=y;if(nm>11){nm=0;ny++;}return getPD(ny,nm,pd);}
-function movedReason(o,pd){pd=pd||payDay;var s=pd+os(pd),d=o.getDay(),k=ds(o);if(d===0)return s+' falls on a Sunday';if(d===6)return s+' falls on a Saturday';if(BH[k])return s+' is '+(BHN[k.substring(5)]||'a bank holiday');return s+' is a non-working day';}
+function movedReason(o,pd){pd=pd||payDay;var actualDay=o.getDate();var s=actualDay+os(actualDay),d=o.getDay(),k=ds(o);if(d===0)return s+' falls on a Sunday';if(d===6)return s+' falls on a Saturday';if(BH[k])return s+' is '+(BHN[k.substring(5)]||'a bank holiday');return s+' is a non-working day';}
 
 // ===== TAX =====
 function gPA(g){if(g<=TS)return PA;return Math.max(0,PA-Math.floor((g-TS)/2));}
@@ -554,7 +554,7 @@ function shiftM(d){var ms=$('pick-month'),ys=$('pick-year'),m=parseInt(ms.value)
 function updPD(){var m=parseInt($('pick-month').value),y=parseInt($('pick-year').value),r=getPD(y,m),nx=getNextPD(y,m),cs=new Date(r.payDate);cs.setDate(cs.getDate()+1);var h='<div class="paydate-card"><div class="paydate-header"><span class="paydate-icon">&#128197;</span><span class="paydate-title">Pay Date for '+MF[m]+' '+y+'</span></div><div class="paydate-date">'+fdl(r.payDate)+'</div>';if(r.moved)h+='<div class="paydate-note">'+movedReason(r.original)+' — paid '+DN[r.payDate.getDay()]+' '+r.payDate.getDate()+os(r.payDate.getDate())+' instead</div>';h+='<div class="paydate-coverage"><strong>Budget coverage:</strong> '+fds(cs)+' — '+fds(nx.payDate)+' <span style="color:var(--primary);font-weight:600">('+Math.round((nx.payDate-cs)/86400000)+' days)</span></div></div>';$('paydate-info').innerHTML=h;}
 
 // ===== SETTINGS =====
-function initPDS(){var s=$('payday-select');s.innerHTML='';for(var d=1;d<=28;d++){var o=document.createElement('option');o.value=d;o.textContent=d+os(d)+' of each month';if(d===payDay)o.selected=true;s.appendChild(o);}}
+function initPDS(){var s=$('payday-select');s.innerHTML='';for(var d=1;d<=31;d++){var o=document.createElement('option');o.value=d;o.textContent=d+os(d)+' of each month';if(d===payDay)o.selected=true;s.appendChild(o);}}
 async function onPDC(){payDay=parseInt($('payday-select').value);localStorage.setItem('finance_payDay',payDay);updPD();if(currentUser){try{await setDoc(doc(db,'users',currentUser.uid,'settings','config'),{payDay:payDay},{merge:true});}catch(e){}}toast('Pay day set to '+payDay+os(payDay));}
 
 // ===== CALC =====
