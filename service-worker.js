@@ -1,6 +1,6 @@
-var CACHE_NAME = 'finance-tracker-v5';
+var CACHE_NAME = 'finance-tracker-v6';
 var ASSETS = [
-  './finance-tracker.html',
+  './index.html',
   './manifest.json',
   './icon-192.svg',
   './icon-512.svg'

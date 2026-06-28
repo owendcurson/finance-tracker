@@ -2,7 +2,7 @@
   "name": "Finance Tracker",
   "short_name": "Finance",
   "description": "UK Personal Finance Tracker — Tax Year 2026/27",
-  "start_url": "./finance-tracker.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0d1b2a",
   "theme_color": "#0d1b2a",
