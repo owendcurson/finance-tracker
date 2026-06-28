@@ -10,6 +10,7 @@
 <link rel="icon" href="./icon-192.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./icon-192.svg">
 <title>UK Personal Finance Tracker 2026/27</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,26 +24,10 @@
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; min-height: 100vh; }
 .container { max-width: 720px; margin: 0 auto; padding: 16px; }
 
-/* Loading & Auth */
+/* Loading */
 .loading-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; flex-direction: column; gap: 12px; color: var(--text-secondary); }
 .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-.auth-screen { display: none; min-height: 100vh; align-items: center; justify-content: center; padding: 16px; background: var(--bg); }
-.auth-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 32px; width: 100%; max-width: 400px; }
-.auth-card h2 { text-align: center; font-size: 1.3rem; margin-bottom: 4px; }
-.auth-card .auth-sub { text-align: center; color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 24px; }
-.auth-error { background: var(--red-bg); color: var(--red); padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 12px; display: none; }
-.google-btn { width: 100%; padding: 10px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--card); font-size: 0.95rem; font-weight: 500; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.15s; }
-.google-btn:hover { background: var(--bg); }
-.google-btn svg { width: 20px; height: 20px; }
-.auth-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; color: var(--text-secondary); font-size: 0.85rem; }
-.auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-.auth-input { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 1rem; font-family: inherit; margin-bottom: 10px; }
-.auth-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,115,232,0.15); }
-.auth-submit { width: 100%; padding: 10px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 500; font-family: inherit; cursor: pointer; margin-top: 4px; }
-.auth-submit:hover { background: #1557b0; }
-.auth-toggle { text-align: center; margin-top: 16px; font-size: 0.85rem; color: var(--text-secondary); }
-.auth-toggle a { color: var(--primary); cursor: pointer; text-decoration: none; font-weight: 500; }
 
 /* Header */
 .app-header { background: var(--navy); color: #fff; padding: 8px 16px; display: flex; align-items: center; gap: 8px; font-size: 0.82rem; flex-wrap: wrap; }
@@ -192,6 +177,33 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
 .settings-field select { width: 100%; }
 .settings-note { font-size: 0.8rem; color: var(--text-secondary); margin-top: 6px; }
 
+/* Splash / Landing */
+.splash { display: none; min-height: 100vh; }
+.splash-inner { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
+.splash-left { background: var(--navy); color: #fff; display: flex; flex-direction: column; justify-content: center; padding: 60px 48px; }
+.splash-left h1 { font-size: 48px; font-weight: 500; margin-bottom: 12px; line-height: 1.1; }
+.splash-tagline { font-size: 18px; opacity: 0.75; margin-bottom: 32px; line-height: 1.5; }
+.splash-features { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+.splash-features li { display: flex; align-items: flex-start; gap: 10px; font-size: 0.92rem; opacity: 0.9; line-height: 1.4; }
+.splash-features li i { font-size: 1.2rem; opacity: 0.7; flex-shrink: 0; margin-top: 1px; }
+.splash-right { background: var(--bg); display: flex; align-items: center; justify-content: center; padding: 40px 32px; }
+.splash-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 32px; width: 100%; max-width: 400px; }
+.splash-tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 24px; }
+.splash-tab { flex: 1; text-align: center; padding: 10px; font-size: 0.95rem; font-weight: 600; color: var(--text-secondary); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: color 0.15s, border-color 0.15s; }
+.splash-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+.splash-form { display: none; }
+.splash-form.active { display: block; }
+.splash-error { background: var(--red-bg); color: var(--red); padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 12px; display: none; }
+.splash-input { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 1rem; font-family: inherit; margin-bottom: 10px; background: var(--card); color: var(--text); }
+.splash-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,115,232,0.15); }
+.splash-submit { width: 100%; padding: 10px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 500; font-family: inherit; cursor: pointer; margin-top: 4px; }
+.splash-submit:hover { background: #1557b0; }
+.splash-divider { display: flex; align-items: center; gap: 12px; margin: 16px 0; color: var(--text-secondary); font-size: 0.85rem; }
+.splash-divider::before, .splash-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.splash-google { width: 100%; padding: 10px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--card); font-size: 0.95rem; font-weight: 500; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.15s; color: var(--text); }
+.splash-google:hover { background: var(--bg); }
+.splash-google svg { width: 20px; height: 20px; }
+
 @media (max-width: 600px) {
   .container { padding: 10px; }
   .card { padding: 16px; }
@@ -205,9 +217,15 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
   .action-row { flex-direction: column; }
   .modal { padding: 20px; }
   .month-picker { flex-wrap: wrap; }
-  .auth-card { padding: 24px 18px; }
   .app-header { font-size: 0.78rem; }
   .dh-stats { flex-wrap: wrap; gap: 6px; }
+  .splash-inner { grid-template-columns: 1fr; }
+  .splash-left { padding: 40px 24px 32px; }
+  .splash-left h1 { font-size: 32px; }
+  .splash-tagline { font-size: 16px; margin-bottom: 24px; }
+  .splash-features li { font-size: 0.85rem; }
+  .splash-right { padding: 0 16px 40px; }
+  .splash-card { padding: 24px 18px; }
 }
 </style>
 </head>
@@ -216,23 +234,48 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
 <!-- Loading -->
 <div class="loading-screen" id="loading-screen"><div class="spinner"></div><span>Loading...</span></div>
 
-<!-- Auth -->
-<div class="auth-screen" id="auth-screen">
-  <div class="auth-card">
-    <h2>UK Finance Tracker</h2>
-    <p class="auth-sub">Sign in to sync across devices</p>
-    <div class="auth-error" id="auth-error"></div>
-    <button class="google-btn" id="google-btn">
-      <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24.1 24.1 0 0 0 0 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-      Sign in with Google
-    </button>
-    <div class="auth-divider">or</div>
-    <form id="email-form">
-      <input class="auth-input" type="email" id="auth-email" placeholder="Email" required>
-      <input class="auth-input" type="password" id="auth-password" placeholder="Password" required minlength="6">
-      <button class="auth-submit" type="submit" id="email-submit-btn">Sign In</button>
-    </form>
-    <div class="auth-toggle" id="auth-toggle">Don't have an account? <a id="auth-switch">Create one</a></div>
+<!-- Splash / Landing -->
+<div class="splash" id="auth-screen">
+  <div class="splash-inner">
+    <div class="splash-left">
+      <h1>Finance Tracker</h1>
+      <p class="splash-tagline">Know exactly where your money goes, every month.</p>
+      <ul class="splash-features">
+        <li><i class="ti ti-calculator"></i>Calculates your exact UK take-home pay using 2026/27 tax and NI rates</li>
+        <li><i class="ti ti-wallet"></i>Tracks your monthly pots and outgoings</li>
+        <li><i class="ti ti-car"></i>Claims mileage at 55p per mile, tax-free</li>
+        <li><i class="ti ti-devices"></i>Syncs across all your devices</li>
+        <li><i class="ti ti-chart-bar"></i>Saves your monthly history with charts and analytics</li>
+      </ul>
+    </div>
+    <div class="splash-right">
+      <div class="splash-card">
+        <div class="splash-tabs">
+          <div class="splash-tab active" id="tab-signin">Sign in</div>
+          <div class="splash-tab" id="tab-signup">Sign up</div>
+        </div>
+        <div class="splash-error" id="auth-error"></div>
+
+        <form class="splash-form active" id="form-signin">
+          <input class="splash-input" type="email" id="signin-email" placeholder="Email" required>
+          <input class="splash-input" type="password" id="signin-password" placeholder="Password" required minlength="6">
+          <button class="splash-submit" type="submit">Sign In</button>
+        </form>
+
+        <form class="splash-form" id="form-signup">
+          <input class="splash-input" type="email" id="signup-email" placeholder="Email" required>
+          <input class="splash-input" type="password" id="signup-password" placeholder="Password" required minlength="6">
+          <input class="splash-input" type="password" id="signup-confirm" placeholder="Confirm password" required minlength="6">
+          <button class="splash-submit" type="submit">Create Account</button>
+        </form>
+
+        <div class="splash-divider">or</div>
+        <button class="splash-google" id="google-btn">
+          <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24.1 24.1 0 0 0 0 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          Continue with Google
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -353,7 +396,7 @@ const app=initializeApp({apiKey:"AIzaSyCrh8OV_QoOeygio4LhqXWk10vQcxHHn4I",authDo
 const auth=getAuth(app),db=getFirestore(app),googleProvider=new GoogleAuthProvider();
 
 var currentUser=null,payDay=parseInt(localStorage.getItem('finance_payDay'))||23;
-var currentStep=1,pots=[],financeHistory=[],lastTakeHome=0,lastMileage=0,authIsSignUp=false;
+var currentStep=1,pots=[],financeHistory=[],lastTakeHome=0,lastMileage=0;
 var editingId=null;
 var chartTH=null,chartSpend=null,chartFree=null;
 
@@ -485,12 +528,20 @@ async function syncFS(){if(!currentUser)return;try{var snap=await getDocs(collec
 async function loadSettingsFS(){if(!currentUser)return;try{var s=await getDoc(doc(db,'users',currentUser.uid,'settings','config'));if(s.exists()&&s.data().payDay){payDay=s.data().payDay;localStorage.setItem('finance_payDay',payDay);$('payday-select').value=payDay;updPD();}}catch(e){}}
 
 // ===== AUTH =====
-function showAuth(){$('loading-screen').style.display='none';$('auth-screen').style.display='flex';$('app-container').style.display='none';}
+function showAuth(){$('loading-screen').style.display='none';$('auth-screen').style.display='block';$('app-container').style.display='none';}
 function showApp(){$('loading-screen').style.display='none';$('auth-screen').style.display='none';$('app-container').style.display='block';}
 
-$('google-btn').addEventListener('click',async function(){$('auth-error').style.display='none';try{await signInWithPopup(auth,googleProvider);}catch(e){var el=$('auth-error');el.textContent=e.message;el.style.display='block';}});
-$('email-form').addEventListener('submit',async function(ev){ev.preventDefault();$('auth-error').style.display='none';var em=$('auth-email').value,pw=$('auth-password').value;try{if(authIsSignUp)await createUserWithEmailAndPassword(auth,em,pw);else await signInWithEmailAndPassword(auth,em,pw);}catch(e){var m=e.code==='auth/user-not-found'?'No account found':e.code==='auth/wrong-password'||e.code==='auth/invalid-credential'?'Incorrect email or password':e.code==='auth/email-already-in-use'?'Email already in use':e.code==='auth/weak-password'?'Password must be 6+ characters':e.message;var el=$('auth-error');el.textContent=m;el.style.display='block';}});
-$('auth-switch').addEventListener('click',function fn(){authIsSignUp=!authIsSignUp;$('email-submit-btn').textContent=authIsSignUp?'Create Account':'Sign In';$('auth-toggle').innerHTML=authIsSignUp?'Already have an account? <a id="auth-switch">Sign in</a>':"Don't have an account? <a id=\"auth-switch\">Create one</a>";$('auth-switch').addEventListener('click',fn);$('auth-error').style.display='none';});
+function showAuthErr(m){var el=$('auth-error');el.textContent=m;el.style.display='block';}
+function authErrMsg(e){return e.code==='auth/user-not-found'?'No account found with this email':e.code==='auth/wrong-password'||e.code==='auth/invalid-credential'?'Incorrect email or password':e.code==='auth/email-already-in-use'?'Email already in use — try signing in':e.code==='auth/weak-password'?'Password must be at least 6 characters':e.code==='auth/invalid-email'?'Please enter a valid email address':e.message;}
+
+$('tab-signin').addEventListener('click',function(){$('tab-signin').classList.add('active');$('tab-signup').classList.remove('active');$('form-signin').classList.add('active');$('form-signup').classList.remove('active');$('auth-error').style.display='none';});
+$('tab-signup').addEventListener('click',function(){$('tab-signup').classList.add('active');$('tab-signin').classList.remove('active');$('form-signup').classList.add('active');$('form-signin').classList.remove('active');$('auth-error').style.display='none';});
+
+$('google-btn').addEventListener('click',async function(){$('auth-error').style.display='none';try{await signInWithPopup(auth,googleProvider);}catch(e){showAuthErr(authErrMsg(e));}});
+
+$('form-signin').addEventListener('submit',async function(ev){ev.preventDefault();$('auth-error').style.display='none';try{await signInWithEmailAndPassword(auth,$('signin-email').value,$('signin-password').value);}catch(e){showAuthErr(authErrMsg(e));}});
+
+$('form-signup').addEventListener('submit',async function(ev){ev.preventDefault();$('auth-error').style.display='none';var pw=$('signup-password').value,cp=$('signup-confirm').value;if(pw!==cp){showAuthErr('Passwords do not match');return;}try{await createUserWithEmailAndPassword(auth,$('signup-email').value,pw);}catch(e){showAuthErr(authErrMsg(e));}});
 $('signout-btn').addEventListener('click',async function(){await fbSignOut(auth);});
 
 onAuthStateChanged(auth,async function(user){if(user){currentUser=user;loadLocal();initMP();initPDS();showApp();$('user-display').textContent=user.displayName||user.email;showDashboard();await loadSettingsFS();await syncFS();}else{currentUser=null;showAuth();}});
