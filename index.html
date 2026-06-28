@@ -214,6 +214,53 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
 .splash-google:hover { background: var(--bg); }
 .splash-google svg { width: 20px; height: 20px; }
 
+/* Splash trust & outcomes */
+.splash-trust { margin-top: 28px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.15); }
+.splash-trust p { font-size: 0.85rem; opacity: 0.8; line-height: 1.5; margin-bottom: 16px; }
+.trust-icons { display: flex; gap: 20px; flex-wrap: wrap; }
+.trust-icon { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; opacity: 0.7; }
+.trust-icon i { font-size: 1rem; }
+.splash-outcomes { margin-top: 32px; }
+.splash-outcomes h3 { font-size: 1rem; font-weight: 600; margin-bottom: 16px; opacity: 0.95; }
+.outcome-item { display: flex; gap: 12px; margin-bottom: 18px; }
+.outcome-item i { font-size: 1.3rem; opacity: 0.7; flex-shrink: 0; margin-top: 2px; }
+.outcome-item strong { font-size: 0.92rem; display: block; margin-bottom: 2px; }
+.outcome-item span { font-size: 0.82rem; opacity: 0.65; line-height: 1.4; }
+.splash-demo-btn { margin-top: 24px; width: 100%; padding: 12px; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.25); border-radius: 8px; color: #fff; font-size: 0.95rem; font-weight: 500; font-family: inherit; cursor: pointer; transition: background 0.15s; }
+.splash-demo-btn:hover { background: rgba(255,255,255,0.2); }
+
+/* Demo panel */
+.demo-panel { display: none; margin-top: 20px; background: rgba(0,0,0,0.25); border-radius: var(--radius); padding: 20px; }
+.demo-panel.open { display: block; }
+.demo-banner { background: rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 12px; font-size: 0.78rem; opacity: 0.7; margin-bottom: 14px; text-align: center; }
+.demo-step { display: none; }
+.demo-step.active { display: block; }
+.demo-field { margin-bottom: 12px; }
+.demo-field label { display: block; font-size: 0.82rem; opacity: 0.75; margin-bottom: 4px; }
+.demo-input { width: 100%; padding: 8px 10px; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; background: rgba(255,255,255,0.08); color: #fff; font-size: 0.95rem; font-family: inherit; }
+.demo-input:focus { outline: none; border-color: var(--primary); }
+.demo-input::placeholder { color: rgba(255,255,255,0.35); }
+.demo-breakdown { margin: 12px 0; font-size: 0.88rem; }
+.demo-breakdown div { display: flex; justify-content: space-between; padding: 4px 0; }
+.demo-breakdown .demo-total { border-top: 1.5px solid rgba(255,255,255,0.25); padding-top: 6px; font-weight: 700; margin-top: 4px; }
+.demo-breakdown .demo-deduct { opacity: 0.7; }
+.demo-breakdown .demo-green { color: var(--green); }
+.demo-breakdown .demo-red { color: var(--red); }
+.demo-pot-row { display: flex; gap: 6px; margin-bottom: 6px; }
+.demo-pot-row input { flex: 1; min-width: 0; }
+.demo-pot-row input:last-child { width: 80px; flex: none; }
+.demo-nav { display: flex; gap: 8px; margin-top: 14px; }
+.demo-nav button { flex: 1; padding: 8px; border: none; border-radius: 6px; font-size: 0.88rem; font-weight: 500; font-family: inherit; cursor: pointer; }
+.demo-next { background: var(--primary); color: #fff; }
+.demo-next:hover { opacity: 0.9; }
+.demo-back { background: rgba(255,255,255,0.1); color: #fff; }
+.demo-cta-card { background: rgba(255,255,255,0.08); border-radius: 8px; padding: 16px; margin-top: 14px; text-align: center; }
+.demo-cta-card p { font-size: 0.88rem; opacity: 0.85; margin-bottom: 10px; }
+.demo-cta-btn { padding: 10px 20px; background: var(--green); color: #fff; border: none; border-radius: 6px; font-size: 0.9rem; font-weight: 500; font-family: inherit; cursor: pointer; }
+.demo-cta-btn:hover { opacity: 0.9; }
+.demo-restart { background: none; border: none; color: rgba(255,255,255,0.6); font-size: 0.82rem; font-family: inherit; cursor: pointer; margin-top: 8px; }
+.demo-restart:hover { color: #fff; }
+
 /* Splash features showcase */
 .splash-showcase { background: var(--card); padding: 60px 24px; }
 .showcase-inner { max-width: 960px; margin: 0 auto; }
@@ -303,6 +350,8 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
   .splash-tagline { font-size: 16px; margin-bottom: 24px; }
   .splash-features li { font-size: 0.85rem; }
   .splash-right { padding: 0 16px 40px; }
+  .trust-icons { gap: 12px; }
+  .demo-panel { padding: 14px; }
   .splash-card { padding: 24px 18px; }
   .showcase-grid { grid-template-columns: 1fr; }
   .showcase-preview { grid-template-columns: 1fr; }
@@ -330,6 +379,61 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
         <li><i class="ti ti-devices"></i>Syncs across all your devices</li>
         <li><i class="ti ti-chart-bar"></i>Saves your monthly history with charts and analytics</li>
       </ul>
+
+      <!-- Trust line -->
+      <div class="splash-trust">
+        <p>Built specifically for UK workers — uses real HMRC PAYE rates, National Insurance thresholds, and England bank holidays. Not a generic budget app.</p>
+        <div class="trust-icons">
+          <div class="trust-icon"><i class="ti ti-building-bank"></i>HMRC 2026/27 rates</div>
+          <div class="trust-icon"><i class="ti ti-calendar-check"></i>Bank holiday aware</div>
+          <div class="trust-icon"><i class="ti ti-device-mobile"></i>Works on any device</div>
+        </div>
+      </div>
+
+      <!-- After your first month -->
+      <div class="splash-outcomes">
+        <h3>After your first month you'll know...</h3>
+        <div class="outcome-item"><i class="ti ti-cash"></i><div><strong>Exactly how much free money you have</strong><span>Not an estimate — your precise take-home minus every outgoing, down to the penny.</span></div></div>
+        <div class="outcome-item"><i class="ti ti-calendar-dollar"></i><div><strong>When you'll actually get paid</strong><span>We check every month if your payday falls on a weekend or bank holiday and adjust automatically.</span></div></div>
+        <div class="outcome-item"><i class="ti ti-chart-line"></i><div><strong>Whether your spending is creeping up</strong><span>Monthly charts show where your money goes and whether anything is quietly growing.</span></div></div>
+        <div class="outcome-item"><i class="ti ti-pig-money"></i><div><strong>How much you're actually saving</strong><span>Your savings rate tracked over time — so you can see the progress you're making.</span></div></div>
+      </div>
+
+      <!-- Demo button -->
+      <button class="splash-demo-btn" id="demo-toggle-btn">Try it now — no account needed</button>
+
+      <!-- Demo panel -->
+      <div class="demo-panel" id="demo-panel">
+        <div class="demo-banner">Demo mode — your data won't be saved</div>
+
+        <div class="demo-step active" id="demo-step-1">
+          <div class="demo-field">
+            <label>Annual gross salary</label>
+            <input class="demo-input" type="number" id="demo-salary" value="32000" placeholder="e.g. 32000">
+          </div>
+          <div class="demo-breakdown" id="demo-tax-breakdown"></div>
+          <div class="demo-nav"><button class="demo-next" id="demo-next-1">Next — add your outgoings</button></div>
+        </div>
+
+        <div class="demo-step" id="demo-step-2">
+          <div id="demo-pots-list"></div>
+          <button class="demo-back" id="demo-add-pot" style="margin-bottom:10px;font-size:0.82rem;color:rgba(255,255,255,0.7)">+ Add pot</button>
+          <div class="demo-breakdown" id="demo-pots-summary"></div>
+          <div class="demo-nav">
+            <button class="demo-back" id="demo-back-2">Back</button>
+            <button class="demo-next" id="demo-next-2">Next — see your summary</button>
+          </div>
+        </div>
+
+        <div class="demo-step" id="demo-step-3">
+          <div class="demo-breakdown" id="demo-summary"></div>
+          <div class="demo-cta-card">
+            <p>Like what you see? Create a free account to save your results and track every month.</p>
+            <button class="demo-cta-btn" id="demo-signup-btn">Create account</button><br>
+            <button class="demo-restart" id="demo-restart-btn">Start over</button>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="splash-right">
       <div class="splash-card">
@@ -898,6 +1002,57 @@ $('close-detail-btn').addEventListener('click',function(){$('detail-modal').clas
 $('settings-btn').addEventListener('click',function(){$('settings-modal').classList.add('open');});$('close-settings-btn').addEventListener('click',function(){$('settings-modal').classList.remove('open');});$('settings-modal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
 $('payday-select').addEventListener('change',onPDC);
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeAccounts();$('detail-modal').classList.remove('open');$('settings-modal').classList.remove('open');$('salcalc-modal').classList.remove('open');}});
+
+// ===== INTERACTIVE DEMO =====
+var demoPots=[{name:'Rent',amount:800},{name:'Food',amount:300},{name:'Subscriptions',amount:50}];
+function demoFmt(n){return'£'+Math.abs(n).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function demoCalcTax(){
+  var sal=parseFloat($('demo-salary').value)||0;
+  var mG=sal/12,aT=cTax(sal),aN=cNI(sal),mT=aT/12,mN=aN/12,th=mG-mT-mN;
+  var h='<div><span>Monthly gross</span><span>'+demoFmt(mG)+'</span></div>';
+  h+='<div class="demo-deduct"><span>Income tax</span><span>−'+demoFmt(mT)+'</span></div>';
+  h+='<div class="demo-deduct"><span>National Insurance</span><span>−'+demoFmt(mN)+'</span></div>';
+  h+='<div class="demo-total"><span>Monthly take-home</span><span>'+demoFmt(th)+'</span></div>';
+  $('demo-tax-breakdown').innerHTML=h;
+}
+function demoRenderPots(){
+  var h='';demoPots.forEach(function(p,i){
+    h+='<div class="demo-pot-row"><input class="demo-input" type="text" value="'+esc(p.name)+'" placeholder="Pot name" oninput="window._demoUpdPot('+i+',\'name\',this.value)"><input class="demo-input" type="number" value="'+p.amount+'" placeholder="£" oninput="window._demoUpdPot('+i+',\'amount\',parseFloat(this.value)||0)"></div>';
+  });$('demo-pots-list').innerHTML=h;demoCalcPots();
+}
+function demoCalcPots(){
+  var sal=parseFloat($('demo-salary').value)||0;
+  var th=sal/12-cTax(sal)/12-cNI(sal)/12;
+  var tp=demoPots.reduce(function(s,p){return s+(p.amount||0);},0);
+  var fr=th-tp;
+  var h='<div><span>Total outgoings</span><span>'+demoFmt(tp)+'</span></div>';
+  h+='<div class="demo-total '+(fr>=0?'demo-green':'demo-red')+'"><span>Free money</span><span>'+(fr<0?'−':'')+demoFmt(fr)+'</span></div>';
+  $('demo-pots-summary').innerHTML=h;
+}
+function demoShowSummary(){
+  var sal=parseFloat($('demo-salary').value)||0;
+  var th=sal/12-cTax(sal)/12-cNI(sal)/12;
+  var tp=demoPots.reduce(function(s,p){return s+(p.amount||0);},0);
+  var fr=th-tp;
+  var now=new Date();var pd=getPD(now.getFullYear(),now.getMonth());
+  if(pd.payDate<now)pd=getNextPD(now.getFullYear(),now.getMonth());
+  var h='<div><span>Monthly take-home</span><span>'+demoFmt(th)+'</span></div>';
+  h+='<div><span>Total outgoings</span><span>'+demoFmt(tp)+'</span></div>';
+  h+='<div class="demo-total '+(fr>=0?'demo-green':'demo-red')+'"><span>Free money</span><span>'+(fr<0?'−':'')+demoFmt(fr)+'</span></div>';
+  h+='<div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.15);opacity:0.8"><span>Next payday</span><span>'+fdl(pd.payDate)+'</span></div>';
+  $('demo-summary').innerHTML=h;
+}
+function demoGoStep(n){for(var i=1;i<=3;i++)$('demo-step-'+i).classList.toggle('active',i===n);if(n===2)demoRenderPots();if(n===3)demoShowSummary();}
+window._demoUpdPot=function(i,f,v){demoPots[i][f]=v;demoCalcPots();};
+
+$('demo-toggle-btn').addEventListener('click',function(){var p=$('demo-panel');p.classList.toggle('open');if(p.classList.contains('open')){demoCalcTax();demoGoStep(1);}});
+$('demo-salary').addEventListener('input',demoCalcTax);
+$('demo-next-1').addEventListener('click',function(){demoGoStep(2);});
+$('demo-back-2').addEventListener('click',function(){demoGoStep(1);});
+$('demo-next-2').addEventListener('click',function(){demoGoStep(3);});
+$('demo-add-pot').addEventListener('click',function(){if(demoPots.length<6){demoPots.push({name:'',amount:0});demoRenderPots();}});
+$('demo-signup-btn').addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});setTimeout(function(){$('tab-signup').click();},400);});
+$('demo-restart-btn').addEventListener('click',function(){demoPots=[{name:'Rent',amount:800},{name:'Food',amount:300},{name:'Subscriptions',amount:50}];$('demo-salary').value=32000;demoGoStep(1);demoCalcTax();});
 
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./service-worker.js');
 </script>
