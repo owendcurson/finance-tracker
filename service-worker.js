@@ -1,4 +1,4 @@
-var CACHE_NAME = 'finance-tracker-v7';
+var CACHE_NAME = 'finance-tracker-v8';
 var ASSETS = [
   './index.html',
   './manifest.json',
