@@ -12,39 +12,50 @@
 <title>UK Personal Finance Tracker 2026/27</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --bg: #f0f2f5;
-  --card: #ffffff;
-  --primary: #1a73e8;
-  --primary-light: #e8f0fe;
-  --text: #202124;
-  --text-secondary: #5f6368;
-  --border: #dadce0;
-  --green: #0d904f;
-  --green-bg: #e6f4ea;
-  --red: #c5221f;
-  --red-bg: #fce8e6;
-  --amber: #e37400;
-  --amber-bg: #fef7e0;
-  --radius: 12px;
-  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+  --bg: #f0f2f5; --card: #ffffff; --primary: #1a73e8; --primary-light: #e8f0fe;
+  --text: #202124; --text-secondary: #5f6368; --border: #dadce0;
+  --green: #0d904f; --green-bg: #e6f4ea; --red: #c5221f; --red-bg: #fce8e6;
+  --amber: #e37400; --amber-bg: #fef7e0; --navy: #0d1b2a;
+  --radius: 12px; --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
 }
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.5;
-  min-height: 100vh;
-}
-
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; min-height: 100vh; }
 .container { max-width: 720px; margin: 0 auto; padding: 16px; }
-
 h1 { font-size: 1.5rem; font-weight: 700; text-align: center; padding: 20px 0 4px; }
-
 .subtitle { text-align: center; color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 24px; }
 
+/* Loading */
+.loading-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; flex-direction: column; gap: 12px; color: var(--text-secondary); }
+.spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Auth screen */
+.auth-screen { display: none; min-height: 100vh; align-items: center; justify-content: center; padding: 16px; background: var(--bg); }
+.auth-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 32px; width: 100%; max-width: 400px; }
+.auth-card h2 { text-align: center; font-size: 1.3rem; margin-bottom: 4px; }
+.auth-card .auth-sub { text-align: center; color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 24px; }
+.auth-error { background: var(--red-bg); color: var(--red); padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 12px; display: none; }
+.google-btn { width: 100%; padding: 10px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--card); font-size: 0.95rem; font-weight: 500; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.15s; }
+.google-btn:hover { background: var(--bg); }
+.google-btn svg { width: 20px; height: 20px; }
+.auth-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; color: var(--text-secondary); font-size: 0.85rem; }
+.auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.auth-input { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 1rem; font-family: inherit; margin-bottom: 10px; }
+.auth-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,115,232,0.15); }
+.auth-submit { width: 100%; padding: 10px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 500; font-family: inherit; cursor: pointer; margin-top: 4px; }
+.auth-submit:hover { background: #1557b0; }
+.auth-toggle { text-align: center; margin-top: 16px; font-size: 0.85rem; color: var(--text-secondary); }
+.auth-toggle a { color: var(--primary); cursor: pointer; text-decoration: none; font-weight: 500; }
+
+/* App header */
+.app-header { background: var(--navy); color: #fff; padding: 8px 16px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.82rem; flex-wrap: wrap; }
+.app-header .user-name { opacity: 0.85; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.header-btn { background: rgba(255,255,255,0.15); border: none; color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 0.8rem; font-family: inherit; cursor: pointer; white-space: nowrap; }
+.header-btn:hover { background: rgba(255,255,255,0.25); }
+.header-icon { background: none; border: none; color: #fff; cursor: pointer; padding: 4px; font-size: 1.1rem; line-height: 1; opacity: 0.8; }
+.header-icon:hover { opacity: 1; }
+
+/* Steps */
 .steps-bar { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 28px; padding: 0 8px; }
 .step-item { display: flex; align-items: center; cursor: pointer; }
 .step-circle { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.9rem; border: 2px solid var(--border); color: var(--text-secondary); background: var(--card); transition: all 0.2s; flex-shrink: 0; }
@@ -60,17 +71,14 @@ h1 { font-size: 1.5rem; font-weight: 700; text-align: center; padding: 20px 0 4p
 
 .field { margin-bottom: 16px; }
 .field label { display: block; font-size: 0.85rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; }
-
 .input-wrap { position: relative; }
 .input-wrap .prefix { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-weight: 500; pointer-events: none; }
 .input-wrap .suffix { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 0.85rem; pointer-events: none; }
-
 input[type="number"], input[type="text"] { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 1rem; font-family: inherit; transition: border-color 0.15s; -moz-appearance: textfield; }
 input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,115,232,0.15); }
 .input-wrap input.has-prefix { padding-left: 28px; }
 .input-wrap input.has-suffix { padding-right: 60px; }
-
 select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.85rem; font-family: inherit; background: var(--card); color: var(--text); cursor: pointer; transition: border-color 0.15s; }
 
 .breakdown { width: 100%; border-collapse: collapse; margin-top: 12px; }
@@ -87,7 +95,6 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
 .toggle-row .toggle-label { font-size: 0.9rem; font-weight: 500; }
 .toggle-content { padding: 4px 0 8px; display: none; }
 .toggle-content.open { display: block; }
-
 .live-calc { font-size: 0.85rem; color: var(--primary); background: var(--primary-light); padding: 6px 12px; border-radius: 6px; margin-top: 8px; font-weight: 500; }
 
 .pot-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
@@ -111,26 +118,20 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
 .btn-amber:hover { background: #c86500; }
 
 .nav-row { display: flex; justify-content: space-between; margin-top: 16px; }
-
 .banner { padding: 16px 20px; border-radius: var(--radius); font-weight: 600; font-size: 1.1rem; text-align: center; margin-bottom: 16px; }
 .banner-green { background: var(--green-bg); color: var(--green); border: 1.5px solid var(--green); }
 .banner-red { background: var(--red-bg); color: var(--red); border: 1.5px solid var(--red); }
-
 .banner-info { background: var(--primary-light); color: var(--primary); border: 1.5px solid var(--primary); padding: 12px 16px; border-radius: var(--radius); font-size: 0.9rem; font-weight: 500; margin-bottom: 16px; display: none; }
 
 .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
 .summary-stat { background: var(--bg); border-radius: 8px; padding: 14px; }
 .summary-stat .stat-label { font-size: 0.78rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 4px; }
 .summary-stat .stat-value { font-size: 1.2rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-
 .step-panel { display: none; }
 .step-panel.active { display: block; }
-
 .action-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-
 .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--text); color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 0.9rem; font-weight: 500; z-index: 1000; opacity: 0; transition: transform 0.3s, opacity 0.3s; pointer-events: none; }
 .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-
 .history-empty { text-align: center; color: var(--text-secondary); padding: 24px; font-size: 0.9rem; }
 
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 900; display: flex; align-items: center; justify-content: center; padding: 16px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
@@ -162,7 +163,6 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
 .paydate-card .paydate-coverage { font-size: 0.85rem; color: var(--text-secondary); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
 .paydate-card .paydate-coverage strong { color: var(--text); }
 
-/* History list cards */
 .history-card-item { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px 20px; margin-bottom: 10px; cursor: pointer; transition: box-shadow 0.15s; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .history-card-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
 .history-card-left { flex: 1; min-width: 0; }
@@ -174,10 +174,14 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
 .history-card-free.positive { color: var(--green); }
 .history-card-free.negative { color: var(--red); }
 .history-card-delete { flex-shrink: 0; }
-
-/* View history button */
 .view-history-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.85rem; font-weight: 500; color: var(--text-secondary); cursor: pointer; transition: background 0.15s; font-family: inherit; }
 .view-history-btn:hover { background: var(--border); }
+
+/* Settings */
+.settings-field { margin-bottom: 20px; }
+.settings-field label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
+.settings-field select { width: 100%; }
+.settings-note { font-size: 0.8rem; color: var(--text-secondary); margin-top: 6px; }
 
 @media (max-width: 500px) {
   .container { padding: 10px; }
@@ -192,154 +196,153 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
   .modal { padding: 20px; }
   .month-picker { flex-wrap: wrap; }
   .history-card-stats { flex-wrap: wrap; gap: 8px; }
+  .auth-card { padding: 24px 18px; }
+  .app-header { font-size: 0.78rem; }
 }
 </style>
 </head>
 <body>
 
-<div class="container">
-  <h1>UK Finance Tracker</h1>
-  <p class="subtitle">Tax Year 2026/27 &middot; England, Wales &amp; NI</p>
+<!-- Loading -->
+<div class="loading-screen" id="loading-screen">
+  <div class="spinner"></div>
+  <span>Loading...</span>
+</div>
 
-  <div class="month-picker">
-    <button class="btn btn-outline" onclick="shiftMonth(-1)" title="Previous month">&larr;</button>
-    <select id="pick-month" onchange="updatePaydate()"></select>
-    <select id="pick-year" onchange="updatePaydate()"></select>
-    <button class="btn btn-outline" onclick="shiftMonth(1)" title="Next month">&rarr;</button>
-  </div>
-
-  <div id="paydate-info"></div>
-
-  <div class="steps-bar">
-    <div class="step-item" onclick="goStep(1)">
-      <div class="step-circle active" id="sc1">1</div>
-      <span class="step-label">Income</span>
-    </div>
-    <div class="step-line" id="sl1"></div>
-    <div class="step-item" onclick="goStep(2)">
-      <div class="step-circle" id="sc2">2</div>
-      <span class="step-label">Adjustments</span>
-    </div>
-    <div class="step-line" id="sl2"></div>
-    <div class="step-item" onclick="goStep(3)">
-      <div class="step-circle" id="sc3">3</div>
-      <span class="step-label">Pots &amp; Summary</span>
+<!-- Auth -->
+<div class="auth-screen" id="auth-screen">
+  <div class="auth-card">
+    <h2>UK Finance Tracker</h2>
+    <p class="auth-sub">Sign in to sync across devices</p>
+    <div class="auth-error" id="auth-error"></div>
+    <button class="google-btn" id="google-btn">
+      <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24.1 24.1 0 0 0 0 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Sign in with Google
+    </button>
+    <div class="auth-divider">or</div>
+    <form id="email-form">
+      <input class="auth-input" type="email" id="auth-email" placeholder="Email" required>
+      <input class="auth-input" type="password" id="auth-password" placeholder="Password" required minlength="6">
+      <button class="auth-submit" type="submit" id="email-submit-btn">Sign In</button>
+    </form>
+    <div class="auth-toggle" id="auth-toggle">
+      Don't have an account? <a id="auth-switch">Create one</a>
     </div>
   </div>
+</div>
 
-  <!-- STEP 1 -->
-  <div class="step-panel active" id="panel1">
-    <div id="template-banner" class="banner-info"></div>
+<!-- App -->
+<div id="app-container" style="display:none">
+  <div class="app-header">
+    <button class="header-icon" id="settings-btn" title="Settings">&#9881;</button>
+    <span class="user-name" id="user-display"></span>
+    <button class="header-btn" id="signout-btn">Sign Out</button>
+  </div>
 
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <h2 style="margin:0">Gross Annual Salary</h2>
-        <button class="view-history-btn" onclick="openHistory()">View History</button>
-      </div>
-      <div class="field">
-        <label for="salary">Enter your yearly gross salary</label>
-        <div class="input-wrap">
-          <span class="prefix">&pound;</span>
-          <input type="number" id="salary" class="has-prefix has-suffix" placeholder="0" min="0" step="100" oninput="calc()">
-          <span class="suffix">/year</span>
+  <div class="container">
+    <h1>UK Finance Tracker</h1>
+    <p class="subtitle">Tax Year 2026/27 &middot; England, Wales &amp; NI</p>
+
+    <div class="month-picker">
+      <button class="btn btn-outline" id="month-prev" title="Previous month">&larr;</button>
+      <select id="pick-month"></select>
+      <select id="pick-year"></select>
+      <button class="btn btn-outline" id="month-next" title="Next month">&rarr;</button>
+    </div>
+
+    <div id="paydate-info"></div>
+
+    <div class="steps-bar">
+      <div class="step-item" id="step-item-1"><div class="step-circle active" id="sc1">1</div><span class="step-label">Income</span></div>
+      <div class="step-line" id="sl1"></div>
+      <div class="step-item" id="step-item-2"><div class="step-circle" id="sc2">2</div><span class="step-label">Adjustments</span></div>
+      <div class="step-line" id="sl2"></div>
+      <div class="step-item" id="step-item-3"><div class="step-circle" id="sc3">3</div><span class="step-label">Pots &amp; Summary</span></div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="step-panel active" id="panel1">
+      <div id="template-banner" class="banner-info"></div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <h2 style="margin:0">Gross Annual Salary</h2>
+          <button class="view-history-btn" id="view-history-btn">View History</button>
         </div>
-      </div>
-    </div>
-
-    <div class="card" id="tax-card" style="display:none">
-      <h2>Monthly Pay Breakdown</h2>
-      <table class="breakdown" id="monthly-table"></table>
-    </div>
-
-    <div class="card" id="annual-card" style="display:none">
-      <h2>Annual Tax Summary</h2>
-      <table class="breakdown" id="annual-table"></table>
-    </div>
-
-    <div class="nav-row">
-      <div></div>
-      <button class="btn btn-primary" onclick="goStep(2)">Next &rarr;</button>
-    </div>
-  </div>
-
-  <!-- STEP 2 -->
-  <div class="step-panel" id="panel2">
-    <div class="card">
-      <h2>Monthly Adjustments</h2>
-      <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:14px;">Toggle any that apply this month.</p>
-
-      <label class="toggle-row">
-        <input type="checkbox" id="tog-expenses" onchange="toggleSection('expenses');calc()">
-        <span class="toggle-label">Work Expenses</span>
-      </label>
-      <div class="toggle-content" id="sec-expenses">
         <div class="field">
-          <label>Monthly work expenses (reduces taxable income)</label>
+          <label for="salary">Enter your yearly gross salary</label>
           <div class="input-wrap">
             <span class="prefix">&pound;</span>
-            <input type="number" id="work-expenses" class="has-prefix" placeholder="0" min="0" step="10" oninput="calc()">
+            <input type="number" id="salary" class="has-prefix has-suffix" placeholder="0" min="0" step="100">
+            <span class="suffix">/year</span>
           </div>
         </div>
       </div>
-
-      <label class="toggle-row">
-        <input type="checkbox" id="tog-mileage" onchange="toggleSection('mileage');calc()">
-        <span class="toggle-label">Mileage / Fuel</span>
-      </label>
-      <div class="toggle-content" id="sec-mileage">
-        <div class="field">
-          <label>Business miles driven this month</label>
-          <div class="input-wrap">
-            <input type="number" id="miles" class="has-suffix" placeholder="0" min="0" step="1" oninput="calc()">
-            <span class="suffix">miles</span>
-          </div>
-        </div>
-        <div class="live-calc" id="mileage-calc">0 miles &times; 55p = &pound;0.00</div>
+      <div class="card" id="tax-card" style="display:none">
+        <h2>Monthly Pay Breakdown</h2>
+        <table class="breakdown" id="monthly-table"></table>
       </div>
-
-      <label class="toggle-row">
-        <input type="checkbox" id="tog-overtime" onchange="toggleSection('overtime');calc()">
-        <span class="toggle-label">Overtime / Bonus</span>
-      </label>
-      <div class="toggle-content" id="sec-overtime">
-        <div class="field">
-          <label>Extra gross pay this month (before tax)</label>
-          <div class="input-wrap">
-            <span class="prefix">&pound;</span>
-            <input type="number" id="overtime" class="has-prefix" placeholder="0" min="0" step="10" oninput="calc()">
-          </div>
-        </div>
+      <div class="card" id="annual-card" style="display:none">
+        <h2>Annual Tax Summary</h2>
+        <table class="breakdown" id="annual-table"></table>
+      </div>
+      <div class="nav-row">
+        <div></div>
+        <button class="btn btn-primary" id="nav-next-1">Next &rarr;</button>
       </div>
     </div>
 
-    <div class="nav-row">
-      <button class="btn btn-outline" onclick="goStep(1)">&larr; Back</button>
-      <button class="btn btn-primary" onclick="goStep(3)">Next &rarr;</button>
+    <!-- STEP 2 -->
+    <div class="step-panel" id="panel2">
+      <div class="card">
+        <h2>Monthly Adjustments</h2>
+        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:14px;">Toggle any that apply this month.</p>
+        <label class="toggle-row"><input type="checkbox" id="tog-expenses"><span class="toggle-label">Work Expenses</span></label>
+        <div class="toggle-content" id="sec-expenses">
+          <div class="field"><label>Monthly work expenses (reduces taxable income)</label>
+            <div class="input-wrap"><span class="prefix">&pound;</span><input type="number" id="work-expenses" class="has-prefix" placeholder="0" min="0" step="10"></div>
+          </div>
+        </div>
+        <label class="toggle-row"><input type="checkbox" id="tog-mileage"><span class="toggle-label">Mileage / Fuel</span></label>
+        <div class="toggle-content" id="sec-mileage">
+          <div class="field"><label>Business miles driven this month</label>
+            <div class="input-wrap"><input type="number" id="miles" class="has-suffix" placeholder="0" min="0" step="1"><span class="suffix">miles</span></div>
+          </div>
+          <div class="live-calc" id="mileage-calc">0 miles &times; 55p = &pound;0.00</div>
+        </div>
+        <label class="toggle-row"><input type="checkbox" id="tog-overtime"><span class="toggle-label">Overtime / Bonus</span></label>
+        <div class="toggle-content" id="sec-overtime">
+          <div class="field"><label>Extra gross pay this month (before tax)</label>
+            <div class="input-wrap"><span class="prefix">&pound;</span><input type="number" id="overtime" class="has-prefix" placeholder="0" min="0" step="10"></div>
+          </div>
+        </div>
+      </div>
+      <div class="nav-row">
+        <button class="btn btn-outline" id="nav-back-2">&larr; Back</button>
+        <button class="btn btn-primary" id="nav-next-2">Next &rarr;</button>
+      </div>
     </div>
-  </div>
 
-  <!-- STEP 3 -->
-  <div class="step-panel" id="panel3">
-    <div class="card">
-      <h2>Monthly Pots</h2>
-      <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:14px;">Add your regular monthly outgoings. Assign each to an account for payday planning.</p>
-      <div id="pots-list"></div>
-      <button class="btn btn-outline" onclick="addPot()">+ Add Pot</button>
-    </div>
-
-    <div id="summary-section"></div>
-
-    <div class="nav-row">
-      <button class="btn btn-outline" onclick="goStep(2)">&larr; Back</button>
-      <div></div>
+    <!-- STEP 3 -->
+    <div class="step-panel" id="panel3">
+      <div class="card">
+        <h2>Monthly Pots</h2>
+        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:14px;">Add your regular monthly outgoings. Assign each to an account for payday planning.</p>
+        <div id="pots-list"></div>
+        <button class="btn btn-outline" id="add-pot-btn">+ Add Pot</button>
+      </div>
+      <div id="summary-section"></div>
+      <div class="nav-row">
+        <button class="btn btn-outline" id="nav-back-3">&larr; Back</button>
+        <div></div>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- Accounts modal -->
-<div class="modal-overlay" id="accounts-modal" onclick="if(event.target===this)closeAccounts()">
+<div class="modal-overlay" id="accounts-modal">
   <div class="modal">
-    <button class="modal-close" onclick="closeAccounts()">&times;</button>
+    <button class="modal-close" id="close-accounts-btn">&times;</button>
     <h2>Payday Account Breakdown</h2>
     <p class="modal-subtitle">Where to transfer your money on payday</p>
     <div id="accounts-body"></div>
@@ -347,32 +350,63 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
 </div>
 
 <!-- History modal -->
-<div class="modal-overlay" id="history-modal" onclick="if(event.target===this)closeHistory()">
+<div class="modal-overlay" id="history-modal">
   <div class="modal" style="max-width:600px">
-    <button class="modal-close" onclick="closeHistory()">&times;</button>
+    <button class="modal-close" id="close-history-btn">&times;</button>
     <div id="history-modal-body"></div>
   </div>
 </div>
 
-<!-- Toast -->
+<!-- Settings modal -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal" style="max-width:420px">
+    <button class="modal-close" id="close-settings-btn">&times;</button>
+    <h2>Settings</h2>
+    <p class="modal-subtitle">Customise your finance tracker</p>
+    <div class="settings-field">
+      <label for="payday-select">Pay Day</label>
+      <select id="payday-select"></select>
+      <p class="settings-note">Capped at 28th to avoid issues with shorter months (February has 28 days). If your pay day falls on a weekend or bank holiday, it will be moved to the nearest working day before.</p>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
-<script>
-var PERSONAL_ALLOWANCE = 12570;
-var BASIC_UPPER = 50270;
-var HIGHER_UPPER = 125140;
-var TAPER_START = 100000;
-var BASIC_RATE = 0.20;
-var HIGHER_RATE = 0.40;
-var ADDITIONAL_RATE = 0.45;
-var NI_LOWER = 12570;
-var NI_UPPER = 50270;
-var NI_MAIN = 0.08;
-var NI_HIGHER = 0.02;
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js';
+import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as fbSignOut } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js';
+import { getFirestore, collection, doc, setDoc, getDoc, getDocs, deleteDoc } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCrh8OV_QoOeygio4LhqXWk10vQcxHHn4I",
+  authDomain: "financial-tracker-f8d47.firebaseapp.com",
+  projectId: "financial-tracker-f8d47",
+  storageBucket: "financial-tracker-f8d47.firebasestorage.app",
+  messagingSenderId: "626879548091",
+  appId: "1:626879548091:web:7cff4521a13b4744c6b79e",
+  measurementId: "G-N6Z2DLR94L"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
+
+var currentUser = null;
+var payDay = parseInt(localStorage.getItem('finance_payDay')) || 23;
+var currentStep = 1;
+var pots = [];
+var financeHistory = [];
+var lastTakeHome = 0, lastMileage = 0;
+var authIsSignUp = false;
+
+// ===================== CONSTANTS =====================
+var PERSONAL_ALLOWANCE = 12570, BASIC_UPPER = 50270, HIGHER_UPPER = 125140, TAPER_START = 100000;
+var BASIC_RATE = 0.20, HIGHER_RATE = 0.40, ADDITIONAL_RATE = 0.45;
+var NI_LOWER = 12570, NI_UPPER = 50270, NI_MAIN = 0.08, NI_HIGHER = 0.02;
 var MILEAGE_RATE = 0.55;
-
 var ACCOUNTS = ['Bills', 'Train', 'Car Finance', 'Holiday Savings', 'Car Insurance'];
-
 var UK_BANK_HOLIDAYS = [
   '2024-01-01','2024-03-29','2024-04-01','2024-05-06','2024-05-27','2024-08-26','2024-12-25','2024-12-26',
   '2025-01-01','2025-04-18','2025-04-21','2025-05-05','2025-05-26','2025-08-25','2025-12-25','2025-12-26',
@@ -380,641 +414,537 @@ var UK_BANK_HOLIDAYS = [
   '2027-01-01','2027-03-26','2027-03-29','2027-05-03','2027-05-31','2027-08-30','2027-12-27','2027-12-28',
   '2028-01-03','2028-04-14','2028-04-17','2028-05-01','2028-05-29','2028-08-28','2028-12-25','2028-12-26'
 ];
-
 var BANK_HOLIDAY_SET = {};
 UK_BANK_HOLIDAYS.forEach(function(d) { BANK_HOLIDAY_SET[d] = true; });
-
 var BANK_HOLIDAY_NAMES = {
-  '01-01': 'New Year\'s Day', '01-03': 'New Year\'s Day (substitute)',
-  '03-26': 'Good Friday', '03-29': 'Good Friday',
-  '04-01': 'Easter Monday', '04-03': 'Good Friday', '04-06': 'Easter Monday',
-  '04-14': 'Good Friday', '04-17': 'Easter Monday', '04-18': 'Good Friday', '04-21': 'Easter Monday',
-  '05-01': 'Early May bank holiday', '05-03': 'Early May bank holiday',
-  '05-04': 'Early May bank holiday', '05-05': 'Early May bank holiday', '05-06': 'Early May bank holiday',
-  '05-25': 'Spring bank holiday', '05-26': 'Spring bank holiday',
-  '05-27': 'Spring bank holiday', '05-29': 'Spring bank holiday', '05-31': 'Spring bank holiday',
-  '08-25': 'Summer bank holiday', '08-26': 'Summer bank holiday',
-  '08-28': 'Summer bank holiday', '08-30': 'Summer bank holiday', '08-31': 'Summer bank holiday',
-  '12-25': 'Christmas Day', '12-26': 'Boxing Day',
-  '12-27': 'Christmas Day (substitute)', '12-28': 'Boxing Day (substitute)'
+  '01-01':'New Year\'s Day','01-03':'New Year\'s Day (substitute)',
+  '03-26':'Good Friday','03-29':'Good Friday',
+  '04-01':'Easter Monday','04-03':'Good Friday','04-06':'Easter Monday',
+  '04-14':'Good Friday','04-17':'Easter Monday','04-18':'Good Friday','04-21':'Easter Monday',
+  '05-01':'Early May bank holiday','05-03':'Early May bank holiday','05-04':'Early May bank holiday',
+  '05-05':'Early May bank holiday','05-06':'Early May bank holiday',
+  '05-25':'Spring bank holiday','05-26':'Spring bank holiday','05-27':'Spring bank holiday',
+  '05-29':'Spring bank holiday','05-31':'Spring bank holiday',
+  '08-25':'Summer bank holiday','08-26':'Summer bank holiday','08-28':'Summer bank holiday',
+  '08-30':'Summer bank holiday','08-31':'Summer bank holiday',
+  '12-25':'Christmas Day','12-26':'Boxing Day','12-27':'Christmas Day (substitute)','12-28':'Boxing Day (substitute)'
 };
-
 var MONTH_NAMES_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 var MONTH_NAMES_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 var DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
-function dateToStr(d) {
-  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-}
-function isBankHoliday(d) { return BANK_HOLIDAY_SET[dateToStr(d)] === true; }
-function isWorkingDay(d) { var day = d.getDay(); return day >= 1 && day <= 5 && !isBankHoliday(d); }
+// ===================== UTILITIES =====================
+function dateToStr(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function isBankHoliday(d) { return BANK_HOLIDAY_SET[dateToStr(d)]===true; }
+function isWorkingDay(d) { var day=d.getDay(); return day>=1&&day<=5&&!isBankHoliday(d); }
+function ordSuffix(d) { if(d===1||d===21||d===31) return 'st'; if(d===2||d===22) return 'nd'; if(d===3||d===23) return 'rd'; return 'th'; }
+function formatDateLong(d) { return DAY_NAMES[d.getDay()]+' '+d.getDate()+ordSuffix(d.getDate())+' '+MONTH_NAMES_FULL[d.getMonth()]+' '+d.getFullYear(); }
+function formatDateShort(d) { return d.getDate()+' '+MONTH_NAMES_SHORT[d.getMonth()]+' '+d.getFullYear(); }
+function fmt(n) { return '£'+Math.abs(n).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function row(label,value,cls) { var v=value<0?('−'+fmt(value)):fmt(value); return '<tr><td>'+label+'</td><td class="'+(cls||'')+'">'+v+'</td></tr>'; }
+function rowTotal(label,value) { return '<tr class="total"><td>'+label+'</td><td>'+fmt(value)+'</td></tr>'; }
+function stat(label,value) { return '<div class="summary-stat"><div class="stat-label">'+label+'</div><div class="stat-value">'+value+'</div></div>'; }
+function showToast(msg) { var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},2500); }
 
-function getPayDate(year, month) {
-  var target = new Date(year, month, 23);
+// ===================== PAY DATE =====================
+function getPayDate(year, month, pd) {
+  pd = pd || payDay;
+  var target = new Date(year, month, pd);
   var original = new Date(target);
-  while (!isWorkingDay(target)) target.setDate(target.getDate() - 1);
-  return { payDate: target, original: original, moved: target.getTime() !== original.getTime() };
+  while (!isWorkingDay(target)) target.setDate(target.getDate()-1);
+  return { payDate: target, original: original, moved: target.getTime()!==original.getTime() };
 }
-function getNextPayDate(year, month) {
-  var nm = month + 1, ny = year;
-  if (nm > 11) { nm = 0; ny++; }
-  return getPayDate(ny, nm);
+function getNextPayDate(year, month, pd) {
+  var nm=month+1, ny=year; if(nm>11){nm=0;ny++;}
+  return getPayDate(ny, nm, pd);
 }
-
-function formatDateLong(d) {
-  var day = d.getDate();
-  return DAY_NAMES[d.getDay()] + ' ' + day + ordSuffix(day) + ' ' + MONTH_NAMES_FULL[d.getMonth()] + ' ' + d.getFullYear();
-}
-function formatDateShort(d) {
-  return d.getDate() + ' ' + MONTH_NAMES_SHORT[d.getMonth()] + ' ' + d.getFullYear();
-}
-function ordSuffix(d) {
-  if (d === 1 || d === 21 || d === 31) return 'st';
-  if (d === 2 || d === 22) return 'nd';
-  if (d === 3 || d === 23) return 'rd';
-  return 'th';
-}
-function getMovedReason(original) {
+function getMovedReason(original, pd) {
+  pd = pd || payDay;
+  var dayStr = pd+ordSuffix(pd);
   var day = original.getDay();
   var ds = dateToStr(original);
-  if (day === 0) return '23rd falls on a Sunday';
-  if (day === 6) return '23rd falls on a Saturday';
-  if (BANK_HOLIDAY_SET[ds]) {
-    var name = BANK_HOLIDAY_NAMES[ds.substring(5)] || 'bank holiday';
-    return '23rd is ' + name;
-  }
-  return '23rd is a non-working day';
+  if (day===0) return dayStr+' falls on a Sunday';
+  if (day===6) return dayStr+' falls on a Saturday';
+  if (BANK_HOLIDAY_SET[ds]) { return dayStr+' is '+(BANK_HOLIDAY_NAMES[ds.substring(5)]||'a bank holiday'); }
+  return dayStr+' is a non-working day';
 }
 
-function initMonthPicker() {
-  var now = new Date();
-  var mSel = document.getElementById('pick-month');
-  var ySel = document.getElementById('pick-year');
-  for (var m = 0; m < 12; m++) {
-    var opt = document.createElement('option');
-    opt.value = m; opt.textContent = MONTH_NAMES_FULL[m];
-    if (m === now.getMonth()) opt.selected = true;
-    mSel.appendChild(opt);
-  }
-  for (var y = 2024; y <= 2028; y++) {
-    var opt = document.createElement('option');
-    opt.value = y; opt.textContent = y;
-    if (y === now.getFullYear()) opt.selected = true;
-    ySel.appendChild(opt);
-  }
-  updatePaydate();
-}
-
-function shiftMonth(dir) {
-  var mSel = document.getElementById('pick-month');
-  var ySel = document.getElementById('pick-year');
-  var m = parseInt(mSel.value) + dir, y = parseInt(ySel.value);
-  if (m > 11) { m = 0; y++; }
-  if (m < 0) { m = 11; y--; }
-  if (y < 2024) y = 2024;
-  if (y > 2028) y = 2028;
-  mSel.value = m; ySel.value = y;
-  updatePaydate();
-}
-
-function updatePaydate() {
-  var m = parseInt(document.getElementById('pick-month').value);
-  var y = parseInt(document.getElementById('pick-year').value);
-  var result = getPayDate(y, m);
-  var next = getNextPayDate(y, m);
-  var coverageStart = new Date(result.payDate);
-  coverageStart.setDate(coverageStart.getDate() + 1);
-  var coverageEnd = next.payDate;
-
-  var html = '<div class="paydate-card">';
-  html += '<div class="paydate-header"><span class="paydate-icon">&#128197;</span>';
-  html += '<span class="paydate-title">Pay Date for ' + MONTH_NAMES_FULL[m] + ' ' + y + '</span></div>';
-  html += '<div class="paydate-date">' + formatDateLong(result.payDate) + '</div>';
-  if (result.moved) {
-    var reason = getMovedReason(result.original);
-    html += '<div class="paydate-note">' + reason + ' — paid ' + DAY_NAMES[result.payDate.getDay()] + ' ' + result.payDate.getDate() + ordSuffix(result.payDate.getDate()) + ' instead</div>';
-  }
-  html += '<div class="paydate-coverage"><strong>Budget coverage:</strong> ' + formatDateShort(coverageStart) + ' — ' + formatDateShort(coverageEnd);
-  var days = Math.round((coverageEnd - coverageStart) / 86400000);
-  html += ' <span style="color:var(--primary);font-weight:600">(' + days + ' days)</span></div></div>';
-  document.getElementById('paydate-info').innerHTML = html;
-}
-
-var currentStep = 1;
-var pots = [];
-var financeHistory = [];
-var lastTakeHome = 0;
-var lastMileage = 0;
-
-function fmt(n) {
-  return '£' + Math.abs(n).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-function getPA(gross) {
-  if (gross <= TAPER_START) return PERSONAL_ALLOWANCE;
-  return Math.max(0, PERSONAL_ALLOWANCE - Math.floor((gross - TAPER_START) / 2));
-}
+// ===================== TAX =====================
+function getPA(gross) { if(gross<=TAPER_START) return PERSONAL_ALLOWANCE; return Math.max(0,PERSONAL_ALLOWANCE-Math.floor((gross-TAPER_START)/2)); }
 function calcTax(gross) {
-  var pa = getPA(gross);
-  var taxable = Math.max(0, gross - pa);
-  var tax = 0;
-  var basicBand = Math.max(0, BASIC_UPPER - pa);
-  var bt = Math.min(taxable, basicBand); tax += bt * BASIC_RATE; taxable -= bt;
-  var ht = Math.min(taxable, HIGHER_UPPER - BASIC_UPPER); tax += ht * HIGHER_RATE; taxable -= ht;
-  tax += taxable * ADDITIONAL_RATE;
-  return tax;
+  var pa=getPA(gross), taxable=Math.max(0,gross-pa), tax=0;
+  var bt=Math.min(taxable,Math.max(0,BASIC_UPPER-pa)); tax+=bt*BASIC_RATE; taxable-=bt;
+  var ht=Math.min(taxable,HIGHER_UPPER-BASIC_UPPER); tax+=ht*HIGHER_RATE; taxable-=ht;
+  return tax+taxable*ADDITIONAL_RATE;
 }
 function calcNI(gross) {
-  if (gross <= NI_LOWER) return 0;
-  var ni = Math.max(0, Math.min(gross, NI_UPPER) - NI_LOWER) * NI_MAIN;
-  if (gross > NI_UPPER) ni += (gross - NI_UPPER) * NI_HIGHER;
-  return ni;
+  if(gross<=NI_LOWER) return 0;
+  return Math.max(0,Math.min(gross,NI_UPPER)-NI_LOWER)*NI_MAIN + (gross>NI_UPPER?(gross-NI_UPPER)*NI_HIGHER:0);
 }
 
+// ===================== MONTH PICKER =====================
+var monthPickerInited = false;
+function initMonthPicker() {
+  var mSel=document.getElementById('pick-month'), ySel=document.getElementById('pick-year');
+  if (!monthPickerInited) {
+    var now=new Date();
+    for(var m=0;m<12;m++){var o=document.createElement('option');o.value=m;o.textContent=MONTH_NAMES_FULL[m];if(m===now.getMonth())o.selected=true;mSel.appendChild(o);}
+    for(var y=2024;y<=2028;y++){var o=document.createElement('option');o.value=y;o.textContent=y;if(y===now.getFullYear())o.selected=true;ySel.appendChild(o);}
+    monthPickerInited = true;
+  }
+  updatePaydate();
+}
+function shiftMonth(dir) {
+  var mSel=document.getElementById('pick-month'), ySel=document.getElementById('pick-year');
+  var m=parseInt(mSel.value)+dir, y=parseInt(ySel.value);
+  if(m>11){m=0;y++;} if(m<0){m=11;y--;}
+  if(y<2024)y=2024; if(y>2028)y=2028;
+  mSel.value=m; ySel.value=y; updatePaydate();
+}
+function updatePaydate() {
+  var m=parseInt(document.getElementById('pick-month').value), y=parseInt(document.getElementById('pick-year').value);
+  var result=getPayDate(y,m), next=getNextPayDate(y,m);
+  var cs=new Date(result.payDate); cs.setDate(cs.getDate()+1);
+  var html='<div class="paydate-card"><div class="paydate-header"><span class="paydate-icon">&#128197;</span>';
+  html+='<span class="paydate-title">Pay Date for '+MONTH_NAMES_FULL[m]+' '+y+'</span></div>';
+  html+='<div class="paydate-date">'+formatDateLong(result.payDate)+'</div>';
+  if(result.moved) html+='<div class="paydate-note">'+getMovedReason(result.original)+' — paid '+DAY_NAMES[result.payDate.getDay()]+' '+result.payDate.getDate()+ordSuffix(result.payDate.getDate())+' instead</div>';
+  html+='<div class="paydate-coverage"><strong>Budget coverage:</strong> '+formatDateShort(cs)+' — '+formatDateShort(next.payDate);
+  html+=' <span style="color:var(--primary);font-weight:600">('+Math.round((next.payDate-cs)/86400000)+' days)</span></div></div>';
+  document.getElementById('paydate-info').innerHTML=html;
+}
+
+// ===================== SETTINGS =====================
+function initPaydaySelect() {
+  var sel=document.getElementById('payday-select');
+  sel.innerHTML='';
+  for(var d=1;d<=28;d++){
+    var o=document.createElement('option');
+    o.value=d; o.textContent=d+ordSuffix(d)+' of each month';
+    if(d===payDay) o.selected=true;
+    sel.appendChild(o);
+  }
+}
+async function onPayDayChange() {
+  payDay=parseInt(document.getElementById('payday-select').value);
+  localStorage.setItem('finance_payDay', payDay);
+  updatePaydate();
+  if(currentUser) {
+    try { await setDoc(doc(db,'users',currentUser.uid,'settings','config'),{payDay:payDay},{merge:true}); }
+    catch(e) { console.error('Settings save failed:',e); }
+  }
+  showToast('Pay day set to '+payDay+ordSuffix(payDay));
+}
+
+// ===================== CALC =====================
 function calc() {
-  var salary = parseFloat(document.getElementById('salary').value) || 0;
-  var togExpenses = document.getElementById('tog-expenses').checked;
-  var togMileage = document.getElementById('tog-mileage').checked;
-  var togOvertime = document.getElementById('tog-overtime').checked;
-  var workExpenses = togExpenses ? (parseFloat(document.getElementById('work-expenses').value) || 0) : 0;
-  var miles = togMileage ? (parseFloat(document.getElementById('miles').value) || 0) : 0;
-  var overtime = togOvertime ? (parseFloat(document.getElementById('overtime').value) || 0) : 0;
-  var mileageAmount = miles * MILEAGE_RATE;
-
-  if (togMileage) {
-    document.getElementById('mileage-calc').innerHTML = miles.toLocaleString('en-GB') + ' miles × 55p = ' + fmt(mileageAmount);
-  }
-
-  var annualTax = calcTax(salary), annualNI = calcNI(salary);
-  var annualNet = salary - annualTax - annualNI;
-  var effectiveRate = salary > 0 ? ((annualTax + annualNI) / salary * 100) : 0;
-  var monthlyGross = salary / 12, monthlyTax = annualTax / 12, monthlyNI = annualNI / 12;
-
-  var adjSalary = Math.max(0, salary - (workExpenses * 12));
-  var adjMonthlyTax = calcTax(adjSalary) / 12;
-  var taxSaving = monthlyTax - adjMonthlyTax;
-
-  var totalWithOT = salary + overtime * 12;
-  var otTax = (calcTax(totalWithOT) - calcTax(salary)) / 12;
-  var otNI = (calcNI(totalWithOT) - calcNI(salary)) / 12;
-
-  var finalTax = adjMonthlyTax + otTax;
-  var finalNI = monthlyNI + otNI;
-  var actualTakeHome = monthlyGross + overtime - finalTax - finalNI;
-
-  lastTakeHome = actualTakeHome;
-  lastMileage = mileageAmount;
-
-  var show = salary > 0;
-  document.getElementById('tax-card').style.display = show ? 'block' : 'none';
-  document.getElementById('annual-card').style.display = show ? 'block' : 'none';
-
-  var mhtml = row('Gross salary', monthlyGross);
-  if (overtime > 0) mhtml += row('Overtime / bonus', overtime, 'addition');
-  mhtml += row('Income tax', -finalTax, 'deduction');
-  mhtml += row('National Insurance', -finalNI, 'deduction');
-  if (workExpenses > 0) mhtml += row('Tax relief on expenses', taxSaving, 'addition');
-  mhtml += rowTotal('Monthly take-home', actualTakeHome);
-  document.getElementById('monthly-table').innerHTML = mhtml;
-
-  var ahtml = row('Gross salary', salary);
-  ahtml += '<tr><td class="label-secondary">Personal allowance</td><td class="label-secondary" style="text-align:right">' + fmt(getPA(salary)) + '</td></tr>';
-  ahtml += row('Income tax', -annualTax, 'deduction') + row('National Insurance', -annualNI, 'deduction');
-  ahtml += rowTotal('Annual net pay', annualNet);
-  ahtml += '<tr><td class="label-secondary">Effective deduction rate</td><td class="label-secondary" style="text-align:right">' + effectiveRate.toFixed(1) + '%</td></tr>';
-  document.getElementById('annual-table').innerHTML = ahtml;
-
-  renderSummary(actualTakeHome, mileageAmount);
-  save();
+  var salary=parseFloat(document.getElementById('salary').value)||0;
+  var togE=document.getElementById('tog-expenses').checked;
+  var togM=document.getElementById('tog-mileage').checked;
+  var togO=document.getElementById('tog-overtime').checked;
+  var workExp=togE?(parseFloat(document.getElementById('work-expenses').value)||0):0;
+  var miles=togM?(parseFloat(document.getElementById('miles').value)||0):0;
+  var ot=togO?(parseFloat(document.getElementById('overtime').value)||0):0;
+  var mileageAmt=miles*MILEAGE_RATE;
+  if(togM) document.getElementById('mileage-calc').innerHTML=miles.toLocaleString('en-GB')+' miles × 55p = '+fmt(mileageAmt);
+  var aTax=calcTax(salary),aNI=calcNI(salary),aNet=salary-aTax-aNI;
+  var effRate=salary>0?((aTax+aNI)/salary*100):0;
+  var mGross=salary/12,mTax=aTax/12,mNI=aNI/12;
+  var adjTax=calcTax(Math.max(0,salary-(workExp*12)))/12, taxSav=mTax-adjTax;
+  var otTax=(calcTax(salary+ot*12)-calcTax(salary))/12;
+  var otNI=(calcNI(salary+ot*12)-calcNI(salary))/12;
+  var fTax=adjTax+otTax, fNI=mNI+otNI;
+  var takeHome=mGross+ot-fTax-fNI;
+  lastTakeHome=takeHome; lastMileage=mileageAmt;
+  var show=salary>0;
+  document.getElementById('tax-card').style.display=show?'block':'none';
+  document.getElementById('annual-card').style.display=show?'block':'none';
+  var mh=row('Gross salary',mGross);
+  if(ot>0) mh+=row('Overtime / bonus',ot,'addition');
+  mh+=row('Income tax',-fTax,'deduction')+row('National Insurance',-fNI,'deduction');
+  if(workExp>0) mh+=row('Tax relief on expenses',taxSav,'addition');
+  mh+=rowTotal('Monthly take-home',takeHome);
+  document.getElementById('monthly-table').innerHTML=mh;
+  var ah=row('Gross salary',salary);
+  ah+='<tr><td class="label-secondary">Personal allowance</td><td class="label-secondary" style="text-align:right">'+fmt(getPA(salary))+'</td></tr>';
+  ah+=row('Income tax',-aTax,'deduction')+row('National Insurance',-aNI,'deduction');
+  ah+=rowTotal('Annual net pay',aNet);
+  ah+='<tr><td class="label-secondary">Effective deduction rate</td><td class="label-secondary" style="text-align:right">'+effRate.toFixed(1)+'%</td></tr>';
+  document.getElementById('annual-table').innerHTML=ah;
+  renderSummary(takeHome,mileageAmt);
+  saveLocal();
 }
 
-function row(label, value, cls) {
-  var valStr = value < 0 ? ('−' + fmt(value)) : fmt(value);
-  return '<tr><td>' + label + '</td><td class="' + (cls || '') + '">' + valStr + '</td></tr>';
-}
-function rowTotal(label, value) {
-  return '<tr class="total"><td>' + label + '</td><td>' + fmt(value) + '</td></tr>';
-}
-
-function renderSummary(takeHome, mileage) {
-  var totalPots = pots.reduce(function(s, p) { return s + (parseFloat(p.amount) || 0); }, 0);
-  var freeMoney = takeHome + mileage - totalPots;
-
-  var html = '';
-  if (freeMoney >= 0) {
-    html += '<div class="banner banner-green">' + fmt(freeMoney) + ' free money this month</div>';
-  } else {
-    html += '<div class="banner banner-red">' + fmt(freeMoney) + ' over budget this month</div>';
-  }
-
-  html += '<div class="summary-grid">';
-  html += stat('Take-Home Pay', fmt(takeHome)) + stat('Mileage Received', fmt(mileage));
-  html += stat('Total Outgoings', fmt(totalPots)) + stat('Free Money', (freeMoney < 0 ? '−' : '') + fmt(freeMoney));
-  html += '</div>';
-
-  html += '<div class="action-row">';
-  html += '<button class="btn btn-success" onclick="saveMonth()">Save Month</button>';
-  html += '<button class="btn btn-amber" onclick="openAccounts()">Form Accounts</button>';
-  html += '</div>';
-
-  html += '<div class="card"><h3>Itemised Breakdown</h3><table class="breakdown">';
-  html += row('Monthly take-home pay', takeHome);
-  if (mileage > 0) html += row('Mileage expenses (tax-free)', mileage, 'addition');
-  html += '<tr class="divider"><td colspan="2" style="font-weight:600;padding-top:12px">Outgoings</td></tr>';
-  pots.forEach(function(p) {
-    var amt = parseFloat(p.amount) || 0;
-    if (p.name || amt > 0) {
-      var label = p.name || 'Unnamed pot';
-      if (p.account) label += ' <span class="label-secondary">(' + esc(p.account) + ')</span>';
-      html += row(label, -amt, 'deduction');
-    }
-  });
-  html += rowTotal('Remaining', freeMoney);
-  html += '</table></div>';
-
-  document.getElementById('summary-section').innerHTML = html;
+function renderSummary(takeHome,mileage) {
+  var totalPots=pots.reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);
+  var free=takeHome+mileage-totalPots;
+  var html='';
+  html+=free>=0?'<div class="banner banner-green">'+fmt(free)+' free money this month</div>':'<div class="banner banner-red">'+fmt(free)+' over budget this month</div>';
+  html+='<div class="summary-grid">'+stat('Take-Home Pay',fmt(takeHome))+stat('Mileage Received',fmt(mileage))+stat('Total Outgoings',fmt(totalPots))+stat('Free Money',(free<0?'−':'')+fmt(free))+'</div>';
+  html+='<div class="action-row"><button class="btn btn-success" id="save-month-btn">Save Month</button><button class="btn btn-amber" id="form-accounts-btn">Form Accounts</button></div>';
+  html+='<div class="card"><h3>Itemised Breakdown</h3><table class="breakdown">';
+  html+=row('Monthly take-home pay',takeHome);
+  if(mileage>0) html+=row('Mileage expenses (tax-free)',mileage,'addition');
+  html+='<tr class="divider"><td colspan="2" style="font-weight:600;padding-top:12px">Outgoings</td></tr>';
+  pots.forEach(function(p){var a=parseFloat(p.amount)||0;if(p.name||a>0){var l=p.name||'Unnamed pot';if(p.account)l+=' <span class="label-secondary">('+esc(p.account)+')</span>';html+=row(l,-a,'deduction');}});
+  html+=rowTotal('Remaining',free)+'</table></div>';
+  document.getElementById('summary-section').innerHTML=html;
+  document.getElementById('save-month-btn').addEventListener('click',saveMonth);
+  document.getElementById('form-accounts-btn').addEventListener('click',openAccounts);
 }
 
-function stat(label, value) {
-  return '<div class="summary-stat"><div class="stat-label">' + label + '</div><div class="stat-value">' + value + '</div></div>';
-}
-
+// ===================== NAVIGATION =====================
 function goStep(n) {
-  currentStep = n;
-  for (var i = 1; i <= 3; i++) {
-    document.getElementById('panel' + i).classList.toggle('active', i === n);
-    var sc = document.getElementById('sc' + i);
-    sc.classList.remove('active', 'done');
-    if (i < n) { sc.classList.add('done'); sc.textContent = '✓'; }
-    else if (i === n) { sc.classList.add('active'); sc.textContent = i; }
-    else { sc.textContent = i; }
+  currentStep=n;
+  for(var i=1;i<=3;i++){
+    document.getElementById('panel'+i).classList.toggle('active',i===n);
+    var sc=document.getElementById('sc'+i);
+    sc.classList.remove('active','done');
+    if(i<n){sc.classList.add('done');sc.textContent='✓';}
+    else if(i===n){sc.classList.add('active');sc.textContent=i;}
+    else sc.textContent=i;
   }
-  document.getElementById('sl1').classList.toggle('done', n > 1);
-  document.getElementById('sl2').classList.toggle('done', n > 2);
-  if (n === 3) calc();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.getElementById('sl1').classList.toggle('done',n>1);
+  document.getElementById('sl2').classList.toggle('done',n>2);
+  if(n===3) calc();
+  window.scrollTo({top:0,behavior:'smooth'});
 }
+function toggleSection(name) { document.getElementById('sec-'+name).classList.toggle('open',document.getElementById('tog-'+name).checked); }
 
-function toggleSection(name) {
-  var sec = document.getElementById('sec-' + name);
-  var tog = document.getElementById('tog-' + name);
-  sec.classList.toggle('open', tog.checked);
-}
-
-function addPot(name, amount, account) {
-  pots.push({ name: name || '', amount: amount || '', account: account || '' });
-  renderPots(); calc();
-}
-function removePot(i) { pots.splice(i, 1); renderPots(); calc(); }
-function updatePot(i, field, value) { pots[i][field] = value; calc(); }
+// ===================== POTS =====================
+function addPot(name,amount,account) { pots.push({name:name||'',amount:amount||'',account:account||''}); renderPots(); calc(); }
+function removePot(i) { pots.splice(i,1); renderPots(); calc(); }
+function updatePot(i,field,value) { pots[i][field]=value; calc(); }
+window._updatePot=updatePot; window._removePot=removePot;
 
 function renderPots() {
-  var html = '';
-  pots.forEach(function(p, i) {
-    var opts = '<option value="">No account</option>';
-    opts += '<option value="Direct Payment"' + (p.account === 'Direct Payment' ? ' selected' : '') + '>Direct Payment</option>';
-    ACCOUNTS.forEach(function(a) {
-      opts += '<option value="' + esc(a) + '"' + (p.account === a ? ' selected' : '') + '>' + esc(a) + '</option>';
-    });
-    html += '<div class="pot-row">' +
-      '<input type="text" placeholder="Pot name" value="' + esc(p.name) + '" oninput="updatePot(' + i + ',\'name\',this.value)">' +
-      '<div class="input-wrap"><span class="prefix">£</span>' +
-      '<input type="number" class="has-prefix" placeholder="0" min="0" step="10" value="' + p.amount + '" oninput="updatePot(' + i + ',\'amount\',this.value)"></div>' +
-      '<select onchange="updatePot(' + i + ',\'account\',this.value)">' + opts + '</select>' +
-      '<button class="btn btn-danger" onclick="removePot(' + i + ')" title="Remove">×</button></div>';
+  var html='';
+  pots.forEach(function(p,i){
+    var opts='<option value="">No account</option><option value="Direct Payment"'+(p.account==='Direct Payment'?' selected':'')+'>Direct Payment</option>';
+    ACCOUNTS.forEach(function(a){opts+='<option value="'+esc(a)+'"'+(p.account===a?' selected':'')+'>'+esc(a)+'</option>';});
+    html+='<div class="pot-row"><input type="text" placeholder="Pot name" value="'+esc(p.name)+'" oninput="window._updatePot('+i+',\'name\',this.value)">';
+    html+='<div class="input-wrap"><span class="prefix">£</span><input type="number" class="has-prefix" placeholder="0" min="0" step="10" value="'+p.amount+'" oninput="window._updatePot('+i+',\'amount\',this.value)"></div>';
+    html+='<select onchange="window._updatePot('+i+',\'account\',this.value)">'+opts+'</select>';
+    html+='<button class="btn btn-danger" onclick="window._removePot('+i+')" title="Remove">×</button></div>';
   });
-  document.getElementById('pots-list').innerHTML = html;
+  document.getElementById('pots-list').innerHTML=html;
 }
 
-function esc(s) {
-  return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
-// === FORM ACCOUNTS ===
+// ===================== FORM ACCOUNTS =====================
 function openAccounts() {
-  var groups = {}, directPayments = [], unassigned = [];
-  pots.forEach(function(p) {
-    var amt = parseFloat(p.amount) || 0;
-    if (!p.name && amt === 0) return;
-    var name = p.name || 'Unnamed pot';
-    if (p.account === 'Direct Payment') { directPayments.push({ name: name, amount: amt }); }
-    else if (p.account) {
-      if (!groups[p.account]) groups[p.account] = { items: [], total: 0 };
-      groups[p.account].items.push({ name: name, amount: amt });
-      groups[p.account].total += amt;
-    } else { unassigned.push({ name: name, amount: amt }); }
-  });
-
-  var html = '', grandTotal = 0;
-  if (directPayments.length) {
-    var dpTotal = directPayments.reduce(function(s, it) { return s + it.amount; }, 0);
-    grandTotal += dpTotal;
-    html += '<div class="account-group" style="border-left:3px solid var(--red);background:var(--red-bg)">' +
-      '<div class="account-group-header"><span class="account-group-name" style="color:var(--red)">Pay Immediately</span>' +
-      '<span class="account-group-total" style="color:var(--red)">' + fmt(dpTotal) + '</span></div>' +
-      '<div style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:6px">Pay these off as soon as you\'re paid</div><div class="account-group-items">';
-    directPayments.forEach(function(it) { html += '<div><span>' + esc(it.name) + '</span><span>' + fmt(it.amount) + '</span></div>'; });
-    html += '</div></div>';
-  }
-  ACCOUNTS.forEach(function(acct) {
-    var g = groups[acct]; if (!g) return;
-    grandTotal += g.total;
-    html += '<div class="account-group"><div class="account-group-header"><span class="account-group-name">' + esc(acct) + '</span><span class="account-group-total">' + fmt(g.total) + '</span></div><div class="account-group-items">';
-    g.items.forEach(function(it) { html += '<div><span>' + esc(it.name) + '</span><span>' + fmt(it.amount) + '</span></div>'; });
-    html += '</div></div>';
-  });
-  if (unassigned.length) {
-    var unTotal = unassigned.reduce(function(s, it) { return s + it.amount; }, 0);
-    grandTotal += unTotal;
-    html += '<div class="account-group"><div class="account-group-header"><span class="account-group-name" style="color:var(--text-secondary)">Main Account / Unassigned</span><span class="account-group-total">' + fmt(unTotal) + '</span></div><div class="account-group-items">';
-    unassigned.forEach(function(it) { html += '<div><span>' + esc(it.name) + '</span><span>' + fmt(it.amount) + '</span></div>'; });
-    html += '</div></div>';
-  }
-  if (!html) html = '<p class="history-empty">No pots to assign. Add some pots first.</p>';
-  else html += '<div class="account-grand-total"><span>Total Outgoings</span><span>' + fmt(grandTotal) + '</span></div>';
-
-  document.getElementById('accounts-body').innerHTML = html;
+  var groups={},dp=[],un=[];
+  pots.forEach(function(p){var a=parseFloat(p.amount)||0;if(!p.name&&a===0)return;var n=p.name||'Unnamed pot';
+    if(p.account==='Direct Payment')dp.push({name:n,amount:a});
+    else if(p.account){if(!groups[p.account])groups[p.account]={items:[],total:0};groups[p.account].items.push({name:n,amount:a});groups[p.account].total+=a;}
+    else un.push({name:n,amount:a});});
+  var html='',gt=0;
+  if(dp.length){var t=dp.reduce(function(s,i){return s+i.amount;},0);gt+=t;
+    html+='<div class="account-group" style="border-left:3px solid var(--red);background:var(--red-bg)"><div class="account-group-header"><span class="account-group-name" style="color:var(--red)">Pay Immediately</span><span class="account-group-total" style="color:var(--red)">'+fmt(t)+'</span></div><div style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:6px">Pay these off as soon as you\'re paid</div><div class="account-group-items">';
+    dp.forEach(function(i){html+='<div><span>'+esc(i.name)+'</span><span>'+fmt(i.amount)+'</span></div>';});html+='</div></div>';}
+  ACCOUNTS.forEach(function(ac){var g=groups[ac];if(!g)return;gt+=g.total;
+    html+='<div class="account-group"><div class="account-group-header"><span class="account-group-name">'+esc(ac)+'</span><span class="account-group-total">'+fmt(g.total)+'</span></div><div class="account-group-items">';
+    g.items.forEach(function(i){html+='<div><span>'+esc(i.name)+'</span><span>'+fmt(i.amount)+'</span></div>';});html+='</div></div>';});
+  if(un.length){var t=un.reduce(function(s,i){return s+i.amount;},0);gt+=t;
+    html+='<div class="account-group"><div class="account-group-header"><span class="account-group-name" style="color:var(--text-secondary)">Main Account / Unassigned</span><span class="account-group-total">'+fmt(t)+'</span></div><div class="account-group-items">';
+    un.forEach(function(i){html+='<div><span>'+esc(i.name)+'</span><span>'+fmt(i.amount)+'</span></div>';});html+='</div></div>';}
+  if(!html) html='<p class="history-empty">No pots to assign.</p>';
+  else html+='<div class="account-grand-total"><span>Total Outgoings</span><span>'+fmt(gt)+'</span></div>';
+  document.getElementById('accounts-body').innerHTML=html;
   document.getElementById('accounts-modal').classList.add('open');
 }
-function closeAccounts() { document.getElementById('accounts-modal').classList.remove('open'); }
+function closeAccounts(){document.getElementById('accounts-modal').classList.remove('open');}
 
-// === SAVE MONTH ===
-function saveMonth() {
-  var salary = parseFloat(document.getElementById('salary').value) || 0;
-  if (salary === 0) { showToast('Enter a salary before saving'); return; }
-
-  var selMonth = parseInt(document.getElementById('pick-month').value);
-  var selYear = parseInt(document.getElementById('pick-year').value);
-  var payResult = getPayDate(selYear, selMonth);
-  var totalPots = pots.reduce(function(s, p) { return s + (parseFloat(p.amount) || 0); }, 0);
-  var freeMoney = lastTakeHome + lastMileage - totalPots;
-
-  var entry = {
-    id: Date.now(),
-    month: selMonth,
-    year: selYear,
-    label: MONTH_NAMES_SHORT[selMonth] + ' ' + selYear,
-    payDate: dateToStr(payResult.payDate),
-    payDateLong: formatDateLong(payResult.payDate),
-    payDateMoved: payResult.moved,
-    payDateReason: payResult.moved ? getMovedReason(payResult.original) : '',
-    salary: salary,
-    togExpenses: document.getElementById('tog-expenses').checked,
-    workExpenses: parseFloat(document.getElementById('work-expenses').value) || 0,
-    togMileage: document.getElementById('tog-mileage').checked,
-    miles: parseFloat(document.getElementById('miles').value) || 0,
-    togOvertime: document.getElementById('tog-overtime').checked,
-    overtime: parseFloat(document.getElementById('overtime').value) || 0,
-    takeHome: Math.round(lastTakeHome * 100) / 100,
-    mileage: Math.round(lastMileage * 100) / 100,
-    outgoings: Math.round(totalPots * 100) / 100,
-    freeMoney: Math.round(freeMoney * 100) / 100,
-    pots: pots.filter(function(p) { return p.name || (parseFloat(p.amount) || 0) > 0; }).map(function(p) {
-      return { name: p.name || 'Unnamed', amount: parseFloat(p.amount) || 0, account: p.account || '' };
-    })
+// ===================== SAVE MONTH =====================
+async function saveMonth() {
+  var salary=parseFloat(document.getElementById('salary').value)||0;
+  if(salary===0){showToast('Enter a salary before saving');return;}
+  var sm=parseInt(document.getElementById('pick-month').value), sy=parseInt(document.getElementById('pick-year').value);
+  var pr=getPayDate(sy,sm), tp=pots.reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);
+  var entry={
+    id:Date.now(), month:sm, year:sy, label:MONTH_NAMES_SHORT[sm]+' '+sy,
+    payDate:dateToStr(pr.payDate), payDateLong:formatDateLong(pr.payDate),
+    payDateMoved:pr.moved, payDateReason:pr.moved?getMovedReason(pr.original):'',
+    payDayUsed:payDay, salary:salary,
+    togExpenses:document.getElementById('tog-expenses').checked,
+    workExpenses:parseFloat(document.getElementById('work-expenses').value)||0,
+    togMileage:document.getElementById('tog-mileage').checked,
+    miles:parseFloat(document.getElementById('miles').value)||0,
+    togOvertime:document.getElementById('tog-overtime').checked,
+    overtime:parseFloat(document.getElementById('overtime').value)||0,
+    takeHome:Math.round(lastTakeHome*100)/100, mileage:Math.round(lastMileage*100)/100,
+    outgoings:Math.round(tp*100)/100, freeMoney:Math.round((lastTakeHome+lastMileage-tp)*100)/100,
+    pots:pots.filter(function(p){return p.name||(parseFloat(p.amount)||0)>0;}).map(function(p){return{name:p.name||'Unnamed',amount:parseFloat(p.amount)||0,account:p.account||''};})
   };
-
   financeHistory.unshift(entry);
-  persistHistory();
-
-  // Clear all inputs
-  pots = [];
-  renderPots();
-  document.getElementById('salary').value = '';
-  document.getElementById('work-expenses').value = '';
-  document.getElementById('miles').value = '';
-  document.getElementById('overtime').value = '';
-  document.getElementById('tog-expenses').checked = false;
-  document.getElementById('tog-mileage').checked = false;
-  document.getElementById('tog-overtime').checked = false;
+  persistHistoryLocal();
+  if(currentUser){try{await setDoc(doc(db,'users',currentUser.uid,'months',String(entry.id)),entry);}catch(e){console.error('Firestore save:',e);}}
+  pots=[]; renderPots();
+  document.getElementById('salary').value='';
+  document.getElementById('work-expenses').value='';
+  document.getElementById('miles').value='';
+  document.getElementById('overtime').value='';
+  document.getElementById('tog-expenses').checked=false;
+  document.getElementById('tog-mileage').checked=false;
+  document.getElementById('tog-overtime').checked=false;
   document.getElementById('sec-expenses').classList.remove('open');
   document.getElementById('sec-mileage').classList.remove('open');
   document.getElementById('sec-overtime').classList.remove('open');
-  lastTakeHome = 0; lastMileage = 0;
-  save();
-
-  var now = new Date();
-  document.getElementById('pick-month').value = now.getMonth();
-  document.getElementById('pick-year').value = now.getFullYear();
-  updatePaydate();
-
-  goStep(1);
-  showToast('Saved ' + entry.label + ' — inputs cleared');
+  lastTakeHome=0;lastMileage=0; saveLocal();
+  var now=new Date();
+  document.getElementById('pick-month').value=now.getMonth();
+  document.getElementById('pick-year').value=now.getFullYear();
+  updatePaydate(); goStep(1);
+  showToast('Saved '+entry.label+' — inputs cleared');
 }
 
-// === HISTORY ===
-function openHistory() {
-  renderHistoryList();
-  document.getElementById('history-modal').classList.add('open');
-}
-function closeHistory() { document.getElementById('history-modal').classList.remove('open'); }
+// ===================== HISTORY =====================
+function openHistory(){renderHistoryList();document.getElementById('history-modal').classList.add('open');}
+function closeHistory(){document.getElementById('history-modal').classList.remove('open');}
+window._viewEntry=viewHistoryEntry; window._deleteEntry=deleteHistoryEntry; window._loadTemplate=loadAsTemplate; window._backToList=renderHistoryList;
 
 function renderHistoryList() {
-  var body = document.getElementById('history-modal-body');
-  var html = '<h2>Saved Months</h2><p class="modal-subtitle">Click a month to view the full breakdown</p>';
-
-  if (!financeHistory.length) {
-    html += '<p class="history-empty">No saved months yet. Complete a month and click "Save Month" on the summary screen.</p>';
-    body.innerHTML = html;
-    return;
-  }
-
-  financeHistory.forEach(function(h) {
-    var cls = h.freeMoney >= 0 ? 'positive' : 'negative';
-    var freeStr = (h.freeMoney < 0 ? '−' : '') + fmt(h.freeMoney);
-    html += '<div class="history-card-item" onclick="viewHistoryEntry(' + h.id + ')">' +
-      '<div class="history-card-left">' +
-        '<div class="history-card-month">' + esc(MONTH_NAMES_FULL[h.month] + ' ' + h.year) + '</div>' +
-        '<div class="history-card-paydate">Paid: ' + esc(h.payDateLong || h.payDate) + '</div>' +
-        '<div class="history-card-stats">' +
-          '<span>Take-home: ' + fmt(h.takeHome) + '</span>' +
-          '<span>Out: ' + fmt(h.outgoings) + '</span>' +
-        '</div>' +
-      '</div>' +
-      '<div class="history-card-free ' + cls + '">' + freeStr + '</div>' +
-      '<div class="history-card-delete"><button class="btn btn-danger" onclick="event.stopPropagation();deleteHistoryEntry(' + h.id + ')" title="Delete">×</button></div>' +
-    '</div>';
+  var b=document.getElementById('history-modal-body');
+  var html='<h2>Saved Months</h2><p class="modal-subtitle">Click a month to view the full breakdown</p>';
+  if(!financeHistory.length){html+='<p class="history-empty">No saved months yet.</p>';b.innerHTML=html;return;}
+  financeHistory.forEach(function(h){
+    var cls=h.freeMoney>=0?'positive':'negative', fs=(h.freeMoney<0?'−':'')+fmt(h.freeMoney);
+    html+='<div class="history-card-item" onclick="window._viewEntry('+h.id+')"><div class="history-card-left">';
+    html+='<div class="history-card-month">'+esc(MONTH_NAMES_FULL[h.month]+' '+h.year)+'</div>';
+    html+='<div class="history-card-paydate">Paid: '+esc(h.payDateLong||h.payDate)+'</div>';
+    html+='<div class="history-card-stats"><span>Take-home: '+fmt(h.takeHome)+'</span><span>Out: '+fmt(h.outgoings)+'</span></div>';
+    html+='</div><div class="history-card-free '+cls+'">'+fs+'</div>';
+    html+='<div class="history-card-delete"><button class="btn btn-danger" onclick="event.stopPropagation();window._deleteEntry('+h.id+')" title="Delete">×</button></div></div>';
   });
-
-  body.innerHTML = html;
+  b.innerHTML=html;
 }
 
 function viewHistoryEntry(id) {
-  var h = financeHistory.find(function(e) { return e.id === id; });
-  if (!h) return;
-
-  var body = document.getElementById('history-modal-body');
-  var html = '<div style="margin-bottom:16px"><button class="btn btn-outline" onclick="renderHistoryList()">&larr; Back to list</button></div>';
-
-  html += '<h2>' + esc(MONTH_NAMES_FULL[h.month] + ' ' + h.year) + '</h2>';
-
-  // Pay date
-  html += '<div class="paydate-card" style="margin:12px 0 16px;box-shadow:none;border-left:4px solid var(--primary)">';
-  html += '<div class="paydate-date" style="font-size:1.1rem;margin:0">' + esc(h.payDateLong || h.payDate) + '</div>';
-  if (h.payDateMoved && h.payDateReason) {
-    html += '<div class="paydate-note">' + esc(h.payDateReason) + '</div>';
-  }
-  html += '</div>';
-
-  // Budget banner
-  if (h.freeMoney >= 0) {
-    html += '<div class="banner banner-green" style="font-size:1rem;padding:12px">' + fmt(h.freeMoney) + ' free money</div>';
-  } else {
-    html += '<div class="banner banner-red" style="font-size:1rem;padding:12px">' + fmt(h.freeMoney) + ' over budget</div>';
-  }
-
-  // Stats grid
-  html += '<div class="summary-grid" style="margin-bottom:12px">';
-  html += stat('Salary', fmt(h.salary) + '/yr');
-  html += stat('Take-Home', fmt(h.takeHome));
-  html += stat('Mileage', fmt(h.mileage));
-  html += stat('Outgoings', fmt(h.outgoings));
-  html += '</div>';
-
-  // Adjustments
-  if (h.togExpenses || h.togMileage || h.togOvertime) {
-    html += '<div class="account-group" style="margin-bottom:12px"><div style="font-weight:600;margin-bottom:6px">Adjustments</div><div class="account-group-items">';
-    if (h.togExpenses && h.workExpenses > 0) html += '<div><span>Work expenses</span><span>' + fmt(h.workExpenses) + '</span></div>';
-    if (h.togMileage && h.miles > 0) html += '<div><span>Mileage (' + h.miles + ' miles × 55p)</span><span>' + fmt(h.mileage) + '</span></div>';
-    if (h.togOvertime && h.overtime > 0) html += '<div><span>Overtime / bonus (gross)</span><span>' + fmt(h.overtime) + '</span></div>';
-    html += '</div></div>';
-  }
-
-  // Pots breakdown
-  if (h.pots && h.pots.length) {
-    html += '<div class="account-group"><div style="font-weight:600;margin-bottom:6px">Pots</div><div class="account-group-items">';
-    h.pots.forEach(function(p) {
-      var label = esc(p.name);
-      if (p.account) label += ' <span style="color:var(--text-secondary)">(' + esc(p.account) + ')</span>';
-      html += '<div><span>' + label + '</span><span>' + fmt(p.amount) + '</span></div>';
-    });
-    html += '</div></div>';
-  }
-
-  // Actions
-  html += '<div class="action-row" style="margin-top:16px">';
-  html += '<button class="btn btn-primary" onclick="loadAsTemplate(' + h.id + ')">Load as Template</button>';
-  html += '<button class="btn btn-danger-solid" onclick="deleteHistoryEntry(' + h.id + ')">Delete Month</button>';
-  html += '</div>';
-
-  body.innerHTML = html;
+  var h=financeHistory.find(function(e){return e.id===id;});if(!h)return;
+  var b=document.getElementById('history-modal-body');
+  var html='<div style="margin-bottom:16px"><button class="btn btn-outline" onclick="window._backToList()">&larr; Back to list</button></div>';
+  html+='<h2>'+esc(MONTH_NAMES_FULL[h.month]+' '+h.year)+'</h2>';
+  html+='<div class="paydate-card" style="margin:12px 0 16px;box-shadow:none"><div class="paydate-date" style="font-size:1.1rem;margin:0">'+esc(h.payDateLong||h.payDate)+'</div>';
+  if(h.payDateMoved&&h.payDateReason) html+='<div class="paydate-note">'+esc(h.payDateReason)+'</div>';
+  html+='</div>';
+  html+=h.freeMoney>=0?'<div class="banner banner-green" style="font-size:1rem;padding:12px">'+fmt(h.freeMoney)+' free money</div>':'<div class="banner banner-red" style="font-size:1rem;padding:12px">'+fmt(h.freeMoney)+' over budget</div>';
+  html+='<div class="summary-grid" style="margin-bottom:12px">'+stat('Salary',fmt(h.salary)+'/yr')+stat('Take-Home',fmt(h.takeHome))+stat('Mileage',fmt(h.mileage))+stat('Outgoings',fmt(h.outgoings))+'</div>';
+  if(h.togExpenses||h.togMileage||h.togOvertime){
+    html+='<div class="account-group" style="margin-bottom:12px"><div style="font-weight:600;margin-bottom:6px">Adjustments</div><div class="account-group-items">';
+    if(h.togExpenses&&h.workExpenses>0) html+='<div><span>Work expenses</span><span>'+fmt(h.workExpenses)+'</span></div>';
+    if(h.togMileage&&h.miles>0) html+='<div><span>Mileage ('+h.miles+' miles × 55p)</span><span>'+fmt(h.mileage)+'</span></div>';
+    if(h.togOvertime&&h.overtime>0) html+='<div><span>Overtime / bonus (gross)</span><span>'+fmt(h.overtime)+'</span></div>';
+    html+='</div></div>';}
+  if(h.pots&&h.pots.length){
+    html+='<div class="account-group"><div style="font-weight:600;margin-bottom:6px">Pots</div><div class="account-group-items">';
+    h.pots.forEach(function(p){var l=esc(p.name);if(p.account)l+=' <span style="color:var(--text-secondary)">('+esc(p.account)+')</span>';html+='<div><span>'+l+'</span><span>'+fmt(p.amount)+'</span></div>';});
+    html+='</div></div>';}
+  html+='<div class="action-row" style="margin-top:16px"><button class="btn btn-primary" onclick="window._loadTemplate('+h.id+')">Load as Template</button>';
+  html+='<button class="btn btn-danger-solid" onclick="window._deleteEntry('+h.id+')">Delete Month</button></div>';
+  b.innerHTML=html;
 }
 
-function deleteHistoryEntry(id) {
-  var h = financeHistory.find(function(e) { return e.id === id; });
-  if (!h) return;
-  if (!confirm('Delete ' + MONTH_NAMES_FULL[h.month] + ' ' + h.year + '? This cannot be undone.')) return;
-  financeHistory = financeHistory.filter(function(e) { return e.id !== id; });
-  persistHistory();
+async function deleteHistoryEntry(id) {
+  var h=financeHistory.find(function(e){return e.id===id;});if(!h)return;
+  if(!confirm('Delete '+MONTH_NAMES_FULL[h.month]+' '+h.year+'? This cannot be undone.'))return;
+  financeHistory=financeHistory.filter(function(e){return e.id!==id;});
+  persistHistoryLocal();
+  if(currentUser){try{await deleteDoc(doc(db,'users',currentUser.uid,'months',String(id)));}catch(e){console.error('Firestore delete:',e);}}
   renderHistoryList();
-  showToast('Deleted ' + h.label);
+  showToast('Deleted '+h.label);
 }
 
 function loadAsTemplate(id) {
-  var h = financeHistory.find(function(e) { return e.id === id; });
-  if (!h) return;
-
-  // Load salary and pots
-  document.getElementById('salary').value = h.salary;
-  pots = h.pots.map(function(p) {
-    return { name: p.name || '', amount: p.amount || '', account: p.account || '' };
-  });
+  var h=financeHistory.find(function(e){return e.id===id;});if(!h)return;
+  document.getElementById('salary').value=h.salary;
+  pots=h.pots.map(function(p){return{name:p.name||'',amount:p.amount||'',account:p.account||''};});
   renderPots();
-
-  // Clear adjustments
-  document.getElementById('work-expenses').value = '';
-  document.getElementById('miles').value = '';
-  document.getElementById('overtime').value = '';
-  document.getElementById('tog-expenses').checked = false;
-  document.getElementById('tog-mileage').checked = false;
-  document.getElementById('tog-overtime').checked = false;
+  document.getElementById('work-expenses').value='';
+  document.getElementById('miles').value='';
+  document.getElementById('overtime').value='';
+  document.getElementById('tog-expenses').checked=false;
+  document.getElementById('tog-mileage').checked=false;
+  document.getElementById('tog-overtime').checked=false;
   document.getElementById('sec-expenses').classList.remove('open');
   document.getElementById('sec-mileage').classList.remove('open');
   document.getElementById('sec-overtime').classList.remove('open');
-
-  // Set month to current
-  var now = new Date();
-  document.getElementById('pick-month').value = now.getMonth();
-  document.getElementById('pick-year').value = now.getFullYear();
-  updatePaydate();
-
-  closeHistory();
-  goStep(1);
-  calc();
-
-  // Show template banner
-  var banner = document.getElementById('template-banner');
-  banner.textContent = 'Template loaded from ' + MONTH_NAMES_FULL[h.month] + ' ' + h.year + ' — salary and pots ready, fill in this month\'s adjustments';
-  banner.style.display = 'block';
-  setTimeout(function() { banner.style.display = 'none'; }, 8000);
+  var now=new Date();
+  document.getElementById('pick-month').value=now.getMonth();
+  document.getElementById('pick-year').value=now.getFullYear();
+  updatePaydate(); closeHistory(); goStep(1); calc();
+  var banner=document.getElementById('template-banner');
+  banner.textContent='Template loaded from '+MONTH_NAMES_FULL[h.month]+' '+h.year+' — salary and pots ready, fill in this month\'s adjustments';
+  banner.style.display='block';
+  setTimeout(function(){banner.style.display='none';},8000);
 }
 
-function showToast(msg) {
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(function() { t.classList.remove('show'); }, 2500);
+// ===================== LOCAL PERSISTENCE =====================
+function saveLocal() {
+  try{localStorage.setItem('uk-finance-tracker',JSON.stringify({
+    salary:document.getElementById('salary').value,
+    togExpenses:document.getElementById('tog-expenses').checked,
+    togMileage:document.getElementById('tog-mileage').checked,
+    togOvertime:document.getElementById('tog-overtime').checked,
+    workExpenses:document.getElementById('work-expenses').value,
+    miles:document.getElementById('miles').value,
+    overtime:document.getElementById('overtime').value,
+    pots:pots
+  }));}catch(e){}
+}
+function persistHistoryLocal(){try{localStorage.setItem('finance_history',JSON.stringify(financeHistory));}catch(e){}}
+function loadLocal() {
+  try{var r=localStorage.getItem('uk-finance-tracker');if(r){var d=JSON.parse(r);
+    if(d.salary)document.getElementById('salary').value=d.salary;
+    if(d.togExpenses){document.getElementById('tog-expenses').checked=true;toggleSection('expenses');}
+    if(d.togMileage){document.getElementById('tog-mileage').checked=true;toggleSection('mileage');}
+    if(d.togOvertime){document.getElementById('tog-overtime').checked=true;toggleSection('overtime');}
+    if(d.workExpenses)document.getElementById('work-expenses').value=d.workExpenses;
+    if(d.miles)document.getElementById('miles').value=d.miles;
+    if(d.overtime)document.getElementById('overtime').value=d.overtime;
+    if(d.pots&&d.pots.length){pots=d.pots.map(function(p){return{name:p.name||'',amount:p.amount||'',account:p.account||''};});renderPots();}
+  }}catch(e){}
+  try{var old=localStorage.getItem('uk-finance-history');var nw=localStorage.getItem('finance_history');
+    if(old&&!nw){localStorage.setItem('finance_history',old);localStorage.removeItem('uk-finance-history');}
+    var h=localStorage.getItem('finance_history');if(h)financeHistory=JSON.parse(h);
+  }catch(e){}
 }
 
-// === PERSISTENCE ===
-function save() {
-  var data = {
-    salary: document.getElementById('salary').value,
-    togExpenses: document.getElementById('tog-expenses').checked,
-    togMileage: document.getElementById('tog-mileage').checked,
-    togOvertime: document.getElementById('tog-overtime').checked,
-    workExpenses: document.getElementById('work-expenses').value,
-    miles: document.getElementById('miles').value,
-    overtime: document.getElementById('overtime').value,
-    pots: pots
-  };
-  try { localStorage.setItem('uk-finance-tracker', JSON.stringify(data)); } catch(e) {}
-}
-function persistHistory() {
-  try { localStorage.setItem('finance_history', JSON.stringify(financeHistory)); } catch(e) {}
-}
-function load() {
+// ===================== FIRESTORE SYNC =====================
+async function syncFromFirestore() {
+  if(!currentUser) return;
   try {
-    var raw = localStorage.getItem('uk-finance-tracker');
-    if (raw) {
-      var d = JSON.parse(raw);
-      if (d.salary) document.getElementById('salary').value = d.salary;
-      if (d.togExpenses) { document.getElementById('tog-expenses').checked = true; toggleSection('expenses'); }
-      if (d.togMileage) { document.getElementById('tog-mileage').checked = true; toggleSection('mileage'); }
-      if (d.togOvertime) { document.getElementById('tog-overtime').checked = true; toggleSection('overtime'); }
-      if (d.workExpenses) document.getElementById('work-expenses').value = d.workExpenses;
-      if (d.miles) document.getElementById('miles').value = d.miles;
-      if (d.overtime) document.getElementById('overtime').value = d.overtime;
-      if (d.pots && d.pots.length) {
-        pots = d.pots.map(function(p) { return { name: p.name || '', amount: p.amount || '', account: p.account || '' }; });
-        renderPots();
+    var snap=await getDocs(collection(db,'users',currentUser.uid,'months'));
+    var entries=[];
+    snap.forEach(function(d){entries.push(d.data());});
+    if(entries.length>0||financeHistory.length===0){
+      // Merge: if Firestore has data, use it. If local has entries not in Firestore, push them up.
+      var fsIds=new Set(entries.map(function(e){return e.id;}));
+      var localOnly=financeHistory.filter(function(e){return !fsIds.has(e.id);});
+      for(var i=0;i<localOnly.length;i++){
+        entries.push(localOnly[i]);
+        try{await setDoc(doc(db,'users',currentUser.uid,'months',String(localOnly[i].id)),localOnly[i]);}catch(e){}
       }
+      financeHistory=entries.sort(function(a,b){return b.id-a.id;});
+      persistHistoryLocal();
     }
-  } catch(e) {}
-  try {
-    // Migrate old history key
-    var oldH = localStorage.getItem('uk-finance-history');
-    var newH = localStorage.getItem('finance_history');
-    if (oldH && !newH) {
-      localStorage.setItem('finance_history', oldH);
-      localStorage.removeItem('uk-finance-history');
-    }
-    var hraw = localStorage.getItem('finance_history');
-    if (hraw) financeHistory = JSON.parse(hraw);
-  } catch(e) {}
+  } catch(e){ console.error('Firestore sync:',e); }
 }
 
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') { closeAccounts(); closeHistory(); }
+async function loadSettingsFromFirestore() {
+  if(!currentUser) return;
+  try {
+    var snap=await getDoc(doc(db,'users',currentUser.uid,'settings','config'));
+    if(snap.exists()){
+      var data=snap.data();
+      if(data.payDay){payDay=data.payDay;localStorage.setItem('finance_payDay',payDay);document.getElementById('payday-select').value=payDay;updatePaydate();}
+    }
+  } catch(e){console.error('Settings load:',e);}
+}
+
+// ===================== AUTH =====================
+function showAuthScreen() {
+  document.getElementById('loading-screen').style.display='none';
+  document.getElementById('auth-screen').style.display='flex';
+  document.getElementById('app-container').style.display='none';
+}
+function showApp() {
+  document.getElementById('loading-screen').style.display='none';
+  document.getElementById('auth-screen').style.display='none';
+  document.getElementById('app-container').style.display='block';
+}
+function updateUserDisplay() {
+  if(!currentUser) return;
+  document.getElementById('user-display').textContent=currentUser.displayName||currentUser.email;
+}
+function showAuthError(msg) {
+  var el=document.getElementById('auth-error');
+  el.textContent=msg; el.style.display='block';
+}
+
+document.getElementById('google-btn').addEventListener('click', async function(){
+  document.getElementById('auth-error').style.display='none';
+  try{await signInWithPopup(auth,googleProvider);}
+  catch(e){showAuthError(e.message);}
 });
 
-load();
-initMonthPicker();
-calc();
+document.getElementById('email-form').addEventListener('submit', async function(ev){
+  ev.preventDefault();
+  document.getElementById('auth-error').style.display='none';
+  var email=document.getElementById('auth-email').value;
+  var pass=document.getElementById('auth-password').value;
+  try{
+    if(authIsSignUp) await createUserWithEmailAndPassword(auth,email,pass);
+    else await signInWithEmailAndPassword(auth,email,pass);
+  }catch(e){
+    var msg=e.code==='auth/user-not-found'?'No account found — try creating one':
+            e.code==='auth/wrong-password'||e.code==='auth/invalid-credential'?'Incorrect email or password':
+            e.code==='auth/email-already-in-use'?'Email already in use — try signing in':
+            e.code==='auth/weak-password'?'Password must be at least 6 characters':e.message;
+    showAuthError(msg);
+  }
+});
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./service-worker.js');
-}
+document.getElementById('auth-switch').addEventListener('click', function(){
+  authIsSignUp=!authIsSignUp;
+  document.getElementById('email-submit-btn').textContent=authIsSignUp?'Create Account':'Sign In';
+  document.getElementById('auth-toggle').innerHTML=authIsSignUp?'Already have an account? <a id="auth-switch">Sign in</a>':'Don\'t have an account? <a id="auth-switch">Create one</a>';
+  document.getElementById('auth-switch').addEventListener('click',arguments.callee);
+  document.getElementById('auth-error').style.display='none';
+});
+
+document.getElementById('signout-btn').addEventListener('click', async function(){
+  await fbSignOut(auth);
+});
+
+onAuthStateChanged(auth, async function(user){
+  if(user){
+    currentUser=user;
+    loadLocal();
+    initMonthPicker();
+    initPaydaySelect();
+    showApp();
+    updateUserDisplay();
+    calc();
+    await loadSettingsFromFirestore();
+    await syncFromFirestore();
+  } else {
+    currentUser=null;
+    showAuthScreen();
+  }
+});
+
+// ===================== EVENT LISTENERS =====================
+document.getElementById('salary').addEventListener('input',calc);
+document.getElementById('work-expenses').addEventListener('input',calc);
+document.getElementById('miles').addEventListener('input',calc);
+document.getElementById('overtime').addEventListener('input',calc);
+document.getElementById('tog-expenses').addEventListener('change',function(){toggleSection('expenses');calc();});
+document.getElementById('tog-mileage').addEventListener('change',function(){toggleSection('mileage');calc();});
+document.getElementById('tog-overtime').addEventListener('change',function(){toggleSection('overtime');calc();});
+document.getElementById('pick-month').addEventListener('change',updatePaydate);
+document.getElementById('pick-year').addEventListener('change',updatePaydate);
+document.getElementById('month-prev').addEventListener('click',function(){shiftMonth(-1);});
+document.getElementById('month-next').addEventListener('click',function(){shiftMonth(1);});
+document.getElementById('step-item-1').addEventListener('click',function(){goStep(1);});
+document.getElementById('step-item-2').addEventListener('click',function(){goStep(2);});
+document.getElementById('step-item-3').addEventListener('click',function(){goStep(3);});
+document.getElementById('nav-next-1').addEventListener('click',function(){goStep(2);});
+document.getElementById('nav-back-2').addEventListener('click',function(){goStep(1);});
+document.getElementById('nav-next-2').addEventListener('click',function(){goStep(3);});
+document.getElementById('nav-back-3').addEventListener('click',function(){goStep(2);});
+document.getElementById('add-pot-btn').addEventListener('click',function(){addPot();});
+document.getElementById('view-history-btn').addEventListener('click',openHistory);
+document.getElementById('close-history-btn').addEventListener('click',closeHistory);
+document.getElementById('close-accounts-btn').addEventListener('click',closeAccounts);
+document.getElementById('settings-btn').addEventListener('click',function(){document.getElementById('settings-modal').classList.add('open');});
+document.getElementById('close-settings-btn').addEventListener('click',function(){document.getElementById('settings-modal').classList.remove('open');});
+document.getElementById('payday-select').addEventListener('change',onPayDayChange);
+document.getElementById('accounts-modal').addEventListener('click',function(e){if(e.target===this)closeAccounts();});
+document.getElementById('history-modal').addEventListener('click',function(e){if(e.target===this)closeHistory();});
+document.getElementById('settings-modal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeAccounts();closeHistory();document.getElementById('settings-modal').classList.remove('open');}});
+
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js');
 </script>
-
 </body>
 </html>
