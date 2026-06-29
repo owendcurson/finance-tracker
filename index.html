@@ -15,6 +15,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.2/confetti.browser.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -213,6 +214,23 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
 .splash-google { width: 100%; padding: 10px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--card); font-size: 0.95rem; font-weight: 500; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.15s; color: var(--text); }
 .splash-google:hover { background: var(--bg); }
 .splash-google svg { width: 20px; height: 20px; }
+
+/* Payday celebration modal */
+.payday-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 850; display: flex; align-items: center; justify-content: center; padding: 16px; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+.payday-overlay.open { opacity: 1; pointer-events: auto; }
+.payday-modal { background: var(--card); border-radius: var(--radius); box-shadow: 0 12px 40px rgba(0,0,0,0.2); width: 100%; max-width: 420px; padding: 32px; text-align: center; position: relative; transform: translateY(20px); transition: transform 0.3s; }
+.payday-overlay.open .payday-modal { transform: translateY(0); }
+.payday-modal .payday-close { position: absolute; top: 12px; right: 12px; background: none; border: none; font-size: 1.3rem; color: var(--text-secondary); cursor: pointer; padding: 4px; }
+.payday-modal .payday-close:hover { color: var(--text); }
+.payday-modal .payday-icon { font-size: 48px; color: var(--green); margin-bottom: 8px; }
+.payday-modal h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; }
+.payday-modal .payday-date { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 8px; }
+.payday-modal .payday-msg { color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 16px; }
+.payday-modal .payday-amount { font-size: 1.8rem; font-weight: 700; color: var(--green); margin-bottom: 20px; font-variant-numeric: tabular-nums; }
+.payday-modal .payday-actions { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.payday-modal .payday-actions .btn { width: 100%; padding: 12px; font-size: 0.95rem; }
+.payday-modal .payday-dismiss { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.82rem; color: var(--text-secondary); }
+.payday-modal .payday-dismiss input { accent-color: var(--primary); }
 
 /* Splash trust & outcomes */
 .splash-trust { margin-top: 28px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.15); }
@@ -683,6 +701,22 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
   </div>
   <div id="salcalc-result"></div>
 </div></div>
+<!-- Payday celebration -->
+<div class="payday-overlay" id="payday-overlay">
+  <div class="payday-modal">
+    <button class="payday-close" id="payday-close"><i class="ti ti-x"></i></button>
+    <div class="payday-icon"><i class="ti ti-pig-money"></i></div>
+    <h2>It's payday! 🎉</h2>
+    <div class="payday-date" id="payday-date-text"></div>
+    <div class="payday-msg">Your money should be hitting your account today. Here's what's waiting for you.</div>
+    <div class="payday-amount" id="payday-amount-text"></div>
+    <div class="payday-actions">
+      <button class="btn btn-primary" id="payday-update-btn">Update this month's figures</button>
+      <button class="btn btn-outline" id="payday-dismiss-btn">View my current tracker</button>
+    </div>
+    <label class="payday-dismiss"><input type="checkbox" id="payday-no-show">Don't show this again today</label>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -983,7 +1017,7 @@ $('form-signin').addEventListener('submit',async function(ev){ev.preventDefault(
 $('form-signup').addEventListener('submit',async function(ev){ev.preventDefault();$('auth-error').style.display='none';var pw=$('signup-password').value,cp=$('signup-confirm').value;if(pw!==cp){showAuthErr('Passwords do not match');return;}try{await createUserWithEmailAndPassword(auth,$('signup-email').value,pw);}catch(e){showAuthErr(authErrMsg(e));}});
 $('signout-btn').addEventListener('click',async function(){await fbSignOut(auth);});
 
-onAuthStateChanged(auth,async function(user){if(user){currentUser=user;loadLocal();loadEmailPrefs();initMP();initPDS();showApp();$('user-display').textContent=user.displayName||user.email;showDashboard();await loadSettingsFS();await syncFS();await maybeSendPaydayEmail();}else{currentUser=null;showAuth();}});
+onAuthStateChanged(auth,async function(user){if(user){currentUser=user;loadLocal();loadEmailPrefs();initMP();initPDS();showApp();$('user-display').textContent=user.displayName||user.email;showDashboard();await loadSettingsFS();await syncFS();await maybeSendPaydayEmail();maybeShowPayday();}else{currentUser=null;showAuth();}});
 
 // ===== EVENTS =====
 initTheme();
@@ -1063,6 +1097,27 @@ $('demo-add-pot').addEventListener('click',function(){if(demoPots.length<6){demo
 $('demo-signup-btn').addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});setTimeout(function(){$('tab-signup').click();},400);});
 $('demo-restart-btn').addEventListener('click',function(){demoPots=[{name:'Rent',amount:800},{name:'Food',amount:300},{name:'Subscriptions',amount:50}];$('demo-salary').value=32000;demoGoStep(1);demoCalcTax();});
 demoCalcTax();
+
+// ===== PAYDAY CELEBRATION =====
+function isPaydayToday(){var now=new Date();now.setHours(0,0,0,0);var pd=getPD(now.getFullYear(),now.getMonth()).payDate;pd.setHours(0,0,0,0);return pd.getTime()===now.getTime();}
+
+function fireConfetti(){if(!window.confetti)return;var colors=['#0d904f','#1a73e8','#3fbf7f','#4d8cf5','#ffffff'];
+window.confetti({particleCount:80,spread:70,origin:{x:0.15,y:1},colors:colors,gravity:0.8,ticks:200});
+window.confetti({particleCount:80,spread:70,origin:{x:0.85,y:1},colors:colors,gravity:0.8,ticks:200});
+setTimeout(function(){window.confetti({particleCount:50,spread:90,origin:{x:0.5,y:0.7},colors:colors,gravity:1,ticks:150});},600);}
+
+function closePaydayModal(){var ov=$('payday-overlay');ov.classList.remove('open');if($('payday-no-show').checked){localStorage.setItem('payday_dismissed_'+new Date().toISOString().slice(0,10),'1');}}
+
+function maybeShowPayday(){if(!currentUser||!isPaydayToday())return;var now=new Date();var confKey='confetti_shown_'+now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');var dismissKey='payday_dismissed_'+now.toISOString().slice(0,10);
+if(!localStorage.getItem(confKey)){localStorage.setItem(confKey,'1');setTimeout(fireConfetti,300);}
+if(localStorage.getItem(dismissKey))return;
+var dateText=fdl(getPD(now.getFullYear(),now.getMonth()).payDate);$('payday-date-text').textContent=dateText;
+if(financeHistory.length){$('payday-amount-text').innerHTML=fmt(financeHistory[0].takeHome)+' take-home';}else{$('payday-amount-text').innerHTML='<span style="font-size:0.9rem;color:var(--text-secondary);font-weight:400">Set up your tracker to see your take-home here</span>';}
+setTimeout(function(){$('payday-overlay').classList.add('open');},500);}
+
+$('payday-close').addEventListener('click',closePaydayModal);
+$('payday-dismiss-btn').addEventListener('click',closePaydayModal);
+$('payday-update-btn').addEventListener('click',function(){closePaydayModal();var now=new Date();editingId=null;clearTracker();$('pick-month').value=now.getMonth();$('pick-year').value=now.getFullYear();updPD();showTracker();});
 
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./service-worker.js');
 </script>
