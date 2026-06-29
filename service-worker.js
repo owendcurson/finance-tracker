@@ -1,4 +1,4 @@
-var CACHE_NAME = 'finance-tracker-v11';
+var CACHE_NAME = 'finance-tracker-v12';
 var ASSETS = [
   './index.html',
   './manifest.json',
@@ -13,7 +13,7 @@ var CDN_ASSETS = [
   'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
   'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.2/confetti.browser.min.js'
+  'https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.4/confetti.min.js'
 ];
 
 self.addEventListener('install', function(event) {

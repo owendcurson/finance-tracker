@@ -15,7 +15,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.2/confetti.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.4/confetti.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -1101,14 +1101,11 @@ demoCalcTax();
 // ===== PAYDAY CELEBRATION =====
 function isPaydayToday(){var now=new Date();now.setHours(0,0,0,0);var pd=getPD(now.getFullYear(),now.getMonth()).payDate;pd.setHours(0,0,0,0);return pd.getTime()===now.getTime();}
 
-function fireConfetti(){if(!window.confetti)return;var colors=['#0d904f','#1a73e8','#3fbf7f','#4d8cf5','#ffffff'];
-window.confetti({particleCount:80,spread:70,origin:{x:0.15,y:1},colors:colors,gravity:0.8,ticks:200});
-window.confetti({particleCount:80,spread:70,origin:{x:0.85,y:1},colors:colors,gravity:0.8,ticks:200});
-setTimeout(function(){window.confetti({particleCount:50,spread:90,origin:{x:0.5,y:0.7},colors:colors,gravity:1,ticks:150});},600);}
+function fireConfetti(){if(!window.confetti)return;var colors=['#0d904f','#1a73e8','#3fbf7f','#4d8cf5','#ffffff'];var end=Date.now()+4000;(function burst(){if(Date.now()>end)return;window.confetti({particleCount:6,angle:60,spread:55,origin:{x:0,y:0.6},colors:colors,zIndex:800});window.confetti({particleCount:6,angle:120,spread:55,origin:{x:1,y:0.6},colors:colors,zIndex:800});requestAnimationFrame(burst);})();}
 
 function closePaydayModal(){var ov=$('payday-overlay');ov.classList.remove('open');if($('payday-no-show').checked){localStorage.setItem('payday_dismissed_'+new Date().toISOString().slice(0,10),'1');}}
 
-function maybeShowPayday(){if(!currentUser||!isPaydayToday())return;var now=new Date();var confKey='confetti_shown_'+now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');var dismissKey='payday_dismissed_'+now.toISOString().slice(0,10);
+function maybeShowPayday(){if(!currentUser||!isPaydayToday())return;var now=new Date();var confKey='confetti_shown_'+now.toISOString().slice(0,10);var dismissKey='payday_dismissed_'+now.toISOString().slice(0,10);
 if(!localStorage.getItem(confKey)){localStorage.setItem(confKey,'1');setTimeout(fireConfetti,300);}
 if(localStorage.getItem(dismissKey))return;
 var dateText=fdl(getPD(now.getFullYear(),now.getMonth()).payDate);$('payday-date-text').textContent=dateText;
