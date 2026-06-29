@@ -1,6 +1,6 @@
 {
   "name": "Finance Tracker",
-  "short_name": "Finance",
+  "short_name": "FinTracker",
   "description": "UK Personal Finance Tracker — Tax Year 2026/27",
   "start_url": "./index.html",
   "display": "standalone",

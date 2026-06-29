@@ -346,8 +346,52 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
 /* Splash theme toggle */
 .splash-theme-toggle { position: fixed; top: 16px; right: 16px; z-index: 10; background: var(--card); border: 1.5px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow); }
 
+/* Inbox */
+.inbox-badge { position:absolute; top:-4px; right:-4px; background:var(--red); color:#fff; font-size:0.65rem; min-width:16px; height:16px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:700; padding:0 3px; }
+.header-icon { position:relative; }
+.inbox-panel { position:fixed; top:0; right:-400px; width:380px; height:100vh; background:var(--card); box-shadow:-4px 0 20px rgba(0,0,0,0.15); z-index:950; transition:right 0.3s; overflow-y:auto; display:flex; flex-direction:column; }
+.inbox-panel.open { right:0; }
+.inbox-header { padding:16px 20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+.inbox-header h2 { font-size:1.05rem; font-weight:700; }
+.inbox-mark-read { background:none; border:none; color:var(--primary); font-size:0.8rem; font-family:inherit; cursor:pointer; }
+.inbox-close { background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--text-secondary); padding:0 4px; line-height:1; }
+.inbox-list { flex:1; }
+.inbox-item { padding:14px 20px; border-bottom:1px solid var(--border); cursor:pointer; display:flex; gap:12px; align-items:flex-start; position:relative; }
+.inbox-item:hover { background:var(--bg); }
+.inbox-item.unread { background:var(--primary-light); }
+.inbox-item i { font-size:1.2rem; color:var(--primary); flex-shrink:0; margin-top:2px; }
+.inbox-item-title { font-weight:600; font-size:0.88rem; }
+.inbox-item-body { font-size:0.82rem; color:var(--text-secondary); margin-top:2px; }
+.inbox-item-time { font-size:0.75rem; color:var(--text-secondary); margin-top:4px; }
+.inbox-unread-dot { width:8px; height:8px; border-radius:50%; background:var(--primary); position:absolute; top:18px; right:16px; }
+.inbox-empty { text-align:center; color:var(--text-secondary); padding:40px 24px; font-size:0.88rem; }
+.inbox-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.3); z-index:940; opacity:0; pointer-events:none; transition:opacity 0.3s; }
+.inbox-overlay.open { opacity:1; pointer-events:auto; }
+
+/* Notification banner */
+#notif-banner { display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:0.9rem; padding:14px 18px; }
+#notif-banner .btn { font-size:0.82rem; padding:6px 14px; }
+
+/* Insights */
+.insight-card { padding:14px 18px; border-radius:var(--radius); margin-bottom:8px; display:flex; gap:12px; align-items:flex-start; position:relative; }
+.insight-card.info { background:var(--primary-light); border-left:3px solid var(--primary); }
+.insight-card.positive { background:var(--green-bg); border-left:3px solid var(--green); }
+.insight-card.warning { background:var(--amber-bg); border-left:3px solid var(--amber); }
+.insight-card.alert { background:var(--red-bg); border-left:3px solid var(--red); }
+.insight-card i { font-size:1.2rem; flex-shrink:0; margin-top:2px; }
+.insight-card.info i { color:var(--primary); }
+.insight-card.positive i { color:var(--green); }
+.insight-card.warning i { color:var(--amber); }
+.insight-card.alert i { color:var(--red); }
+.insight-card .insight-title { font-weight:600; font-size:0.88rem; padding-right:20px; }
+.insight-card .insight-body { font-size:0.82rem; color:var(--text-secondary); margin-top:2px; }
+.insight-dismiss { position:absolute; top:8px; right:8px; background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:1rem; line-height:1; }
+.insight-seeall { background:none; border:none; color:var(--primary); font-size:0.85rem; font-family:inherit; cursor:pointer; padding:4px 0; font-weight:500; }
+
 @media (max-width: 600px) {
   .container { padding: 10px; }
+  .inbox-panel { width:100%; right:-100%; bottom:0; top:auto; height:70vh; border-radius:var(--radius) var(--radius) 0 0; }
+  .inbox-panel.open { right:0; }
   .metric-grid, .metric-grid.cols-4 { grid-template-columns: 1fr 1fr; }
   .card { padding: 16px; }
   .step-label { display: none; }
@@ -576,6 +620,7 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
     <span class="header-title">Finance Tracker</span>
     <span class="user-name" id="user-display"></span>
     <button class="header-icon" id="theme-btn" title="Toggle dark mode"><i class="ti ti-moon"></i></button>
+    <button class="header-icon" id="inbox-btn" title="Notifications"><i class="ti ti-bell"></i><span class="inbox-badge" id="inbox-badge" style="display:none">0</span></button>
     <button class="header-icon" id="settings-btn" title="Settings">&#9881;</button>
     <button class="header-btn" id="signout-btn">Sign Out</button>
   </div>
@@ -584,6 +629,11 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
   <div id="dashboard-screen">
     <div class="container">
       <div id="dash-greeting" style="margin-bottom:20px"></div>
+      <div id="notif-banner" class="card" style="display:none;margin-bottom:16px">
+        <span style="flex:1;min-width:160px"><i class="ti ti-bell" style="color:var(--primary)"></i> Enable payday reminders?</span>
+        <button class="btn btn-primary" id="notif-enable-btn">Enable</button>
+        <button class="btn btn-outline" id="notif-dismiss-btn">Dismiss</button>
+      </div>
       <div class="action-row">
         <button class="btn btn-primary btn-lg" id="new-month-btn" style="flex:1">+ New Month</button>
         <button class="btn btn-outline btn-lg" id="salcalc-btn" style="flex:1"><i class="ti ti-calculator"></i> Salary Calculator</button>
@@ -610,6 +660,8 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
       <div class="card chart-card chart-card-full" id="chart-stacked-wrap"><h3>Spending by Category</h3><canvas id="chart-stacked"></canvas></div>
 
       <div id="dash-savings"></div>
+
+      <div id="dash-insights"></div>
 
       <div id="dash-ytd"></div>
 
@@ -716,6 +768,18 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
     </div>
     <label class="payday-dismiss"><input type="checkbox" id="payday-no-show">Don't show this again today</label>
   </div>
+</div>
+<!-- Inbox -->
+<div class="inbox-overlay" id="inbox-overlay"></div>
+<div class="inbox-panel" id="inbox-panel">
+  <div class="inbox-header">
+    <h2>Notifications</h2>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="inbox-mark-read" id="inbox-mark-read-btn">Mark all as read</button>
+      <button class="inbox-close" id="inbox-close-btn">&times;</button>
+    </div>
+  </div>
+  <div class="inbox-list" id="inbox-list"></div>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -846,12 +910,16 @@ function openAccounts(){var h=buildAccountsBreakdown(pots);$('accounts-body').in
 function closeAccounts(){$('accounts-modal').classList.remove('open');}
 
 // ===== SAVE MONTH =====
-async function saveMonth(){var sal=parseFloat($('salary').value)||0;if(sal===0){toast('Enter a salary before saving');return;}var sm=parseInt($('pick-month').value),sy=parseInt($('pick-year').value),pr=getPD(sy,sm),tp=pots.reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);var entryId=editingId||Date.now();var entry={id:entryId,month:sm,year:sy,label:MS[sm]+' '+sy,payDate:ds(pr.payDate),payDateLong:fdl(pr.payDate),payDateMoved:pr.moved,payDateReason:pr.moved?movedReason(pr.original):'',payDayUsed:payDay,salary:sal,togExpenses:$('tog-expenses').checked,workExpenses:parseFloat($('work-expenses').value)||0,togMileage:$('tog-mileage').checked,miles:parseFloat($('miles').value)||0,togOvertime:$('tog-overtime').checked,overtime:parseFloat($('overtime').value)||0,takeHome:Math.round(lastTakeHome*100)/100,mileage:Math.round(lastMileage*100)/100,outgoings:Math.round(tp*100)/100,freeMoney:Math.round((lastTakeHome+lastMileage-tp)*100)/100,pots:pots.filter(function(p){return p.name||(parseFloat(p.amount)||0)>0;}).map(function(p){return{name:p.name||'Unnamed',amount:parseFloat(p.amount)||0,account:p.account||'',target:parseFloat(p.target)||0};})};if(editingId){financeHistory=financeHistory.map(function(e){return e.id===editingId?entry:e;});}else{financeHistory.unshift(entry);}editingId=null;persistHL();if(currentUser){try{await setDoc(doc(db,'users',currentUser.uid,'months',String(entry.id)),entry);}catch(e){}}clearTracker();showDashboard();toast('Saved '+entry.label);}
+async function saveMonth(){var sal=parseFloat($('salary').value)||0;if(sal===0){toast('Enter a salary before saving');return;}var sm=parseInt($('pick-month').value),sy=parseInt($('pick-year').value),pr=getPD(sy,sm),tp=pots.reduce(function(s,p){return s+(parseFloat(p.amount)||0);},0);var entryId=editingId||Date.now();var entry={id:entryId,month:sm,year:sy,label:MS[sm]+' '+sy,payDate:ds(pr.payDate),payDateLong:fdl(pr.payDate),payDateMoved:pr.moved,payDateReason:pr.moved?movedReason(pr.original):'',payDayUsed:payDay,salary:sal,togExpenses:$('tog-expenses').checked,workExpenses:parseFloat($('work-expenses').value)||0,togMileage:$('tog-mileage').checked,miles:parseFloat($('miles').value)||0,togOvertime:$('tog-overtime').checked,overtime:parseFloat($('overtime').value)||0,takeHome:Math.round(lastTakeHome*100)/100,mileage:Math.round(lastMileage*100)/100,outgoings:Math.round(tp*100)/100,freeMoney:Math.round((lastTakeHome+lastMileage-tp)*100)/100,pots:pots.filter(function(p){return p.name||(parseFloat(p.amount)||0)>0;}).map(function(p){return{name:p.name||'Unnamed',amount:parseFloat(p.amount)||0,account:p.account||'',target:parseFloat(p.target)||0};})};if(editingId){financeHistory=financeHistory.map(function(e){return e.id===editingId?entry:e;});}else{financeHistory.unshift(entry);}editingId=null;persistHL();if(currentUser){try{await setDoc(doc(db,'users',currentUser.uid,'months',String(entry.id)),entry);}catch(e){}}
+addInboxItem('ti-circle-check',MF[entry.month]+' '+entry.year+' saved successfully',(entry.freeMoney<0?'Over budget by ':'Free money: ')+(entry.freeMoney<0?'−':'')+fmt(entry.freeMoney));
+var overPots=entry.pots.filter(function(p){return(p.target||0)>0&&p.amount>p.target;}).map(function(p){return p.name;});
+if(overPots.length)addInboxItem('ti-alert-triangle',overPots.length+' pot'+(overPots.length===1?'':'s')+' went over budget this month',overPots.join(', '));
+clearTracker();showDashboard();toast('Saved '+entry.label);}
 
 function clearTracker(){pots=[];renderPots();$('salary').value='';$('work-expenses').value='';$('miles').value='';$('overtime').value='';$('tog-expenses').checked=false;$('tog-mileage').checked=false;$('tog-overtime').checked=false;$('sec-expenses').classList.remove('open');$('sec-mileage').classList.remove('open');$('sec-overtime').classList.remove('open');lastTakeHome=0;lastMileage=0;saveLocal();var n=new Date();$('pick-month').value=n.getMonth();$('pick-year').value=n.getFullYear();updPD();}
 
 // ===== DASHBOARD =====
-function renderDashboard(){renderOverview();renderCountdown();renderCharts();renderSavings();renderYTD();renderDashHistory();}
+function renderDashboard(){renderOverview();renderCountdown();renderCharts();renderSavings();renderInsights();renderYTD();renderDashHistory();maybeShowNotifBanner();checkPaydayNotifications();}
 
 // ===== PAYDAY COUNTDOWN =====
 function renderCountdown(){var el=$('dash-countdown');if(!el)return;var now=new Date();now.setHours(0,0,0,0);var y=now.getFullYear(),m=now.getMonth();var pd=getPD(y,m).payDate;pd.setHours(0,0,0,0);if(pd<now){var nx=getNextPD(y,m).payDate;nx.setHours(0,0,0,0);var daysAgo=Math.round((now-pd)/86400000);if(daysAgo<=3){el.innerHTML='<div class="countdown-card cd-today"><span class="cd-icon">🎉</span><div class="cd-main"><div class="cd-title">Payday was '+daysAgo+' day'+(daysAgo===1?'':'s')+' ago</div><div class="cd-date">Next payday: '+fdl(nx)+'</div></div></div>';return;}pd=nx;}var days=Math.round((pd-now)/86400000);if(days===0){el.innerHTML='<div class="countdown-card cd-today"><span class="cd-icon">🎉</span><div class="cd-main"><div class="cd-title">It\'s payday today! 🎉</div><div class="cd-date">'+fdl(pd)+'</div></div></div>';return;}el.innerHTML='<div class="countdown-card"><span class="cd-icon"><i class="ti ti-calendar-event"></i></span><div class="cd-main"><div class="cd-title">Payday in '+days+' day'+(days===1?'':'s')+'</div><div class="cd-date">'+fdl(pd)+'</div></div></div>';}
@@ -999,6 +1067,84 @@ function loadLocal(){try{var r=localStorage.getItem('uk-finance-tracker');if(r){
 async function syncFS(){if(!currentUser)return;try{var snap=await getDocs(collection(db,'users',currentUser.uid,'months'));var entries=[];snap.forEach(function(d){entries.push(d.data());});var fsIds=new Set(entries.map(function(e){return e.id;}));var lo=financeHistory.filter(function(e){return!fsIds.has(e.id);});for(var i=0;i<lo.length;i++){entries.push(lo[i]);try{await setDoc(doc(db,'users',currentUser.uid,'months',String(lo[i].id)),lo[i]);}catch(e){}}if(entries.length>0||financeHistory.length===0){financeHistory=entries.sort(function(a,b){return b.id-a.id;});persistHL();renderDashboard();}}catch(e){console.error('Sync:',e);}}
 async function loadSettingsFS(){if(!currentUser)return;try{var s=await getDoc(doc(db,'users',currentUser.uid,'settings','config'));if(s.exists()){var d=s.data();if(d.payDay){payDay=d.payDay;localStorage.setItem('finance_payDay',payDay);$('payday-select').value=payDay;updPD();}if(d.emailSummary){emailPrefs=d.emailSummary;localStorage.setItem('finance_email_prefs',JSON.stringify(emailPrefs));$('email-input').value=emailPrefs.email||'';$('email-toggle').checked=!!emailPrefs.enabled;}}}catch(e){}}
 
+// ===== INBOX =====
+var inboxItems=[];
+function relTime(iso){var d=new Date(iso),now=new Date(),s=Math.round((now-d)/1000);if(s<60)return'just now';var m=Math.round(s/60);if(m<60)return m+'m ago';var h=Math.round(m/60);if(h<24)return h+'h ago';var dy=Math.round(h/24);if(dy<7)return dy+'d ago';return fds(d);}
+function unreadCount(){return inboxItems.filter(function(i){return!i.read;}).length;}
+function updateInboxBadge(){var b=$('inbox-badge');if(!b)return;var c=unreadCount();if(c>0){b.textContent=c>99?'99+':c;b.style.display='flex';}else{b.style.display='none';}}
+async function loadInbox(){if(!currentUser){inboxItems=[];updateInboxBadge();return;}try{var snap=await getDocs(collection(db,'users',currentUser.uid,'inbox'));var items=[];snap.forEach(function(d){items.push(d.data());});inboxItems=items.sort(function(a,b){return b.id-a.id;});}catch(e){inboxItems=[];}updateInboxBadge();}
+async function addInboxItem(icon,title,body,action){if(!currentUser)return;var item={id:Date.now(),icon:icon,title:title,body:body,time:new Date().toISOString(),read:false,action:action||null};inboxItems.unshift(item);try{await setDoc(doc(db,'users',currentUser.uid,'inbox',String(item.id)),item);}catch(e){}
+while(inboxItems.length>50){var old=inboxItems.pop();try{await deleteDoc(doc(db,'users',currentUser.uid,'inbox',String(old.id)));}catch(e){}}
+updateInboxBadge();if($('inbox-panel').classList.contains('open'))renderInbox();return item;}
+function renderInbox(){var el=$('inbox-list');if(!el)return;if(!inboxItems.length){el.innerHTML='<div class="inbox-empty">No notifications yet — we\'ll let you know when something needs your attention.</div>';return;}var h='';inboxItems.forEach(function(it){h+='<div class="inbox-item'+(it.read?'':' unread')+'" onclick="window._inboxClick('+it.id+')"><i class="ti '+esc(it.icon||'ti-bell')+'"></i><div style="flex:1;min-width:0"><div class="inbox-item-title">'+esc(it.title)+'</div><div class="inbox-item-body">'+esc(it.body)+'</div><div class="inbox-item-time">'+esc(relTime(it.time))+'</div></div>'+(it.read?'':'<span class="inbox-unread-dot"></span>')+'</div>';});el.innerHTML=h;}
+function openInbox(){$('inbox-panel').classList.add('open');$('inbox-overlay').classList.add('open');renderInbox();}
+function closeInbox(){$('inbox-panel').classList.remove('open');$('inbox-overlay').classList.remove('open');}
+async function inboxClick(id){var it=inboxItems.find(function(x){return x.id===id;});if(!it)return;if(!it.read){it.read=true;updateInboxBadge();renderInbox();if(currentUser){try{await setDoc(doc(db,'users',currentUser.uid,'inbox',String(id)),it);}catch(e){}}}if(it.action==='tracker'){closeInbox();editingId=null;clearTracker();showTracker();}else if(it.action==='dashboard'){closeInbox();showDashboard();}}
+async function markAllRead(){var changed=inboxItems.filter(function(i){return!i.read;});changed.forEach(function(i){i.read=true;});updateInboxBadge();renderInbox();if(currentUser){for(var i=0;i<changed.length;i++){try{await setDoc(doc(db,'users',currentUser.uid,'inbox',String(changed[i].id)),changed[i]);}catch(e){}}}}
+window._inboxClick=inboxClick;
+
+// ===== NOTIFICATIONS =====
+function notifSupported(){return('Notification'in window)&&('serviceWorker'in navigator);}
+function maybeShowNotifBanner(){var b=$('notif-banner');if(!b)return;if(notifSupported()&&Notification.permission==='default'&&!localStorage.getItem('notif_dismissed')){b.style.display='flex';}else{b.style.display='none';}}
+function enableNotifications(){if(!notifSupported())return;Notification.requestPermission().then(function(p){if(p==='granted'){localStorage.setItem('notif_enabled','1');toast('Payday reminders enabled');}else{toast('Notifications blocked');}$('notif-banner').style.display='none';});}
+function dismissNotifBanner(){localStorage.setItem('notif_dismissed','1');$('notif-banner').style.display='none';}
+function fireNotification(title,body){if(!notifSupported()||Notification.permission!=='granted')return;navigator.serviceWorker.ready.then(function(reg){reg.showNotification(title,{body:body,icon:'./icon-192.svg',badge:'./icon-192.svg',tag:'finance-tracker'});}).catch(function(){});}
+function hasEntryForMonth(y,m){return financeHistory.some(function(h){return h.year===y&&h.month===m;});}
+function checkPaydayNotifications(){if(!currentUser)return;var now=new Date();now.setHours(0,0,0,0);var tomorrow=new Date(now);tomorrow.setDate(tomorrow.getDate()+1);var y=now.getFullYear(),m=now.getMonth();
+  // Tomorrow is payday?
+  var pdThis=getPD(y,m).payDate;pdThis.setHours(0,0,0,0);var pdNext=getNextPD(y,m).payDate;pdNext.setHours(0,0,0,0);
+  var paydayTomorrow=(pdThis.getTime()===tomorrow.getTime())||(pdNext.getTime()===tomorrow.getTime());
+  if(paydayTomorrow){var k='reminder_sent_'+ds(tomorrow);if(!localStorage.getItem(k)){localStorage.setItem(k,'1');var body='Your pay hits tomorrow. Open Finance Tracker to log this month\'s income and outgoings.';if(Notification.permission==='granted')fireNotification('Payday tomorrow! 💰',body);addInboxItem('ti-cash','Payday tomorrow! 💰',body,'tracker');}}
+  // Today is payday and no entry saved for current month?
+  if(pdThis.getTime()===now.getTime()&&!hasEntryForMonth(y,m)){var k2='payday_inbox_'+ds(now);if(!localStorage.getItem(k2)){localStorage.setItem(k2,'1');var body2='Log this month\'s income, mileage, and outgoings to see your free money.';if(Notification.permission==='granted')fireNotification('It\'s payday! Have you updated your tracker?',body2);addInboxItem('ti-pig-money','It\'s payday! Have you updated your tracker?',body2,'tracker');}}}
+
+// ===== SPENDING INSIGHTS =====
+var insightsExpanded=false;
+var insightsInboxedThisSession=new Set();
+function subsGroupAccounts(){var g=ACCOUNT_GROUPS.find(function(x){return x[0]==='Subscriptions';});return g?g[1]:[];}
+function monthGroupTotal(h,accts){var s=0;(h.pots||[]).forEach(function(p){if(accts.indexOf(p.account)!==-1)s+=(parseFloat(p.amount)||0);});return s;}
+function generateInsights(){var out=[];if(financeHistory.length<2)return out;
+  var sorted=financeHistory.slice().sort(function(a,b){return new Date(a.year,a.month)-new Date(b.year,b.month);});
+  var newest=sorted[sorted.length-1],oldest=sorted[0];
+  // 1. Subscription creep
+  var subs=subsGroupAccounts();var subOld=monthGroupTotal(oldest,subs),subNew=monthGroupTotal(newest,subs);var subDiff=subNew-subOld;
+  if(subDiff>10)out.push({icon:'ti-trending-up',title:'Subscription creep',body:'Your subscriptions are up '+fmt(subDiff)+' since '+MS[oldest.month]+' '+oldest.year+' (now '+fmt(subNew)+').',type:'warning',key:'subs_creep'});
+  else if(subDiff<0)out.push({icon:'ti-trending-down',title:'Subscriptions trimmed',body:'You\'ve cut '+fmt(subDiff)+' from subscriptions since '+MS[oldest.month]+' '+oldest.year+'. Nice.',type:'positive',key:'subs_down'});
+  // 2. Mileage summary
+  var start=taxYearStart(new Date());var tyMonths=financeHistory.filter(function(h){return inTaxYear(h,start);});var totMiles=0,totMileageVal=0;tyMonths.forEach(function(h){if(h.togMileage){totMiles+=(h.miles||0);}totMileageVal+=(h.mileage||0);});
+  if(totMiles>0)out.push({icon:'ti-car',title:'Mileage this tax year',body:'You\'ve claimed '+totMiles.toLocaleString('en-GB')+' miles — worth '+fmt(totMileageVal)+' tax-free.',type:'info',key:'mileage_'+start.getFullYear()});
+  // 3. Savings rate trend (last 3 months)
+  if(sorted.length>=3){var last3=sorted.slice(-3);var srates=last3.map(function(h){var sv=monthSavings(h),th=h.takeHome||0;return th>0?(sv/th*100):0;});
+    if(srates[0]>srates[1]&&srates[1]>srates[2])out.push({icon:'ti-trending-down',title:'Savings rate is slipping',body:'Your savings rate has fallen three months running — now '+srates[2].toFixed(1)+'%.',type:'warning',key:'savings_down'});
+    else if(srates[0]<srates[1]&&srates[1]<srates[2])out.push({icon:'ti-trending-up',title:'Savings rate is climbing',body:'Three months of rising savings — now '+srates[2].toFixed(1)+'%. Keep it up.',type:'positive',key:'savings_up'});}
+  // 4. Free money trend (last 3)
+  if(sorted.length>=3){var f3=sorted.slice(-3).map(function(h){return h.freeMoney||0;});
+    if(f3[0]>f3[1]&&f3[1]>f3[2])out.push({icon:'ti-arrow-down-right',title:'Free money is shrinking',body:'Your free money has dropped three months in a row — now '+(f3[2]<0?'−':'')+fmt(f3[2])+'.',type:'warning',key:'free_down'});
+    else if(f3[0]<f3[1]&&f3[1]<f3[2])out.push({icon:'ti-arrow-up-right',title:'Free money is growing',body:'Free money has risen three months in a row — now '+fmt(f3[2])+'.',type:'positive',key:'free_up'});}
+  // 5. Biggest outgoing
+  if(newest.pots&&newest.pots.length){var big=newest.pots.slice().sort(function(a,b){return(b.amount||0)-(a.amount||0);})[0];if(big&&big.amount>0)out.push({icon:'ti-receipt',title:'Biggest outgoing this month',body:big.name+' was your largest pot at '+fmt(big.amount)+'.',type:'info',key:'biggest_'+newest.year+'_'+newest.month});}
+  // 6. Budget alerts
+  var over=(newest.pots||[]).filter(function(p){return(p.target||0)>0&&p.amount>p.target;});
+  if(over.length)out.push({icon:'ti-alert-triangle',title:over.length+' pot'+(over.length===1?'':'s')+' over budget',body:over.map(function(p){return p.name;}).join(', ')+' exceeded target this month.',type:'alert',key:'budget_'+newest.year+'_'+newest.month});
+  // 7. Tax milestone
+  var totTax=0;tyMonths.forEach(function(h){totTax+=cTax(h.salary||0)/12;});var milestones=[10000,5000,2000,1000];var shown=[];try{shown=JSON.parse(localStorage.getItem('tax_milestones_'+start.getFullYear())||'[]');}catch(e){shown=[];}
+  for(var mi=0;mi<milestones.length;mi++){var ms2=milestones[mi];if(totTax>=ms2){out.push({icon:'ti-flag',title:'Tax milestone reached',body:'You\'ve paid over '+fmt(ms2)+' in income tax this tax year ('+fmt(totTax)+' so far).',type:'info',key:'tax_'+start.getFullYear()+'_'+ms2});if(shown.indexOf(ms2)===-1){shown.push(ms2);localStorage.setItem('tax_milestones_'+start.getFullYear(),JSON.stringify(shown));}break;}}
+  // 8. Payday timing
+  var now=new Date();var pr=getPD(now.getFullYear(),now.getMonth());if(pr.moved)out.push({icon:'ti-calendar-event',title:'Payday moved this month',body:movedReason(pr.original)+' — you\'ll be paid '+fdl(pr.payDate)+' instead.',type:'info',key:'payday_moved_'+now.getFullYear()+'_'+now.getMonth()});
+  return out;}
+function getDismissedInsights(){try{return JSON.parse(localStorage.getItem('dismissed_insights')||'[]');}catch(e){return[];}}
+function dismissInsight(key){var d=getDismissedInsights();if(d.indexOf(key)===-1){d.push(key);localStorage.setItem('dismissed_insights',JSON.stringify(d));}renderInsights();}
+window._dismissInsight=dismissInsight;
+window._toggleInsights=function(){insightsExpanded=!insightsExpanded;renderInsights();};
+function renderInsights(){var el=$('dash-insights');if(!el)return;var all=generateInsights();var dismissed=getDismissedInsights();var visible=all.filter(function(i){return dismissed.indexOf(i.key)===-1;});
+  if(!visible.length){el.innerHTML='';return;}
+  visible.forEach(function(i){if(!insightsInboxedThisSession.has(i.key)){insightsInboxedThisSession.add(i.key);addInboxItem(i.icon,i.title,i.body,'dashboard');}});
+  var show=insightsExpanded?visible:visible.slice(0,5);
+  var h='<div class="card"><h2>Spending Insights</h2>';
+  show.forEach(function(i){h+='<div class="insight-card '+i.type+'"><i class="ti '+esc(i.icon)+'"></i><div style="flex:1;min-width:0"><div class="insight-title">'+esc(i.title)+'</div><div class="insight-body">'+esc(i.body)+'</div></div><button class="insight-dismiss" onclick="window._dismissInsight(\''+i.key+'\')" title="Dismiss">&times;</button></div>';});
+  if(visible.length>5)h+='<button class="insight-seeall" onclick="window._toggleInsights()">'+(insightsExpanded?'Show fewer':'See all insights ('+visible.length+')')+'</button>';
+  h+='</div>';el.innerHTML=h;}
+
 // ===== AUTH =====
 function showAuth(){$('loading-screen').style.display='none';$('auth-screen').style.display='block';$('app-container').style.display='none';}
 function showApp(){$('loading-screen').style.display='none';$('auth-screen').style.display='none';$('app-container').style.display='block';}
@@ -1017,7 +1163,7 @@ $('form-signin').addEventListener('submit',async function(ev){ev.preventDefault(
 $('form-signup').addEventListener('submit',async function(ev){ev.preventDefault();$('auth-error').style.display='none';var pw=$('signup-password').value,cp=$('signup-confirm').value;if(pw!==cp){showAuthErr('Passwords do not match');return;}try{await createUserWithEmailAndPassword(auth,$('signup-email').value,pw);}catch(e){showAuthErr(authErrMsg(e));}});
 $('signout-btn').addEventListener('click',async function(){await fbSignOut(auth);});
 
-onAuthStateChanged(auth,async function(user){if(user){currentUser=user;loadLocal();loadEmailPrefs();initMP();initPDS();showApp();$('user-display').textContent=user.displayName||user.email;showDashboard();await loadSettingsFS();await syncFS();await maybeSendPaydayEmail();maybeShowPayday();}else{currentUser=null;showAuth();}});
+onAuthStateChanged(auth,async function(user){if(user){currentUser=user;loadLocal();loadEmailPrefs();initMP();initPDS();showApp();$('user-display').textContent=user.displayName||user.email;showDashboard();await loadSettingsFS();await syncFS();await loadInbox();renderDashboard();await maybeSendPaydayEmail();maybeShowPayday();}else{currentUser=null;inboxItems=[];updateInboxBadge();closeInbox();showAuth();}});
 
 // ===== EVENTS =====
 initTheme();
@@ -1044,7 +1190,13 @@ $('close-accounts-btn').addEventListener('click',closeAccounts);$('accounts-moda
 $('close-detail-btn').addEventListener('click',function(){$('detail-modal').classList.remove('open');});$('detail-modal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
 $('settings-btn').addEventListener('click',function(){$('settings-modal').classList.add('open');});$('close-settings-btn').addEventListener('click',function(){$('settings-modal').classList.remove('open');});$('settings-modal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
 $('payday-select').addEventListener('change',onPDC);
-document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeAccounts();$('detail-modal').classList.remove('open');$('settings-modal').classList.remove('open');$('salcalc-modal').classList.remove('open');}});
+$('inbox-btn').addEventListener('click',openInbox);
+$('inbox-close-btn').addEventListener('click',closeInbox);
+$('inbox-overlay').addEventListener('click',closeInbox);
+$('inbox-mark-read-btn').addEventListener('click',markAllRead);
+$('notif-enable-btn').addEventListener('click',enableNotifications);
+$('notif-dismiss-btn').addEventListener('click',dismissNotifBanner);
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeAccounts();$('detail-modal').classList.remove('open');$('settings-modal').classList.remove('open');$('salcalc-modal').classList.remove('open');closeInbox();}});
 
 // ===== INTERACTIVE DEMO =====
 var demoPots=[{name:'Rent',amount:800},{name:'Food',amount:300},{name:'Subscriptions',amount:50}];

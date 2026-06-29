@@ -1,4 +1,4 @@
-var CACHE_NAME = 'finance-tracker-v13';
+var CACHE_NAME = 'finance-tracker-v14';
 var ASSETS = [
   './index.html',
   './manifest.json',
@@ -41,6 +41,53 @@ self.addEventListener('activate', function(event) {
       );
     }).then(function() { return self.clients.claim(); })
   );
+});
+
+self.addEventListener('push', function(event) {
+  var data = {};
+  if (event.data) {
+    try { data = event.data.json(); } catch (e) { data = { title: 'Finance Tracker', body: event.data.text() }; }
+  }
+  var title = data.title || 'Finance Tracker';
+  var options = {
+    body: data.body || '',
+    icon: './icon-192.svg',
+    badge: './icon-192.svg',
+    tag: data.tag || 'finance-tracker',
+    data: { url: data.url || './index.html' }
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', function(event) {
+  event.notification.close();
+  var target = (event.notification.data && event.notification.data.url) || './index.html';
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(list) {
+      for (var i = 0; i < list.length; i++) {
+        var client = list[i];
+        if ('focus' in client) return client.focus();
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(target);
+    })
+  );
+});
+
+self.addEventListener('message', function(event) {
+  var d = event.data || {};
+  if (d.type === 'show-notification') {
+    var title = d.title || 'Finance Tracker';
+    var options = {
+      body: d.body || '',
+      icon: './icon-192.svg',
+      badge: './icon-192.svg',
+      tag: d.tag || 'finance-tracker',
+      data: { url: d.url || './index.html' }
+    };
+    if (self.registration && self.registration.showNotification) {
+      self.registration.showNotification(title, options);
+    }
+  }
 });
 
 self.addEventListener('fetch', function(event) {
