@@ -1,17 +1,41 @@
-var CACHE_NAME = 'finance-tracker-v14';
+var CACHE_NAME = 'finance-tracker-v21';
 var ASSETS = [
   './index.html',
+  './styles.css',
+  './app.js',
   './manifest.json',
   './icon-192.svg',
-  './icon-512.svg'
+  './icon-512.svg',
+  './modules/state.js',
+  './modules/constants.js',
+  './modules/tax.js',
+  './modules/utils.js',
+  './modules/firebase.js',
+  './modules/payday.js',
+  './modules/theme.js',
+  './modules/ui.js',
+  './modules/pots.js',
+  './modules/inbox.js',
+  './modules/charts.js',
+  './modules/achievements.js',
+  './modules/insights.js',
+  './modules/tracker.js',
+  './modules/history.js',
+  './modules/dashboard.js',
+  './modules/settings.js',
+  './modules/auth.js',
+  './modules/notifications.js',
+  './modules/payday_modal.js',
+  './modules/privacy.js',
+  './modules/onboarding.js',
+  './modules/demo.js',
+  './modules/offline.js',
 ];
 var CDN_ASSETS = [
   'https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js',
   'https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js',
   'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js',
   'https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
   'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js',
   'https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js'
 ];
