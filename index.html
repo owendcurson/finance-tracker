@@ -1124,8 +1124,8 @@ function goStep(n){
 function toggleSection(n){$('sec-'+n).classList.toggle('open',$('tog-'+n).checked);}
 
 // ===== SKELETON =====
-function showSkeleton(){clearTimeout(skeletonTimer);skeletonTimer=setTimeout(function(){var sk=$('dash-skeleton'),ct=document.querySelector('#dashboard-screen > .container');if(sk)sk.style.display='block';if(ct)ct.style.display='none';},300);}
-function hideSkeleton(){clearTimeout(skeletonTimer);var sk=$('dash-skeleton'),ct=document.querySelector('#dashboard-screen > .container');if(sk)sk.style.display='none';if(ct){ct.style.display='block';ct.classList.remove('screen-enter');void ct.offsetWidth;ct.classList.add('screen-enter');}}
+function showSkeleton(){clearTimeout(skeletonTimer);skeletonTimer=setTimeout(function(){var sk=$('dash-skeleton'),ct=document.querySelector('#dashboard-screen > .container:not(#dash-skeleton)');if(sk)sk.style.display='block';if(ct)ct.style.display='none';},300);}
+function hideSkeleton(){clearTimeout(skeletonTimer);var sk=$('dash-skeleton'),ct=document.querySelector('#dashboard-screen > .container:not(#dash-skeleton)');if(sk)sk.style.display='none';if(ct){ct.style.display='block';ct.classList.remove('screen-enter');void ct.offsetWidth;ct.classList.add('screen-enter');}}
 
 // ===== EMPTY STATE HELPER =====
 function emptyState(icon,title,text,btnLabel,btnAction){var btn=btnLabel?'<button class="btn btn-primary" style="margin-top:4px" onclick="'+btnAction+'">'+btnLabel+'</button>':'';return'<div class="empty-state"><i class="ti '+icon+' empty-state-icon"></i><div class="empty-state-title">'+title+'</div><p class="empty-state-text">'+text+'</p>'+btn+'</div>';}
@@ -1457,7 +1457,9 @@ function showAchievementToast(icon,title){
 function renderAchievements(){
   var el=$('dash-achievements');if(!el)return;
   var unlocked=calcAchievements();
-  var newUnlocks=ACHIEVEMENTS.filter(function(a){return unlocked[a.id]&&!prevAchievements[a.id];});
+  var seen=JSON.parse(localStorage.getItem('finance_achievements_seen')||'{}');
+  var newUnlocks=ACHIEVEMENTS.filter(function(a){return unlocked[a.id]&&!seen[a.id];});
+  if(newUnlocks.length){newUnlocks.forEach(function(a){seen[a.id]=true;});localStorage.setItem('finance_achievements_seen',JSON.stringify(seen));}
   newUnlocks.forEach(function(a,i){setTimeout(function(){showAchievementToast(a.icon,a.title);},i*700);});
   prevAchievements=Object.assign({},unlocked);
   var anyUnlocked=ACHIEVEMENTS.some(function(a){return unlocked[a.id];});
