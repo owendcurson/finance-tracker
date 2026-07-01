@@ -502,6 +502,12 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
 .privacy-list li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0;margin-top:1px;}
 .privacy-list li:last-child{border-bottom:none;}
 .privacy-p{font-size:0.9rem;color:var(--text-secondary);line-height:1.6;margin-bottom:8px;}
+.contact-field{margin-bottom:14px;}
+.contact-label{display:block;font-size:0.85rem;font-weight:600;color:var(--text-secondary);margin-bottom:4px;}
+.contact-input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:0.9rem;font-family:inherit;box-sizing:border-box;transition:border-color 0.15s;}
+.contact-input:focus{outline:none;border-color:var(--primary);}
+textarea.contact-input{resize:vertical;min-height:100px;}
+.contact-error{color:var(--red);font-size:0.8rem;margin-top:4px;min-height:1em;}
 
 /* ===== ONBOARDING ===== */
 .ob-dot{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);background:var(--card);flex-shrink:0;}
@@ -907,7 +913,23 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
     <div class="privacy-section"><h3 class="privacy-h3"><i class="ti ti-server"></i> Where it's stored</h3><p class="privacy-p">All your data is stored securely in Google Firebase Firestore, in the <strong>europe-west2 region (London, UK)</strong>. Nothing is stored on our servers — we don't have any. Your data goes directly between your device and Firebase.</p></div>
     <div class="privacy-section"><h3 class="privacy-h3"><i class="ti ti-ban"></i> What we never store</h3><p class="privacy-p" style="color:var(--green);font-weight:500;">We never ask for, store, or have access to your bank login details, card numbers, account numbers, sort codes, or any banking credentials. This app does not connect to your bank.</p></div>
     <div class="privacy-section"><h3 class="privacy-h3"><i class="ti ti-user-check"></i> Your rights</h3><p class="privacy-p">You can export all your data at any time using the export buttons on each saved month.</p><p class="privacy-p">You can delete your account and all associated data permanently at any time. This cannot be undone.</p><button class="btn btn-danger-solid" id="delete-account-btn" style="margin-top:8px;width:100%;padding:12px;"><i class="ti ti-trash"></i> Delete my account</button></div>
-    <div class="privacy-section"><h3 class="privacy-h3"><i class="ti ti-mail"></i> Contact</h3><!-- REPLACE WITH CONTACT EMAIL --><p class="privacy-p">Questions about your data? Email: <strong>hello@financetracker.app</strong></p></div>
+    <div class="privacy-section">
+      <h3 class="privacy-h3"><i class="ti ti-mail"></i> Get in touch</h3>
+      <p class="privacy-p">Have a question about your data, a suggestion, or found a bug? We'd love to hear from you.</p>
+      <div id="contact-form-wrap">
+        <div class="contact-field"><label class="contact-label" for="cf-name">Name</label><input type="text" id="cf-name" class="contact-input" placeholder="Your name"><div class="contact-error" id="cf-name-err"></div></div>
+        <div class="contact-field"><label class="contact-label" for="cf-email">Email</label><input type="email" id="cf-email" class="contact-input" placeholder="your@email.com"><div class="contact-error" id="cf-email-err"></div></div>
+        <div class="contact-field"><label class="contact-label" for="cf-subject">Subject</label><select id="cf-subject" class="contact-input"><option value="General question">General question</option><option value="Feedback or suggestion">Feedback or suggestion</option><option value="Bug report">Bug report</option><option value="Data or privacy question">Data or privacy question</option><option value="Other">Other</option></select></div>
+        <div class="contact-field"><label class="contact-label" for="cf-message">Message</label><textarea id="cf-message" class="contact-input" rows="4" placeholder="Your message…"></textarea><div class="contact-error" id="cf-message-err"></div></div>
+        <div class="contact-error" id="cf-submit-err" style="margin-bottom:8px"></div>
+        <button class="btn btn-primary" id="cf-submit-btn" style="width:100%;padding:12px;"><i class="ti ti-send"></i> Send message</button>
+      </div>
+      <div id="contact-success" style="display:none;text-align:center;padding:24px 0;">
+        <i class="ti ti-circle-check" style="font-size:2.5rem;color:var(--green);display:block;margin-bottom:12px;"></i>
+        <div style="font-weight:700;font-size:1.1rem;margin-bottom:8px;">Message sent!</div>
+        <p class="privacy-p" style="margin:0;">Thanks for getting in touch. We'll get back to you as soon as we can.</p>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -975,6 +997,8 @@ import{getFirestore,collection,doc,setDoc,getDoc,getDocs,deleteDoc}from'https://
 
 const app=initializeApp({apiKey:"AIzaSyCrh8OV_QoOeygio4LhqXWk10vQcxHHn4I",authDomain:"financial-tracker-f8d47.firebaseapp.com",projectId:"financial-tracker-f8d47",storageBucket:"financial-tracker-f8d47.firebasestorage.app",messagingSenderId:"626879548091",appId:"1:626879548091:web:7cff4521a13b4744c6b79e",measurementId:"G-N6Z2DLR94L"});
 const auth=getAuth(app),db=getFirestore(app),googleProvider=new GoogleAuthProvider(),microsoftProvider=new OAuthProvider('microsoft.com');
+// Contact form endpoint — do not share publicly
+var CONTACT_ENDPOINT='https://formspree.io/f/maqgplzl';
 
 var currentUser=null,payDay=parseInt(localStorage.getItem('finance_payDay'))||23;
 var currentStep=1,pots=[],financeHistory=[],lastTakeHome=0,lastMileage=0;
@@ -1601,10 +1625,32 @@ $('payday-dismiss-btn').addEventListener('click',closePaydayModal);
 $('payday-update-btn').addEventListener('click',function(){closePaydayModal();var now=new Date();editingId=null;clearTracker();$('pick-month').value=now.getMonth();$('pick-year').value=now.getFullYear();updPD();showTracker();});
 
 // ===== PRIVACY & DELETE ACCOUNT =====
-function openPrivacy(){$('settings-modal').classList.remove('open');var p=$('privacy-panel');p.style.display='block';requestAnimationFrame(function(){p.style.opacity='1';});}
+function openPrivacy(){
+  $('settings-modal').classList.remove('open');
+  if(currentUser){$('cf-name').value=currentUser.displayName||'';$('cf-email').value=currentUser.email||'';}
+  $('contact-form-wrap').style.display='block';$('contact-success').style.display='none';
+  ['cf-name-err','cf-email-err','cf-message-err','cf-submit-err'].forEach(function(id){$(''+id).textContent='';});
+  $('cf-submit-btn').disabled=false;$('cf-submit-btn').innerHTML='<i class="ti ti-send"></i> Send message';
+  var p=$('privacy-panel');p.style.display='block';requestAnimationFrame(function(){p.style.opacity='1';});
+}
 function closePrivacy(){var p=$('privacy-panel');p.style.opacity='0';setTimeout(function(){p.style.display='none';$('settings-modal').classList.add('open');},220);}
 $('open-privacy-btn').addEventListener('click',openPrivacy);
 $('privacy-back-btn').addEventListener('click',closePrivacy);
+$('cf-submit-btn').addEventListener('click',async function(){
+  var name=$('cf-name').value.trim(),email=$('cf-email').value.trim(),subject=$('cf-subject').value,message=$('cf-message').value.trim();
+  $('cf-name-err').textContent='';$('cf-email-err').textContent='';$('cf-message-err').textContent='';$('cf-submit-err').textContent='';
+  var valid=true;
+  if(!name){$('cf-name-err').textContent='Please enter your name.';valid=false;}
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){$('cf-email-err').textContent='Please enter a valid email address.';valid=false;}
+  if(!message){$('cf-message-err').textContent='Please enter a message.';valid=false;}
+  if(!valid)return;
+  var btn=$('cf-submit-btn');btn.disabled=true;btn.innerHTML='<i class="ti ti-send"></i> Sending...';
+  try{
+    var res=await fetch(CONTACT_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({name:name,email:email,subject:subject,message:message})});
+    if(res.ok){$('contact-form-wrap').style.display='none';$('contact-success').style.display='block';}
+    else{$('cf-submit-err').textContent='Something went wrong. Please try again later.';btn.disabled=false;btn.innerHTML='<i class="ti ti-send"></i> Send message';}
+  }catch(e){$('cf-submit-err').textContent='Something went wrong. Please try again later.';btn.disabled=false;btn.innerHTML='<i class="ti ti-send"></i> Send message';}
+});
 $('delete-account-btn').addEventListener('click',function(){$('delete-confirm-input').value='';$('delete-confirm-btn').disabled=true;$('delete-account-error').style.display='none';$('delete-account-modal').classList.add('open');});
 $('delete-confirm-input').addEventListener('input',function(){$('delete-confirm-btn').disabled=this.value!=='DELETE';});
 $('delete-cancel-btn').addEventListener('click',function(){$('delete-account-modal').classList.remove('open');});
