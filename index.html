@@ -218,8 +218,8 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
 /* Payday celebration modal */
 .payday-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 850; display: flex; align-items: center; justify-content: center; padding: 16px; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
 .payday-overlay.open { opacity: 1; pointer-events: auto; }
-.payday-modal { background: var(--card); border-radius: var(--radius); box-shadow: 0 12px 40px rgba(0,0,0,0.2); width: 100%; max-width: 420px; padding: 32px; text-align: center; position: relative; transform: translateY(20px); transition: transform 0.3s; }
-.payday-overlay.open .payday-modal { transform: translateY(0); }
+.payday-modal { background: var(--card); border-radius: var(--radius); box-shadow: 0 12px 40px rgba(0,0,0,0.2); width: 100%; max-width: 420px; padding: 32px; text-align: center; position: relative; transform: scale(0.85); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+.payday-overlay.open .payday-modal { transform: scale(1); }
 .payday-modal .payday-close { position: absolute; top: 12px; right: 12px; background: none; border: none; font-size: 1.3rem; color: var(--text-secondary); cursor: pointer; padding: 4px; }
 .payday-modal .payday-close:hover { color: var(--text); }
 .payday-modal .payday-icon { font-size: 48px; color: var(--green); margin-bottom: 8px; }
@@ -421,9 +421,101 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
   .splash-showcase { padding: 40px 16px; }
   .showcase-inner h2 { font-size: 1.3rem; }
 }
+
+/* ===== OFFLINE BANNER ===== */
+#offline-banner { position:fixed; top:0; left:0; right:0; z-index:9999; padding:10px 16px; font-size:0.88rem; font-weight:500; display:flex; align-items:center; gap:8px; transform:translateY(-100%); opacity:0; transition:transform 0.35s ease,opacity 0.35s ease; pointer-events:none; }
+#offline-banner.offline-show { transform:translateY(0); opacity:1; pointer-events:auto; background:var(--amber-bg); color:var(--amber); border-bottom:1.5px solid var(--amber); }
+#offline-banner.online-show { transform:translateY(0); opacity:1; background:var(--green-bg); color:var(--green); border-bottom:1.5px solid var(--green); }
+
+/* ===== SCREEN TRANSITIONS ===== */
+@keyframes screenIn { from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);} }
+@keyframes stepSlideLeft { from{opacity:0;transform:translateX(40px);}to{opacity:1;transform:translateX(0);} }
+@keyframes stepSlideRight { from{opacity:0;transform:translateX(-40px);}to{opacity:1;transform:translateX(0);} }
+@media (prefers-reduced-motion:no-preference) {
+  .screen-enter{animation:screenIn 220ms ease-out both;}
+  .step-slide-left{animation:stepSlideLeft 220ms ease-out both;}
+  .step-slide-right{animation:stepSlideRight 220ms ease-out both;}
+}
+@media (prefers-reduced-motion:reduce) {
+  .screen-enter,.step-slide-left,.step-slide-right{animation:screenIn 110ms ease-out both;}
+}
+.modal { transform:scale(0.97); transition:transform 0.2s ease-out; }
+.modal-overlay.open .modal { transform:scale(1); }
+
+/* ===== LOADING SKELETONS ===== */
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.skeleton{background:linear-gradient(90deg,var(--border) 25%,var(--card) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite linear;border-radius:8px;}
+.skel-sm{height:18px;}.skel-md{height:80px;border-radius:var(--radius);}
+.skel-chart{height:220px;border-radius:var(--radius);}
+.skel-chart-full{height:260px;border-radius:var(--radius);}
+.skel-countdown{height:64px;border-radius:var(--radius);}
+.skel-insight{height:58px;margin-bottom:8px;border-radius:8px;}
+.skel-metric{height:60px;border-radius:8px;}
+.skel-row{height:56px;margin-bottom:8px;border-radius:8px;}
+.skel-overview{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.skel-chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.skel-metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+
+/* ===== ACHIEVEMENTS ===== */
+.achievements-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;}
+.achievement-badge{background:var(--card);border-radius:var(--radius);padding:16px 12px;text-align:center;border:1.5px solid var(--border);position:relative;overflow:hidden;}
+.achievement-badge.unlocked{border-color:var(--green);}
+.achievement-badge.locked{opacity:0.4;filter:grayscale(0.7);}
+.achievement-badge i{font-size:1.8rem;display:block;margin-bottom:8px;color:var(--primary);}
+.achievement-badge.locked i{color:var(--text-secondary);}
+.achievement-badge .badge-title{font-weight:700;font-size:0.8rem;margin-bottom:4px;}
+.achievement-badge .badge-desc{font-size:0.72rem;color:var(--text-secondary);line-height:1.35;}
+@keyframes goldShimmer{0%,100%{box-shadow:none;}30%,70%{box-shadow:0 0 0 2px #f0c040,0 0 16px rgba(240,192,64,0.5);}}
+.achievement-badge.new-unlock{animation:goldShimmer 1.8s ease-out;}
+.achievement-toast{position:fixed;bottom:90px;right:16px;background:var(--green);color:#fff;padding:10px 16px;border-radius:8px;font-size:0.85rem;font-weight:600;z-index:2000;opacity:0;transform:translateY(8px);transition:opacity 0.3s,transform 0.3s;pointer-events:none;max-width:280px;display:flex;align-items:center;gap:8px;}
+.achievement-toast.show{opacity:1;transform:translateY(0);}
+@media(max-width:767px){
+  .achievements-grid{display:flex;overflow-x:auto;gap:12px;padding-bottom:8px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;}
+  .achievements-grid::-webkit-scrollbar{display:none;}
+  .achievement-badge{min-width:120px;flex-shrink:0;scroll-snap-align:start;}
+}
+
+/* ===== BOTTOM NAV ===== */
+#bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:800;background:var(--card);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom);}
+.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px 8px;background:none;border:none;color:var(--text-secondary);font-size:0.65rem;font-family:inherit;cursor:pointer;font-weight:500;transition:color 0.15s;}
+.bnav-btn i{font-size:1.25rem;}
+.bnav-btn.active{color:var(--primary);}
+@media(max-width:767px){
+  #bottom-nav{display:flex;}
+  #settings-btn,#signout-btn{display:none;}
+  .container{padding-bottom:80px;}
+}
+@media(min-width:768px){#bottom-nav{display:none !important;}}
+
+/* ===== EMPTY STATES ===== */
+.empty-state{text-align:center;padding:36px 20px;}
+.empty-state-icon{font-size:2.5rem;color:var(--border);display:block;margin-bottom:12px;}
+.empty-state-title{font-weight:700;font-size:1rem;margin-bottom:6px;color:var(--text);}
+.empty-state-text{font-size:0.88rem;color:var(--text-secondary);line-height:1.5;margin-bottom:12px;max-width:280px;margin-left:auto;margin-right:auto;}
+
+/* ===== PRIVACY PANEL ===== */
+.privacy-section{background:var(--card);border-radius:var(--radius);padding:20px;margin-bottom:12px;}
+.privacy-h3{font-size:0.95rem;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px;color:var(--text);}
+.privacy-h3 i{color:var(--primary);}
+.privacy-list{list-style:none;padding:0;margin:0;}
+.privacy-list li{padding:7px 0;font-size:0.9rem;color:var(--text-secondary);border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:flex-start;line-height:1.4;}
+.privacy-list li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0;margin-top:1px;}
+.privacy-list li:last-child{border-bottom:none;}
+.privacy-p{font-size:0.9rem;color:var(--text-secondary);line-height:1.6;margin-bottom:8px;}
+
+/* ===== ONBOARDING ===== */
+.ob-dot{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);background:var(--card);flex-shrink:0;}
+.ob-dot.active{background:var(--primary);border-color:var(--primary);}
+.ob-dot.done{background:var(--green);border-color:var(--green);}
+.ob-line{flex:1;height:2px;background:var(--border);margin:0 6px;}
+.ob-line.done{background:var(--green);}
+.ob-step{animation:screenIn 220ms ease-out both;}
 </style>
 </head>
 <body>
+
+<!-- Offline banner -->
+<div id="offline-banner"></div>
 
 <!-- Loading -->
 <div class="loading-screen" id="loading-screen"><div class="spinner"></div><span>Loading...</span></div>
@@ -627,6 +719,18 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
 
   <!-- DASHBOARD -->
   <div id="dashboard-screen">
+    <!-- Loading skeleton -->
+    <div id="dash-skeleton" style="display:none;" class="container">
+      <div style="margin-bottom:20px"><div class="skeleton skel-sm" style="width:200px;margin-bottom:8px"></div><div class="skeleton skel-sm" style="width:160px"></div></div>
+      <div class="skel-overview"><div class="skeleton skel-md"></div><div class="skeleton skel-md"></div><div class="skeleton skel-md"></div><div class="skeleton skel-md"></div></div>
+      <div class="skeleton skel-countdown" style="margin-bottom:16px"></div>
+      <div class="card" style="padding:20px;margin-bottom:16px"><div class="skeleton skel-chart-full"></div></div>
+      <div class="skel-chart-row"><div class="card" style="padding:20px"><div class="skeleton skel-chart"></div></div><div class="card" style="padding:20px"><div class="skeleton skel-chart"></div></div></div>
+      <div class="card" style="padding:20px;margin-bottom:16px"><div class="skeleton skel-chart-full"></div></div>
+      <div class="card" style="margin-bottom:16px"><div class="skeleton skel-sm" style="width:140px;margin-bottom:14px"></div><div class="skeleton skel-insight"></div><div class="skeleton skel-insight"></div><div class="skeleton skel-insight"></div></div>
+      <div class="card" style="margin-bottom:16px"><div class="skeleton skel-sm" style="width:180px;margin-bottom:14px"></div><div class="skel-metric-row"><div class="skeleton skel-metric"></div><div class="skeleton skel-metric"></div><div class="skeleton skel-metric"></div><div class="skeleton skel-metric"></div></div></div>
+      <div class="card"><div class="skeleton skel-sm" style="width:140px;margin-bottom:14px"></div><div class="skeleton skel-row"></div><div class="skeleton skel-row"></div><div class="skeleton skel-row"></div><div class="skeleton skel-row"></div><div class="skeleton skel-row"></div></div>
+    </div>
     <div class="container">
       <div id="dash-greeting" style="margin-bottom:20px"></div>
       <div id="notif-banner" class="card" style="display:none;margin-bottom:16px">
@@ -662,6 +766,8 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
       <div id="dash-savings"></div>
 
       <div id="dash-insights"></div>
+
+      <div id="dash-achievements"></div>
 
       <div id="dash-ytd"></div>
 
@@ -745,6 +851,13 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
   <label class="toggle-row" style="margin-bottom:10px"><input type="checkbox" id="email-toggle"><span class="toggle-label">Send me a summary on payday</span></label>
   <button class="btn btn-outline" id="email-test-btn" style="width:100%">Send test email</button>
   <p class="settings-note">A summary of your latest saved month is emailed on your pay date. Requires EmailJS credentials configured in the app.</p>
+</div>
+<div style="border-top:1px solid var(--border);padding-top:16px;margin-top:4px;">
+  <button id="open-privacy-btn" style="width:100%;display:flex;justify-content:space-between;align-items:center;background:var(--bg);border:none;border-radius:8px;padding:12px 14px;font-size:0.9rem;font-weight:500;font-family:inherit;color:var(--text);cursor:pointer;">
+    <span><i class="ti ti-shield-lock" style="margin-right:8px;color:var(--primary);"></i>Your data &amp; privacy</span>
+    <i class="ti ti-chevron-right" style="color:var(--text-secondary);"></i>
+  </button>
+</div>
 </div></div></div>
 <div class="modal-overlay" id="salcalc-modal"><div class="modal" style="max-width:560px"><button class="modal-close" id="close-salcalc-btn">&times;</button><h2>Salary Increase Calculator</h2><p class="modal-subtitle">Compare your take-home pay across two salaries</p>
   <div style="display:flex;gap:12px;margin-bottom:6px">
@@ -783,9 +896,81 @@ select { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8
 </div>
 <div class="toast" id="toast"></div>
 
+<!-- Privacy panel -->
+<div id="privacy-panel" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:1100;overflow-y:auto;opacity:0;transition:opacity 0.22s ease-out;">
+  <div style="max-width:600px;margin:0 auto;padding:20px 16px 80px;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid var(--border);">
+      <button id="privacy-back-btn" style="background:none;border:none;color:var(--primary);font-size:0.9rem;font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:4px;padding:4px 8px;"><i class="ti ti-arrow-left"></i> Back</button>
+      <h2 style="font-size:1.1rem;font-weight:700;margin:0;">Your data &amp; privacy</h2>
+    </div>
+    <div class="privacy-section"><h3 class="privacy-h3"><i class="ti ti-database"></i> What we store</h3><ul class="privacy-list"><li>Your email address (used for sign-in only)</li><li>Your gross salary and pay day setting</li><li>Your monthly pot names, amounts, and budget targets</li><li>Your saved monthly history — take-home, outgoings, mileage, and free money figures</li><li>Your app preferences — dark mode, email summary toggle, notification settings</li><li>Your inbox notifications and achievement badges</li></ul></div>
+    <div class="privacy-section"><h3 class="privacy-h3"><i class="ti ti-server"></i> Where it's stored</h3><p class="privacy-p">All your data is stored securely in Google Firebase Firestore, in the <strong>europe-west2 region (London, UK)</strong>. Nothing is stored on our servers — we don't have any. Your data goes directly between your device and Firebase.</p></div>
+    <div class="privacy-section"><h3 class="privacy-h3"><i class="ti ti-ban"></i> What we never store</h3><p class="privacy-p" style="color:var(--green);font-weight:500;">We never ask for, store, or have access to your bank login details, card numbers, account numbers, sort codes, or any banking credentials. This app does not connect to your bank.</p></div>
+    <div class="privacy-section"><h3 class="privacy-h3"><i class="ti ti-user-check"></i> Your rights</h3><p class="privacy-p">You can export all your data at any time using the export buttons on each saved month.</p><p class="privacy-p">You can delete your account and all associated data permanently at any time. This cannot be undone.</p><button class="btn btn-danger-solid" id="delete-account-btn" style="margin-top:8px;width:100%;padding:12px;"><i class="ti ti-trash"></i> Delete my account</button></div>
+    <div class="privacy-section"><h3 class="privacy-h3"><i class="ti ti-mail"></i> Contact</h3><!-- REPLACE WITH CONTACT EMAIL --><p class="privacy-p">Questions about your data? Email: <strong>hello@financetracker.app</strong></p></div>
+  </div>
+</div>
+
+<!-- Delete account confirmation modal -->
+<div class="modal-overlay" id="delete-account-modal">
+  <div class="modal" style="max-width:440px;">
+    <h2 style="color:var(--red);margin-bottom:8px;"><i class="ti ti-alert-triangle"></i> Delete your account</h2>
+    <p class="modal-subtitle">This will permanently delete your account and all saved data including your full monthly history, pots, settings, and inbox. <strong>This cannot be undone.</strong></p>
+    <div class="field"><label for="delete-confirm-input">Type <strong>DELETE</strong> to confirm</label><input type="text" id="delete-confirm-input" placeholder="Type DELETE here" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:1rem;font-family:inherit;background:var(--card);color:var(--text);margin-top:4px;" autocomplete="off"></div>
+    <div id="delete-account-error" style="color:var(--red);font-size:0.85rem;margin-bottom:10px;display:none;"></div>
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <button class="btn btn-outline" id="delete-cancel-btn" style="flex:1;">Cancel</button>
+      <button class="btn btn-danger-solid" id="delete-confirm-btn" style="flex:1;" disabled><i class="ti ti-trash"></i> Delete everything</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom navigation bar -->
+<nav id="bottom-nav">
+  <button class="bnav-btn active" id="bnav-dashboard" onclick="window._bnav('dashboard')"><i class="ti ti-layout-dashboard"></i><span>Dashboard</span></button>
+  <button class="bnav-btn" id="bnav-tracker" onclick="window._bnav('tracker')"><i class="ti ti-plus-circle"></i><span>New month</span></button>
+  <button class="bnav-btn" id="bnav-history" onclick="window._bnav('history')"><i class="ti ti-history"></i><span>History</span></button>
+  <button class="bnav-btn" id="bnav-settings" onclick="window._bnav('settings')"><i class="ti ti-settings"></i><span>Settings</span></button>
+</nav>
+
+<!-- Onboarding wizard -->
+<div id="onboarding-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:1200;overflow-y:auto;">
+  <div style="max-width:520px;margin:0 auto;padding:24px 16px 80px;min-height:100%;display:flex;flex-direction:column;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;">
+      <span style="font-weight:700;font-size:0.95rem;color:var(--primary);display:flex;align-items:center;gap:6px;"><i class="ti ti-pig-money"></i> Finance Tracker</span>
+      <button id="ob-skip-btn" style="background:none;border:none;color:var(--text-secondary);font-size:0.85rem;font-family:inherit;cursor:pointer;padding:4px 8px;">Skip setup</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:0;margin-bottom:36px;">
+      <div class="ob-dot active" id="ob-dot-1"></div><div class="ob-line" id="ob-line-1"></div>
+      <div class="ob-dot" id="ob-dot-2"></div><div class="ob-line" id="ob-line-2"></div>
+      <div class="ob-dot" id="ob-dot-3"></div>
+      <div style="flex:1"></div>
+      <span id="ob-step-label" style="font-size:0.8rem;color:var(--text-secondary);font-weight:500;white-space:nowrap;margin-left:12px;">Step 1 of 3</span>
+    </div>
+    <div id="ob-step-1" class="ob-step">
+      <h1 style="font-size:1.5rem;font-weight:700;margin-bottom:8px;">Welcome to Finance Tracker 👋</h1>
+      <p style="color:var(--text-secondary);font-size:0.95rem;margin-bottom:24px;">Let's get you set up in 3 quick steps. First — what's your gross yearly salary?</p>
+      <div class="card"><div class="field"><label for="ob-salary">Annual gross salary</label><div class="input-wrap"><span class="prefix">£</span><input type="number" id="ob-salary" class="has-prefix has-suffix" placeholder="0" min="0" step="100"><span class="suffix">/year</span></div></div><div id="ob-tax-preview" style="display:none;margin-top:12px;"></div></div>
+      <button class="btn btn-primary btn-lg" id="ob-next-1" disabled style="margin-top:16px;">Next →</button>
+    </div>
+    <div id="ob-step-2" class="ob-step" style="display:none;">
+      <h1 style="font-size:1.5rem;font-weight:700;margin-bottom:8px;">When do you get paid?</h1>
+      <p style="color:var(--text-secondary);font-size:0.95rem;margin-bottom:24px;">We'll track your actual pay date each month, accounting for weekends and bank holidays.</p>
+      <div class="card"><div class="settings-field"><label for="ob-payday">Pay day</label><select id="ob-payday" style="width:100%;"></select><p class="settings-note">If this day doesn't exist in a month, you'll be paid on the last working day before it. Weekends and bank holidays are adjusted automatically.</p></div><div id="ob-paydate-preview" style="margin-top:12px;"></div></div>
+      <div class="nav-row" style="margin-top:16px;"><button class="btn btn-outline" id="ob-back-2">← Back</button><button class="btn btn-primary" id="ob-next-2">Next →</button></div>
+    </div>
+    <div id="ob-step-3" class="ob-step" style="display:none;">
+      <h1 style="font-size:1.5rem;font-weight:700;margin-bottom:8px;">Add your regular outgoings</h1>
+      <p style="color:var(--text-secondary);font-size:0.95rem;margin-bottom:24px;">Add the pots you pay every month — rent, bills, subscriptions. You can always add more later.</p>
+      <div class="card"><div id="ob-pots-list"></div><button class="btn btn-outline" id="ob-add-pot-btn" style="margin-top:4px;">+ Add Pot</button></div>
+      <div class="nav-row" style="margin-top:16px;"><button class="btn btn-outline" id="ob-back-3">← Back</button><button class="btn btn-primary" id="ob-finish-btn" disabled>Finish setup →</button></div>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js';
-import{getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,OAuthProvider,signInWithEmailAndPassword,createUserWithEmailAndPassword,signOut as fbSignOut}from'https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js';
+import{getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,OAuthProvider,signInWithEmailAndPassword,createUserWithEmailAndPassword,signOut as fbSignOut,deleteUser}from'https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js';
 import{getFirestore,collection,doc,setDoc,getDoc,getDocs,deleteDoc}from'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
 
 const app=initializeApp({apiKey:"AIzaSyCrh8OV_QoOeygio4LhqXWk10vQcxHHn4I",authDomain:"financial-tracker-f8d47.firebaseapp.com",projectId:"financial-tracker-f8d47",storageBucket:"financial-tracker-f8d47.firebasestorage.app",messagingSenderId:"626879548091",appId:"1:626879548091:web:7cff4521a13b4744c6b79e",measurementId:"G-N6Z2DLR94L"});
@@ -795,6 +980,10 @@ var currentUser=null,payDay=parseInt(localStorage.getItem('finance_payDay'))||23
 var currentStep=1,pots=[],financeHistory=[],lastTakeHome=0,lastMileage=0;
 var editingId=null;
 var chartTH=null,chartSpend=null,chartFree=null,chartStacked=null,chartSavings=null;
+var isNewUser=false,obPots=[],obSalary=0;
+var prevAchievements={};
+var skeletonTimer=null;
+var bottomNavActive='dashboard';
 
 // REPLACE WITH YOUR EMAILJS SERVICE ID, TEMPLATE ID AND PUBLIC KEY
 var EMAILJS_SERVICE = 'service_1igjss7';
@@ -891,10 +1080,65 @@ function renderSum(th,mi){var tp=pots.reduce(function(s,p){return s+(parseFloat(
 
 // ===== NAVIGATION =====
 var GREETINGS=['Time to track your money!','Let\'s save some money!','Here comes the money!','Bling bling!','We\'re here to help!','Are we rich yet?','Show me the money!','Every penny counts!','Budget like a boss!','Money moves!','Stack that cash!','Payday vibes!'];
-function showDashboard(){$('dashboard-screen').style.display='block';$('tracker-screen').style.display='none';$('header-back').style.display='none';editingId=null;$('template-banner').style.display='none';var name=currentUser?(currentUser.displayName||currentUser.email.split('@')[0]):'';var msg=GREETINGS[Math.floor(Math.random()*GREETINGS.length)];$('dash-greeting').innerHTML='<h1 style="text-align:left;padding:16px 0 2px;font-size:1.4rem">Welcome back, '+esc(name)+'</h1><p style="color:var(--text-secondary);font-size:0.95rem;margin-bottom:0">'+esc(msg)+'</p>';renderDashboard();window.scrollTo({top:0});}
-function showTracker(){$('dashboard-screen').style.display='none';$('tracker-screen').style.display='block';$('header-back').style.display='inline';goStep(1);window.scrollTo({top:0});}
-function goStep(n){currentStep=n;for(var i=1;i<=3;i++){$('panel'+i).classList.toggle('active',i===n);var sc=$('sc'+i);sc.classList.remove('active','done');if(i<n){sc.classList.add('done');sc.textContent='✓';}else if(i===n){sc.classList.add('active');sc.textContent=i;}else sc.textContent=i;}$('sl1').classList.toggle('done',n>1);$('sl2').classList.toggle('done',n>2);if(n===3)calc();window.scrollTo({top:0,behavior:'smooth'});}
+function showDashboard(){
+  var ds=$('dashboard-screen');
+  $('tracker-screen').style.display='none';
+  ds.style.display='block';
+  ds.classList.remove('screen-enter');void ds.offsetWidth;ds.classList.add('screen-enter');
+  $('header-back').style.display='none';
+  editingId=null;$('template-banner').style.display='none';
+  var name=currentUser?(currentUser.displayName||currentUser.email.split('@')[0]):'';
+  var msg=GREETINGS[Math.floor(Math.random()*GREETINGS.length)];
+  $('dash-greeting').innerHTML='<h1 style="text-align:left;padding:16px 0 2px;font-size:1.4rem">Welcome back, '+esc(name)+'</h1><p style="color:var(--text-secondary);font-size:0.95rem;margin-bottom:0">'+esc(msg)+'</p>';
+  renderDashboard();window.scrollTo({top:0});
+  setBottomNav('dashboard');
+}
+function showTracker(){
+  var ts=$('tracker-screen');
+  $('dashboard-screen').style.display='none';
+  ts.style.display='block';
+  ts.classList.remove('screen-enter');void ts.offsetWidth;ts.classList.add('screen-enter');
+  $('header-back').style.display='inline';
+  goStep(1);window.scrollTo({top:0});
+  setBottomNav('tracker');
+}
+function goStep(n){
+  var dir=n>currentStep?'left':'right';
+  currentStep=n;
+  for(var i=1;i<=3;i++){
+    var panel=$('panel'+i);
+    if(i===n){
+      panel.classList.add('active');
+      panel.classList.remove('step-slide-left','step-slide-right');
+      void panel.offsetWidth;
+      panel.classList.add(dir==='left'?'step-slide-left':'step-slide-right');
+    }else{panel.classList.remove('active');}
+    var sc=$('sc'+i);sc.classList.remove('active','done');
+    if(i<n){sc.classList.add('done');sc.textContent='✓';}
+    else if(i===n){sc.classList.add('active');sc.textContent=i;}
+    else sc.textContent=i;
+  }
+  $('sl1').classList.toggle('done',n>1);$('sl2').classList.toggle('done',n>2);
+  if(n===3)calc();window.scrollTo({top:0,behavior:'smooth'});
+}
 function toggleSection(n){$('sec-'+n).classList.toggle('open',$('tog-'+n).checked);}
+
+// ===== SKELETON =====
+function showSkeleton(){clearTimeout(skeletonTimer);skeletonTimer=setTimeout(function(){var sk=$('dash-skeleton'),ct=document.querySelector('#dashboard-screen > .container');if(sk)sk.style.display='block';if(ct)ct.style.display='none';},300);}
+function hideSkeleton(){clearTimeout(skeletonTimer);var sk=$('dash-skeleton'),ct=document.querySelector('#dashboard-screen > .container');if(sk)sk.style.display='none';if(ct){ct.style.display='block';ct.classList.remove('screen-enter');void ct.offsetWidth;ct.classList.add('screen-enter');}}
+
+// ===== EMPTY STATE HELPER =====
+function emptyState(icon,title,text,btnLabel,btnAction){var btn=btnLabel?'<button class="btn btn-primary" style="margin-top:4px" onclick="'+btnAction+'">'+btnLabel+'</button>':'';return'<div class="empty-state"><i class="ti '+icon+' empty-state-icon"></i><div class="empty-state-title">'+title+'</div><p class="empty-state-text">'+text+'</p>'+btn+'</div>';}
+window._showTrackerNew=function(){editingId=null;clearTracker();showTracker();};
+
+// ===== BOTTOM NAV =====
+function setBottomNav(tab){bottomNavActive=tab;['dashboard','tracker','history','settings'].forEach(function(t){var b=$('bnav-'+t);if(b)b.classList.toggle('active',t===tab);});}
+window._bnav=function(tab){
+  if(tab==='dashboard'){showDashboard();}
+  else if(tab==='tracker'){editingId=null;clearTracker();showTracker();}
+  else if(tab==='history'){showDashboard();setTimeout(function(){var h=$('dash-history');if(h)h.scrollIntoView({behavior:'smooth'});},350);}
+  else if(tab==='settings'){$('settings-modal').classList.add('open');setBottomNav('settings');}
+};
 
 // ===== POTS =====
 function addPot(n,a,ac,tg){pots.push({name:n||'',amount:a||'',account:ac||'',target:tg||''});renderPots();calc();}
@@ -919,14 +1163,19 @@ clearTracker();showDashboard();toast('Saved '+entry.label);}
 function clearTracker(){pots=[];renderPots();$('salary').value='';$('work-expenses').value='';$('miles').value='';$('overtime').value='';$('tog-expenses').checked=false;$('tog-mileage').checked=false;$('tog-overtime').checked=false;$('sec-expenses').classList.remove('open');$('sec-mileage').classList.remove('open');$('sec-overtime').classList.remove('open');lastTakeHome=0;lastMileage=0;saveLocal();var n=new Date();$('pick-month').value=n.getMonth();$('pick-year').value=n.getFullYear();updPD();}
 
 // ===== DASHBOARD =====
-function renderDashboard(){renderOverview();renderCountdown();renderCharts();renderSavings();renderInsights();renderYTD();renderDashHistory();maybeShowNotifBanner();checkPaydayNotifications();}
+function renderDashboard(){renderOverview();renderCountdown();renderCharts();renderSavings();renderInsights();renderAchievements();renderYTD();renderDashHistory();maybeShowNotifBanner();checkPaydayNotifications();}
 
 // ===== PAYDAY COUNTDOWN =====
 function renderCountdown(){var el=$('dash-countdown');if(!el)return;var now=new Date();now.setHours(0,0,0,0);var y=now.getFullYear(),m=now.getMonth();var pd=getPD(y,m).payDate;pd.setHours(0,0,0,0);if(pd<now){var nx=getNextPD(y,m).payDate;nx.setHours(0,0,0,0);var daysAgo=Math.round((now-pd)/86400000);if(daysAgo<=3){el.innerHTML='<div class="countdown-card cd-today"><span class="cd-icon">🎉</span><div class="cd-main"><div class="cd-title">Payday was '+daysAgo+' day'+(daysAgo===1?'':'s')+' ago</div><div class="cd-date">Next payday: '+fdl(nx)+'</div></div></div>';return;}pd=nx;}var days=Math.round((pd-now)/86400000);if(days===0){el.innerHTML='<div class="countdown-card cd-today"><span class="cd-icon">🎉</span><div class="cd-main"><div class="cd-title">It\'s payday today! 🎉</div><div class="cd-date">'+fdl(pd)+'</div></div></div>';return;}el.innerHTML='<div class="countdown-card"><span class="cd-icon"><i class="ti ti-calendar-event"></i></span><div class="cd-main"><div class="cd-title">Payday in '+days+' day'+(days===1?'':'s')+'</div><div class="cd-date">'+fdl(pd)+'</div></div></div>';}
 
-function renderOverview(){var el=$('dash-overview');if(!financeHistory.length){el.innerHTML='<div class="card" style="text-align:center;padding:32px"><h2 style="margin-bottom:8px">Welcome!</h2><p style="color:var(--text-secondary)">Click "New Month" to add your first month and start tracking your finances.</p></div>';return;}var h=financeHistory[0],cls=h.freeMoney>=0?'positive':'negative';var bh='';var withT=(h.pots||[]).filter(function(p){return(parseFloat(p.target)||0)>0;});if(withT.length){var onTrack=0,near=0,over=0;withT.forEach(function(p){var a=parseFloat(p.amount)||0,t=parseFloat(p.target)||0,pct=a/t*100;if(a>t)over++;else if(pct>=90)near++;else onTrack++;});bh='<div class="dash-stat"><div class="stat-label">Budget Health</div><div class="stat-value" style="font-size:1rem"><span style="color:var(--green)">'+onTrack+' on track</span> · <span style="color:var(--amber)">'+near+' near</span> · <span style="color:var(--red)">'+over+' over</span></div></div>';}el.innerHTML='<div class="dash-overview"><div class="dash-stat"><div class="stat-label">Take-Home Pay</div><div class="stat-value">'+fmt(h.takeHome)+'</div></div><div class="dash-stat"><div class="stat-label">Total Outgoings</div><div class="stat-value">'+fmt(h.outgoings)+'</div></div><div class="dash-stat"><div class="stat-label">Free Money</div><div class="stat-value '+cls+'">'+(h.freeMoney<0?'−':'')+fmt(h.freeMoney)+'</div></div><div class="dash-stat"><div class="stat-label">Mileage Claimed</div><div class="stat-value">'+fmt(h.mileage)+'</div></div>'+bh+'</div>';}
+function renderOverview(){var el=$('dash-overview');if(!financeHistory.length){el.innerHTML='<div class="card">'+emptyState('ti-layout-dashboard','Your dashboard is ready','Save your first month to see your charts, insights, and free money breakdown.','Add my first month →','window._showTrackerNew()')+'</div>';return;}var h=financeHistory[0],cls=h.freeMoney>=0?'positive':'negative';var bh='';var withT=(h.pots||[]).filter(function(p){return(parseFloat(p.target)||0)>0;});if(withT.length){var onTrack=0,near=0,over=0;withT.forEach(function(p){var a=parseFloat(p.amount)||0,t=parseFloat(p.target)||0,pct=a/t*100;if(a>t)over++;else if(pct>=90)near++;else onTrack++;});bh='<div class="dash-stat"><div class="stat-label">Budget Health</div><div class="stat-value" style="font-size:1rem"><span style="color:var(--green)">'+onTrack+' on track</span> · <span style="color:var(--amber)">'+near+' near</span> · <span style="color:var(--red)">'+over+' over</span></div></div>';}el.innerHTML='<div class="dash-overview"><div class="dash-stat"><div class="stat-label">Take-Home Pay</div><div class="stat-value">'+fmt(h.takeHome)+'</div></div><div class="dash-stat"><div class="stat-label">Total Outgoings</div><div class="stat-value">'+fmt(h.outgoings)+'</div></div><div class="dash-stat"><div class="stat-label">Free Money</div><div class="stat-value '+cls+'">'+(h.freeMoney<0?'−':'')+fmt(h.freeMoney)+'</div></div><div class="dash-stat"><div class="stat-label">Mileage Claimed</div><div class="stat-value">'+fmt(h.mileage)+'</div></div>'+bh+'</div>';}
 
-function renderCharts(){var C=window.Chart;if(!C||!financeHistory.length)return;
+function renderCharts(){var C=window.Chart;if(!C||!financeHistory.length){
+  var thEl=$('chart-takehome');if(thEl)thEl.parentElement.innerHTML='<h3 style="font-size:0.9rem;font-weight:600;color:var(--text-secondary);margin-bottom:4px">Monthly Take-Home Pay</h3>'+emptyState('ti-chart-bar','No data yet','Your monthly take-home will appear here once you\'ve saved your first month.','Save a month →','window._showTrackerNew()');
+  var spEl=$('chart-spending');if(spEl)spEl.parentElement.innerHTML='<h3 style="font-size:0.9rem;font-weight:600;color:var(--text-secondary);margin-bottom:4px">Spending Breakdown</h3>'+emptyState('ti-chart-donut','No spending data yet','Add pots to your monthly tracker to see where your money goes.','Open tracker →','window._showTrackerNew()');
+  var frEl=$('chart-free');if(frEl)frEl.parentElement.innerHTML='<h3 style="font-size:0.9rem;font-weight:600;color:var(--text-secondary);margin-bottom:4px">Free Money Trend</h3>'+emptyState('ti-chart-bar','No data yet','Your monthly free money will appear here once you\'ve saved your first month.','Save a month →','window._showTrackerNew()');
+  return;
+}
   var tc=chartTextColor(),gc=chartGridColor();
   // Take-home bar chart — last 12, oldest first
   var last12=financeHistory.slice(0,12).reverse();
@@ -944,7 +1193,7 @@ function renderCharts(){var C=window.Chart;if(!C||!financeHistory.length)return;
     var pData=latest.pots.map(function(p){return p.amount;});
     var colors=['#1a73e8','#0d904f','#e37400','#c5221f','#8430ce','#00897b','#d81b60','#546e7a','#ff6d00','#2962ff'];
     chartSpend=new C($('chart-spending'),{type:'doughnut',data:{labels:pLabels,datasets:[{data:pData,backgroundColor:colors.slice(0,pData.length)}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:tc,boxWidth:12,font:{size:11}}},tooltip:{callbacks:{label:function(c){var total=c.dataset.data.reduce(function(a,b){return a+b;},0);var pct=total>0?Math.round(c.raw/total*100):0;return c.label+': £'+c.raw.toLocaleString('en-GB',{minimumFractionDigits:2})+' ('+pct+'%)';}}}}}}); }
-  else{$('chart-spending').parentElement.innerHTML='<h3 style="font-size:0.9rem;font-weight:600;color:var(--text-secondary);margin-bottom:12px">Spending Breakdown</h3><p class="history-empty">No pots recorded</p>';}
+  else{$('chart-spending').parentElement.innerHTML='<h3 style="font-size:0.9rem;font-weight:600;color:var(--text-secondary);margin-bottom:4px">Spending Breakdown</h3>'+emptyState('ti-chart-donut','No spending data yet','Add pots to your monthly tracker to see where your money goes.','Open tracker →','window._showTrackerNew()');}
 
   // Free money line chart
   var all=financeHistory.slice().reverse();
@@ -969,7 +1218,7 @@ window._viewE=viewEntry;window._delE=deleteEntry;window._loadT=loadTemplate;wind
 
 // ===== SAVINGS RATE =====
 function monthSavings(h){var s=0;(h.pots||[]).forEach(function(p){if(isSavingsPot(p))s+=(parseFloat(p.amount)||0);});return s;}
-function renderSavings(){var el=$('dash-savings');if(!el)return;var any=financeHistory.some(function(h){return monthSavings(h)>0;});if(!financeHistory.length||!any){el.innerHTML='<div class="card"><h2>Savings Rate</h2><p class="history-empty">No savings pots found yet. Add a pot named "Savings" or assign one to a savings category to track your savings rate.</p></div>';if(chartSavings){chartSavings.destroy();chartSavings=null;}return;}
+function renderSavings(){var el=$('dash-savings');if(!el)return;var any=financeHistory.some(function(h){return monthSavings(h)>0;});if(!financeHistory.length||!any){el.innerHTML='<div class="card"><h2>Savings Rate</h2>'+emptyState('ti-pig-money','No savings pots found','Add a savings pot (like Emergency Fund or Holiday Savings) to track your savings rate over time.','Open tracker →','window._showTrackerNew()')+'</div>';if(chartSavings){chartSavings.destroy();chartSavings=null;}return;}
   var all=financeHistory.slice().reverse();
   var rates=all.map(function(h){var sv=monthSavings(h);var th=h.takeHome||0;return th>0?(sv/th*100):0;});
   var nonZero=rates.filter(function(r){return r>0;});
@@ -1004,7 +1253,7 @@ function renderYTD(){var el=$('dash-ytd');if(!el)return;var start=taxYearStart(n
     '</div><p class="section-note">Based on your saved months — figures are estimates based on your inputs.</p></div>';
   var eb=$('ytd-export-btn');if(eb)eb.addEventListener('click',function(){exportYTDExcel();});}
 
-function renderDashHistory(){var el=$('dash-history');if(!financeHistory.length){el.innerHTML='<p class="history-empty">No saved months yet.</p>';return;}var h='';financeHistory.forEach(function(e){var cls=e.freeMoney>=0?'positive':'negative',fs=(e.freeMoney<0?'−':'')+fmt(e.freeMoney);h+='<div class="dash-history-row" onclick="window._viewE('+e.id+')"><div class="dh-main"><div class="dh-month">'+esc(MF[e.month]+' '+e.year)+'</div><div class="dh-paydate">Paid: '+esc(e.payDateLong||e.payDate)+'</div><div class="dh-stats"><span>Take-home: '+fmt(e.takeHome)+'</span><span>Out: '+fmt(e.outgoings)+'</span>'+(e.mileage>0?'<span>Mileage: '+fmt(e.mileage)+'</span>':'')+'</div></div><div class="dh-free '+cls+'">'+fs+'</div><div class="dh-actions"><button class="btn btn-outline" onclick="event.stopPropagation();window._editE('+e.id+')" title="Edit month">Edit</button><button class="btn btn-danger" onclick="event.stopPropagation();window._delE('+e.id+')" title="Delete">×</button></div></div>';});el.innerHTML=h;}
+function renderDashHistory(){var el=$('dash-history');if(!financeHistory.length){el.innerHTML=emptyState('ti-history','No history yet','Every month you save will appear here so you can review, compare, and load as a template.','Save my first month →','window._showTrackerNew()');return;}var h='';financeHistory.forEach(function(e){var cls=e.freeMoney>=0?'positive':'negative',fs=(e.freeMoney<0?'−':'')+fmt(e.freeMoney);h+='<div class="dash-history-row" onclick="window._viewE('+e.id+')"><div class="dh-main"><div class="dh-month">'+esc(MF[e.month]+' '+e.year)+'</div><div class="dh-paydate">Paid: '+esc(e.payDateLong||e.payDate)+'</div><div class="dh-stats"><span>Take-home: '+fmt(e.takeHome)+'</span><span>Out: '+fmt(e.outgoings)+'</span>'+(e.mileage>0?'<span>Mileage: '+fmt(e.mileage)+'</span>':'')+'</div></div><div class="dh-free '+cls+'">'+fs+'</div><div class="dh-actions"><button class="btn btn-outline" onclick="event.stopPropagation();window._editE('+e.id+')" title="Edit month">Edit</button><button class="btn btn-danger" onclick="event.stopPropagation();window._delE('+e.id+')" title="Delete">×</button></div></div>';});el.innerHTML=h;}
 
 // ===== SALARY CALCULATOR =====
 function openSalCalc(){var cur='';if(financeHistory.length&&financeHistory[0].salary)cur=financeHistory[0].salary;$('salcalc-current').value=cur;$('salcalc-proposed').value='';renderSalCalc();$('salcalc-modal').classList.add('open');}
@@ -1064,7 +1313,7 @@ function persistHL(){try{localStorage.setItem('finance_history',JSON.stringify(f
 function loadLocal(){try{var r=localStorage.getItem('uk-finance-tracker');if(r){var d=JSON.parse(r);if(d.salary)$('salary').value=d.salary;if(d.togExpenses){$('tog-expenses').checked=true;toggleSection('expenses');}if(d.togMileage){$('tog-mileage').checked=true;toggleSection('mileage');}if(d.togOvertime){$('tog-overtime').checked=true;toggleSection('overtime');}if(d.workExpenses)$('work-expenses').value=d.workExpenses;if(d.miles)$('miles').value=d.miles;if(d.overtime)$('overtime').value=d.overtime;if(d.pots&&d.pots.length){pots=d.pots.map(function(p){return{name:p.name||'',amount:p.amount||'',account:p.account||'',target:p.target||''};});renderPots();}}}catch(e){}try{var o=localStorage.getItem('uk-finance-history'),n=localStorage.getItem('finance_history');if(o&&!n){localStorage.setItem('finance_history',o);localStorage.removeItem('uk-finance-history');}var h=localStorage.getItem('finance_history');if(h)financeHistory=JSON.parse(h);}catch(e){}}
 
 // ===== FIRESTORE =====
-async function syncFS(){if(!currentUser)return;try{var snap=await getDocs(collection(db,'users',currentUser.uid,'months'));var entries=[];snap.forEach(function(d){entries.push(d.data());});var fsIds=new Set(entries.map(function(e){return e.id;}));var lo=financeHistory.filter(function(e){return!fsIds.has(e.id);});for(var i=0;i<lo.length;i++){entries.push(lo[i]);try{await setDoc(doc(db,'users',currentUser.uid,'months',String(lo[i].id)),lo[i]);}catch(e){}}if(entries.length>0||financeHistory.length===0){financeHistory=entries.sort(function(a,b){return b.id-a.id;});persistHL();renderDashboard();}}catch(e){console.error('Sync:',e);}}
+async function syncFS(){if(!currentUser)return;try{var snap=await getDocs(collection(db,'users',currentUser.uid,'months'));var entries=[];snap.forEach(function(d){entries.push(d.data());});var fsIds=new Set(entries.map(function(e){return e.id;}));var lo=financeHistory.filter(function(e){return!fsIds.has(e.id);});for(var i=0;i<lo.length;i++){entries.push(lo[i]);try{await setDoc(doc(db,'users',currentUser.uid,'months',String(lo[i].id)),lo[i]);}catch(e){}}if(entries.length>0||financeHistory.length===0){financeHistory=entries.sort(function(a,b){return b.id-a.id;});persistHL();}hideSkeleton();renderDashboard();}catch(e){console.error('Sync:',e);hideSkeleton();renderDashboard();}}
 async function loadSettingsFS(){if(!currentUser)return;try{var s=await getDoc(doc(db,'users',currentUser.uid,'settings','config'));if(s.exists()){var d=s.data();if(d.payDay){payDay=d.payDay;localStorage.setItem('finance_payDay',payDay);$('payday-select').value=payDay;updPD();}if(d.emailSummary){emailPrefs=d.emailSummary;localStorage.setItem('finance_email_prefs',JSON.stringify(emailPrefs));$('email-input').value=emailPrefs.email||'';$('email-toggle').checked=!!emailPrefs.enabled;}}}catch(e){}}
 
 // ===== INBOX =====
@@ -1076,7 +1325,7 @@ async function loadInbox(){if(!currentUser){inboxItems=[];updateInboxBadge();ret
 async function addInboxItem(icon,title,body,action){if(!currentUser)return;var item={id:Date.now(),icon:icon,title:title,body:body,time:new Date().toISOString(),read:false,action:action||null};inboxItems.unshift(item);try{await setDoc(doc(db,'users',currentUser.uid,'inbox',String(item.id)),item);}catch(e){}
 while(inboxItems.length>50){var old=inboxItems.pop();try{await deleteDoc(doc(db,'users',currentUser.uid,'inbox',String(old.id)));}catch(e){}}
 updateInboxBadge();if($('inbox-panel').classList.contains('open'))renderInbox();return item;}
-function renderInbox(){var el=$('inbox-list');if(!el)return;if(!inboxItems.length){el.innerHTML='<div class="inbox-empty">No notifications yet — we\'ll let you know when something needs your attention.</div>';return;}var h='';inboxItems.forEach(function(it){h+='<div class="inbox-item'+(it.read?'':' unread')+'" onclick="window._inboxClick('+it.id+')"><i class="ti '+esc(it.icon||'ti-bell')+'"></i><div style="flex:1;min-width:0"><div class="inbox-item-title">'+esc(it.title)+'</div><div class="inbox-item-body">'+esc(it.body)+'</div><div class="inbox-item-time">'+esc(relTime(it.time))+'</div></div>'+(it.read?'':'<span class="inbox-unread-dot"></span>')+'</div>';});el.innerHTML=h;}
+function renderInbox(){var el=$('inbox-list');if(!el)return;if(!inboxItems.length){el.innerHTML='<div class="empty-state" style="padding:48px 24px"><i class="ti ti-bell empty-state-icon"></i><div class="empty-state-title">Nothing here yet</div><p class="empty-state-text">We\'ll notify you about payday, budget alerts, and spending insights as they happen.</p></div>';return;}var h='';inboxItems.forEach(function(it){h+='<div class="inbox-item'+(it.read?'':' unread')+'" onclick="window._inboxClick('+it.id+')"><i class="ti '+esc(it.icon||'ti-bell')+'"></i><div style="flex:1;min-width:0"><div class="inbox-item-title">'+esc(it.title)+'</div><div class="inbox-item-body">'+esc(it.body)+'</div><div class="inbox-item-time">'+esc(relTime(it.time))+'</div></div>'+(it.read?'':'<span class="inbox-unread-dot"></span>')+'</div>';});el.innerHTML=h;}
 function openInbox(){$('inbox-panel').classList.add('open');$('inbox-overlay').classList.add('open');renderInbox();}
 function closeInbox(){$('inbox-panel').classList.remove('open');$('inbox-overlay').classList.remove('open');}
 async function inboxClick(id){var it=inboxItems.find(function(x){return x.id===id;});if(!it)return;if(!it.read){it.read=true;updateInboxBadge();renderInbox();if(currentUser){try{await setDoc(doc(db,'users',currentUser.uid,'inbox',String(id)),it);}catch(e){}}}if(it.action==='tracker'){closeInbox();editingId=null;clearTracker();showTracker();}else if(it.action==='dashboard'){closeInbox();showDashboard();}}
@@ -1136,7 +1385,9 @@ function getDismissedInsights(){try{return JSON.parse(localStorage.getItem('dism
 function dismissInsight(key){var d=getDismissedInsights();if(d.indexOf(key)===-1){d.push(key);localStorage.setItem('dismissed_insights',JSON.stringify(d));}renderInsights();}
 window._dismissInsight=dismissInsight;
 window._toggleInsights=function(){insightsExpanded=!insightsExpanded;renderInsights();};
-function renderInsights(){var el=$('dash-insights');if(!el)return;var all=generateInsights();var dismissed=getDismissedInsights();var visible=all.filter(function(i){return dismissed.indexOf(i.key)===-1;});
+function renderInsights(){var el=$('dash-insights');if(!el)return;
+  if(financeHistory.length<2){el.innerHTML='<div class="card">'+emptyState('ti-bulb','Insights unlock after 2 months','Save one more month and we\'ll start surfacing personalised tips based on your spending patterns.','Save this month →','window._showTrackerNew()')+'</div>';return;}
+  var all=generateInsights();var dismissed=getDismissedInsights();var visible=all.filter(function(i){return dismissed.indexOf(i.key)===-1;});
   if(!visible.length){el.innerHTML='';return;}
   visible.forEach(function(i){if(!insightsInboxedThisSession.has(i.key)){insightsInboxedThisSession.add(i.key);addInboxItem(i.icon,i.title,i.body,'dashboard');}});
   var show=insightsExpanded?visible:visible.slice(0,5);
@@ -1145,9 +1396,88 @@ function renderInsights(){var el=$('dash-insights');if(!el)return;var all=genera
   if(visible.length>5)h+='<button class="insight-seeall" onclick="window._toggleInsights()">'+(insightsExpanded?'Show fewer':'See all insights ('+visible.length+')')+'</button>';
   h+='</div>';el.innerHTML=h;}
 
+// ===== ACHIEVEMENTS =====
+var ACHIEVEMENTS=[
+  {id:'first_step',icon:'ti-rocket',title:'First step',desc:'Save your first month'},
+  {id:'all_set_up',icon:'ti-settings',title:'All set up',desc:'Salary, pay day &amp; 3+ pots set'},
+  {id:'early_bird',icon:'ti-sun',title:'Early bird',desc:'Opened the app on payday'},
+  {id:'on_a_roll',icon:'ti-calendar-check',title:'On a roll',desc:'3 months saved in a row'},
+  {id:'committed',icon:'ti-calendar-stats',title:'Committed',desc:'6 months saved in a row'},
+  {id:'dedicated',icon:'ti-trophy',title:'Dedicated',desc:'12 months saved in a row'},
+  {id:'in_the_green',icon:'ti-mood-smile',title:'In the green',desc:'First month with positive free money'},
+  {id:'comfortable',icon:'ti-mood-happy',title:'Comfortable',desc:'3 months positive in a row'},
+  {id:'getting_better',icon:'ti-trending-up',title:'Getting better',desc:'Free money rising 3 months running'},
+  {id:'saver',icon:'ti-piggy-bank',title:'Saver',desc:'Savings rate above 10%'},
+  {id:'strong_saver',icon:'ti-star',title:'Strong saver',desc:'Savings rate above 20%'},
+  {id:'on_fire',icon:'ti-flame',title:'On fire',desc:'20%+ savings rate for 3 months'},
+  {id:'first_thousand',icon:'ti-cash',title:'First thousand',desc:'Total take-home over £1,000'},
+  {id:'ten_grand',icon:'ti-building-bank',title:'Ten grand',desc:'Total take-home over £10,000'},
+  {id:'road_warrior',icon:'ti-car',title:'Road warrior',desc:'Mileage claimed in 3+ months'},
+  {id:'miles_ahead',icon:'ti-map-pin',title:'Miles ahead',desc:'500+ total miles claimed'},
+  {id:'spot_on',icon:'ti-target',title:'Spot on',desc:'All pots within budget for a month'},
+  {id:'consistent',icon:'ti-shield-check',title:'Consistent',desc:'All pots within budget 3 months'},
+];
+function calcAchievements(){
+  var u={};
+  var sorted=financeHistory.slice().sort(function(a,b){return new Date(a.year,a.month)-new Date(b.year,b.month);});
+  if(sorted.length>=1)u.first_step=true;
+  var latest=sorted[sorted.length-1];
+  if(latest&&latest.salary>0&&payDay>0&&(latest.pots||[]).length>=3)u.all_set_up=true;
+  var ebKey='early_bird_'+new Date().getFullYear();
+  if(isPaydayToday()){localStorage.setItem(ebKey,'1');}
+  if(localStorage.getItem(ebKey))u.early_bird=true;
+  function maxConsec(arr){if(!arr.length)return 0;var max=1,cur=1;for(var i=1;i<arr.length;i++){var exp=new Date(arr[i-1].year,arr[i-1].month+1);var act=new Date(arr[i].year,arr[i].month);if(exp.getFullYear()===act.getFullYear()&&exp.getMonth()===act.getMonth()){cur++;if(cur>max)max=cur;}else cur=1;}return max;}
+  var mc=maxConsec(sorted);
+  if(mc>=3)u.on_a_roll=true;if(mc>=6)u.committed=true;if(mc>=12)u.dedicated=true;
+  if(sorted.some(function(h){return(h.freeMoney||0)>0;}))u.in_the_green=true;
+  for(var i=2;i<sorted.length;i++){if((sorted[i].freeMoney||0)>0&&(sorted[i-1].freeMoney||0)>0&&(sorted[i-2].freeMoney||0)>0){u.comfortable=true;break;}}
+  for(var i=2;i<sorted.length;i++){if((sorted[i].freeMoney||0)>(sorted[i-1].freeMoney||0)&&(sorted[i-1].freeMoney||0)>(sorted[i-2].freeMoney||0)){u.getting_better=true;break;}}
+  var rates=sorted.map(function(h){var sv=monthSavings(h);return h.takeHome>0?(sv/h.takeHome*100):0;});
+  if(rates.some(function(r){return r>=10;}))u.saver=true;
+  if(rates.some(function(r){return r>=20;}))u.strong_saver=true;
+  for(var i=2;i<rates.length;i++){if(rates[i]>=20&&rates[i-1]>=20&&rates[i-2]>=20){u.on_fire=true;break;}}
+  var totTH=sorted.reduce(function(s,h){return s+(h.takeHome||0);},0);
+  if(totTH>=1000)u.first_thousand=true;if(totTH>=10000)u.ten_grand=true;
+  var mileMo=sorted.filter(function(h){return h.togMileage&&(h.miles||0)>0;}).length;
+  if(mileMo>=3)u.road_warrior=true;
+  var totMi=sorted.reduce(function(s,h){return s+(h.togMileage?(h.miles||0):0);},0);
+  if(totMi>=500)u.miles_ahead=true;
+  function allOnBudget(h){var wt=(h.pots||[]).filter(function(p){return(parseFloat(p.target)||0)>0;});return wt.length>0&&wt.every(function(p){return(parseFloat(p.amount)||0)<=(parseFloat(p.target)||0);});}
+  if(sorted.some(allOnBudget))u.spot_on=true;
+  for(var i=2;i<sorted.length;i++){if(allOnBudget(sorted[i])&&allOnBudget(sorted[i-1])&&allOnBudget(sorted[i-2])){u.consistent=true;break;}}
+  return u;
+}
+function showAchievementToast(icon,title){
+  var el=document.createElement('div');el.className='achievement-toast';
+  el.innerHTML='<i class="ti '+icon+'"></i> Achievement unlocked — '+title;
+  document.body.appendChild(el);
+  setTimeout(function(){el.classList.add('show');},50);
+  setTimeout(function(){el.classList.remove('show');setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},400);},4500);
+}
+function renderAchievements(){
+  var el=$('dash-achievements');if(!el)return;
+  var unlocked=calcAchievements();
+  var newUnlocks=ACHIEVEMENTS.filter(function(a){return unlocked[a.id]&&!prevAchievements[a.id];});
+  newUnlocks.forEach(function(a,i){setTimeout(function(){showAchievementToast(a.icon,a.title);},i*700);});
+  prevAchievements=Object.assign({},unlocked);
+  var anyUnlocked=ACHIEVEMENTS.some(function(a){return unlocked[a.id];});
+  var h='<div class="card"><h2>Achievements</h2>';
+  if(!anyUnlocked){
+    h+=emptyState('ti-trophy','Your achievements will appear here','Save your first month to start earning badges.','Get started →','window._showTrackerNew()');
+  }else{
+    h+='<div class="achievements-grid">';
+    ACHIEVEMENTS.forEach(function(a){
+      var isNew=newUnlocks.some(function(n){return n.id===a.id;});
+      h+='<div class="achievement-badge '+(unlocked[a.id]?'unlocked':'locked')+(isNew?' new-unlock':'')+'"><i class="ti '+esc(a.icon)+'"></i><div class="badge-title">'+esc(a.title)+'</div><div class="badge-desc">'+esc(a.desc)+'</div></div>';
+    });
+    h+='</div>';
+  }
+  h+='</div>';el.innerHTML=h;
+}
+
 // ===== AUTH =====
 function showAuth(){$('loading-screen').style.display='none';$('auth-screen').style.display='block';$('app-container').style.display='none';}
-function showApp(){$('loading-screen').style.display='none';$('auth-screen').style.display='none';$('app-container').style.display='block';}
+function showApp(){$('loading-screen').style.display='none';$('auth-screen').style.display='none';$('app-container').style.display='block';showSkeleton();}
 
 function showAuthErr(m){var el=$('auth-error');el.textContent=m;el.style.display='block';}
 function authErrMsg(e){return e.code==='auth/user-not-found'?'No account found with this email':e.code==='auth/wrong-password'||e.code==='auth/invalid-credential'?'Incorrect email or password':e.code==='auth/email-already-in-use'?'Email already in use — try signing in':e.code==='auth/weak-password'?'Password must be at least 6 characters':e.code==='auth/invalid-email'?'Please enter a valid email address':e.message;}
@@ -1160,10 +1490,10 @@ $('microsoft-btn').addEventListener('click',async function(){$('auth-error').sty
 
 $('form-signin').addEventListener('submit',async function(ev){ev.preventDefault();$('auth-error').style.display='none';try{await signInWithEmailAndPassword(auth,$('signin-email').value,$('signin-password').value);}catch(e){showAuthErr(authErrMsg(e));}});
 
-$('form-signup').addEventListener('submit',async function(ev){ev.preventDefault();$('auth-error').style.display='none';var pw=$('signup-password').value,cp=$('signup-confirm').value;if(pw!==cp){showAuthErr('Passwords do not match');return;}try{await createUserWithEmailAndPassword(auth,$('signup-email').value,pw);}catch(e){showAuthErr(authErrMsg(e));}});
+$('form-signup').addEventListener('submit',async function(ev){ev.preventDefault();$('auth-error').style.display='none';var pw=$('signup-password').value,cp=$('signup-confirm').value;if(pw!==cp){showAuthErr('Passwords do not match');return;}try{isNewUser=true;await createUserWithEmailAndPassword(auth,$('signup-email').value,pw);}catch(e){isNewUser=false;showAuthErr(authErrMsg(e));}});
 $('signout-btn').addEventListener('click',async function(){await fbSignOut(auth);});
 
-onAuthStateChanged(auth,async function(user){if(user){currentUser=user;loadLocal();loadEmailPrefs();initMP();initPDS();showApp();$('user-display').textContent=user.displayName||user.email;showDashboard();await loadSettingsFS();await syncFS();await loadInbox();renderDashboard();await maybeSendPaydayEmail();maybeShowPayday();}else{currentUser=null;inboxItems=[];updateInboxBadge();closeInbox();showAuth();}});
+onAuthStateChanged(auth,async function(user){if(user){currentUser=user;loadLocal();loadEmailPrefs();initMP();initPDS();showApp();$('user-display').textContent=user.displayName||user.email;await loadSettingsFS();await syncFS();await loadInbox();await maybeSendPaydayEmail();if(isNewUser){isNewUser=false;var needsOb=await checkOnboarding();if(needsOb){hideSkeleton();showOnboarding();return;}}maybeShowPayday();}else{currentUser=null;inboxItems=[];updateInboxBadge();closeInbox();showAuth();}});
 
 // ===== EVENTS =====
 initTheme();
@@ -1267,6 +1597,84 @@ setTimeout(function(){$('payday-overlay').classList.add('open');},500);}
 $('payday-close').addEventListener('click',closePaydayModal);
 $('payday-dismiss-btn').addEventListener('click',closePaydayModal);
 $('payday-update-btn').addEventListener('click',function(){closePaydayModal();var now=new Date();editingId=null;clearTracker();$('pick-month').value=now.getMonth();$('pick-year').value=now.getFullYear();updPD();showTracker();});
+
+// ===== PRIVACY & DELETE ACCOUNT =====
+function openPrivacy(){$('settings-modal').classList.remove('open');var p=$('privacy-panel');p.style.display='block';requestAnimationFrame(function(){p.style.opacity='1';});}
+function closePrivacy(){var p=$('privacy-panel');p.style.opacity='0';setTimeout(function(){p.style.display='none';$('settings-modal').classList.add('open');},220);}
+$('open-privacy-btn').addEventListener('click',openPrivacy);
+$('privacy-back-btn').addEventListener('click',closePrivacy);
+$('delete-account-btn').addEventListener('click',function(){$('delete-confirm-input').value='';$('delete-confirm-btn').disabled=true;$('delete-account-error').style.display='none';$('delete-account-modal').classList.add('open');});
+$('delete-confirm-input').addEventListener('input',function(){$('delete-confirm-btn').disabled=this.value!=='DELETE';});
+$('delete-cancel-btn').addEventListener('click',function(){$('delete-account-modal').classList.remove('open');});
+$('delete-confirm-btn').addEventListener('click',async function(){
+  if(!currentUser)return;
+  var btn=this;btn.disabled=true;btn.innerHTML='Deleting...';
+  var errEl=$('delete-account-error');errEl.style.display='none';
+  try{
+    var subcolls=['months','inbox'];
+    for(var ci=0;ci<subcolls.length;ci++){var snap=await getDocs(collection(db,'users',currentUser.uid,subcolls[ci]));var dels=[];snap.forEach(function(d){dels.push(deleteDoc(d.ref));});await Promise.all(dels);}
+    try{await deleteDoc(doc(db,'users',currentUser.uid,'settings','config'));}catch(e){}
+    await deleteUser(currentUser);
+    await fbSignOut(auth);
+  }catch(e){
+    btn.disabled=false;btn.innerHTML='<i class="ti ti-trash"></i> Delete everything';
+    errEl.textContent=e.code==='auth/requires-recent-login'?'For security, please sign out and sign back in before deleting your account, then try again.':'Deletion failed: '+(e.message||e.code);
+    errEl.style.display='block';
+  }
+});
+
+// ===== ONBOARDING =====
+function obCalcTax(){
+  obSalary=parseFloat($('ob-salary').value)||0;
+  $('ob-next-1').disabled=obSalary<=0;
+  var prev=$('ob-tax-preview');
+  if(obSalary>0){var mG=obSalary/12,aT=cTax(obSalary),aN=cNI(obSalary),th=mG-aT/12-aN/12;prev.style.display='block';prev.innerHTML='<div style="background:var(--primary-light);border-radius:8px;padding:12px;font-size:0.88rem"><div style="display:flex;justify-content:space-between;padding:3px 0"><span>Monthly gross</span><span style="font-weight:600">'+fmt(mG)+'</span></div><div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--red)"><span>Income tax</span><span>−'+fmt(aT/12)+'</span></div><div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--red)"><span>National Insurance</span><span>−'+fmt(aN/12)+'</span></div><div style="display:flex;justify-content:space-between;padding:5px 0 2px;border-top:1.5px solid var(--border);margin-top:4px;font-weight:700;color:var(--green)"><span>Take-home / month</span><span>'+fmt(th)+'</span></div></div>';}
+  else{prev.style.display='none';}
+}
+function obInitPayday(){var s=$('ob-payday');s.innerHTML='';for(var d=1;d<=28;d++){var o=document.createElement('option');o.value=d;o.textContent=d+os(d)+' of each month';if(d===payDay)o.selected=true;s.appendChild(o);}obUpdPaydate();}
+function obUpdPaydate(){var pd=parseInt($('ob-payday').value)||23,now=new Date(),r=getPD(now.getFullYear(),now.getMonth(),pd);$('ob-paydate-preview').innerHTML='<div class="paydate-card" style="box-shadow:none;margin:0"><div class="paydate-date" style="font-size:1rem;margin:0 0 4px">'+fdl(r.payDate)+'</div>'+(r.moved?'<div class="paydate-note">'+movedReason(r.original,pd)+' — paid earlier</div>':'')+'</div>';}
+function obRenderPots(){var h='';obPots.forEach(function(p,i){h+='<div class="pot-row"><input type="text" placeholder="Pot name" value="'+esc(p.name||'')+'" oninput="window._obPot('+i+',\'name\',this.value)"><div class="input-wrap"><span class="prefix">£</span><input type="number" class="has-prefix" placeholder="0" min="0" step="10" value="'+(p.amount||'')+'" oninput="window._obPot('+i+',\'amount\',this.value)"></div><select onchange="window._obPot('+i+',\'account\',this.value)">'+buildCatOpts(p.account||'')+'</select><button class="btn btn-danger" onclick="window._obDelPot('+i+')" title="Remove">×</button></div>';});$('ob-pots-list').innerHTML=h;$('ob-finish-btn').disabled=!obPots.some(function(p){return(p.name||'').trim()||(parseFloat(p.amount)||0)>0;});}
+window._obPot=function(i,f,v){obPots[i][f]=v;$('ob-finish-btn').disabled=!obPots.some(function(p){return(p.name||'').trim()||(parseFloat(p.amount)||0)>0;});};
+window._obDelPot=function(i){obPots.splice(i,1);obRenderPots();};
+function obGoStep(n){
+  for(var i=1;i<=3;i++){$('ob-step-'+i).style.display=i===n?'block':'none';var dot=$('ob-dot-'+i);dot.classList.remove('active','done');if(i<n)dot.classList.add('done');else if(i===n)dot.classList.add('active');var ln=$('ob-line-'+i);if(ln)ln.classList.toggle('done',i<n);}
+  $('ob-step-label').textContent='Step '+n+' of 3';
+  if(n===2)obInitPayday();if(n===3)obRenderPots();
+}
+async function checkOnboarding(){if(!currentUser)return false;try{var cfg=await getDoc(doc(db,'users',currentUser.uid,'settings','config'));if(cfg.exists()&&cfg.data().onboardingComplete)return false;var months=await getDocs(collection(db,'users',currentUser.uid,'months'));if(!months.empty){await setDoc(doc(db,'users',currentUser.uid,'settings','config'),{onboardingComplete:true},{merge:true});return false;}return true;}catch(e){return false;}}
+function showOnboarding(){var o=$('onboarding-screen');o.style.display='block';o.classList.remove('screen-enter');void o.offsetWidth;o.classList.add('screen-enter');obGoStep(1);}
+async function skipOnboarding(){if(currentUser){try{await setDoc(doc(db,'users',currentUser.uid,'settings','config'),{onboardingComplete:true},{merge:true});}catch(e){}}$('onboarding-screen').style.display='none';showDashboard();}
+$('ob-skip-btn').addEventListener('click',skipOnboarding);
+$('ob-salary').addEventListener('input',obCalcTax);
+$('ob-next-1').addEventListener('click',async function(){if(obSalary<=0)return;$('salary').value=obSalary;if(currentUser){try{await setDoc(doc(db,'users',currentUser.uid,'settings','config'),{salary:obSalary},{merge:true});}catch(e){}}obGoStep(2);});
+$('ob-back-2').addEventListener('click',function(){obGoStep(1);});
+$('ob-next-2').addEventListener('click',async function(){var pd=parseInt($('ob-payday').value)||23;payDay=pd;localStorage.setItem('finance_payDay',pd);if(currentUser){try{await setDoc(doc(db,'users',currentUser.uid,'settings','config'),{payDay:pd},{merge:true});}catch(e){}}obGoStep(3);});
+$('ob-back-3').addEventListener('click',function(){obGoStep(2);});
+$('ob-add-pot-btn').addEventListener('click',function(){obPots.push({name:'',amount:'',account:''});obRenderPots();});
+$('ob-payday').addEventListener('change',obUpdPaydate);
+$('ob-finish-btn').addEventListener('click',async function(){
+  var btn=this;btn.disabled=true;btn.textContent='Saving...';
+  try{
+    var pd=parseInt($('ob-payday').value)||payDay;payDay=pd;localStorage.setItem('finance_payDay',pd);
+    $('salary').value=obSalary;
+    pots=obPots.filter(function(p){return(p.name||'').trim()||(parseFloat(p.amount)||0)>0;}).map(function(p){return{name:p.name||'',amount:p.amount||'',account:p.account||'',target:''};});
+    renderPots();
+    if(currentUser){await setDoc(doc(db,'users',currentUser.uid,'settings','config'),{salary:obSalary,payDay:pd,onboardingComplete:true},{merge:true});}
+    $('onboarding-screen').style.display='none';
+    toast('You\'re all set! Add your first month whenever you\'re ready.');
+    showDashboard();
+  }catch(e){btn.disabled=false;btn.textContent='Finish setup →';toast('Error: '+e.message);}
+});
+
+// ===== OFFLINE INDICATOR =====
+function showOfflineBanner(mode){
+  var b=$('offline-banner');b.className='';
+  if(mode==='offline'){b.innerHTML='<i class="ti ti-wifi-off"></i> You\'re offline — changes are saved locally and will sync when you reconnect';void b.offsetWidth;b.className='offline-show';}
+  else{b.innerHTML='<i class="ti ti-wifi"></i> Back online — syncing your data...';void b.offsetWidth;b.className='online-show';setTimeout(function(){b.style.opacity='0';setTimeout(function(){b.className='';b.style.opacity='';},400);},3000);}
+}
+window.addEventListener('offline',function(){showOfflineBanner('offline');});
+window.addEventListener('online',function(){showOfflineBanner('online');if(currentUser)syncFS();});
+if(!navigator.onLine)showOfflineBanner('offline');
 
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./service-worker.js');
 </script>
