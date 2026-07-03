@@ -580,18 +580,29 @@ window._cancelPreset      = () => {
   if (confirmEl) confirmEl.style.display = 'none';
 };
 
-// ── Customise panel (visibility + order) ──────────────────────────────────────
+const CW_SIZE_OPTIONS = [
+  { cols: 3,  label: '¼' },
+  { cols: 6,  label: '½' },
+  { cols: 8,  label: '⅔' },
+  { cols: 12, label: 'Full' },
+];
+
+// ── Customise panel (visibility + order + size) ────────────────────────────────
 export function openCustomise() {
   const layout = getLayout();
   const panel = $('customise-panel'); if (!panel) return;
 
   const listItems = layout.map(item => {
+    const sizeBtns = CW_SIZE_OPTIONS.map(o =>
+      `<button class="cw-size-btn${item.colSpan===o.cols?' active':''}" data-cols="${o.cols}">${o.label}</button>`
+    ).join('');
     return `<div class="cw-item" data-key="${item.id}" draggable="true">
       <i class="ti ti-grip-vertical cw-grip"></i>
       <label class="cw-label">
         <input type="checkbox" class="cw-check" data-key="${item.id}" ${item.visible?'checked':''}>
         <span>${esc(WIDGET_LABELS[item.id]||item.id)}</span>
       </label>
+      <div class="cw-size-btns">${sizeBtns}</div>
     </div>`;
   }).join('');
 
@@ -613,8 +624,10 @@ export function saveWidgetSettings() {
   items.forEach(el => {
     const id = el.dataset.key;
     const cb = el.querySelector('.cw-check');
+    const activeSize = el.querySelector('.cw-size-btn.active');
+    const colSpan = activeSize ? parseInt(activeSize.dataset.cols) : (map.get(id)?.colSpan || 12);
     const existing = map.get(id) || { id, colSpan: 12, rowSpan: 1, visible: true };
-    newLayout.push({ ...existing, visible: cb ? cb.checked : true });
+    newLayout.push({ ...existing, colSpan, visible: cb ? cb.checked : true });
   });
   layout.forEach(w => { if (!newLayout.find(x => x.id === w.id)) newLayout.push(w); });
   state.dashLayout = newLayout;
@@ -636,6 +649,12 @@ export function resetLayout() {
 
 function initCustomiseDrag() {
   const list = $('cw-list'); if (!list) return;
+  list.addEventListener('click', e => {
+    const btn = e.target.closest('.cw-size-btn');
+    if (!btn) return;
+    btn.closest('.cw-size-btns')?.querySelectorAll('.cw-size-btn')
+      .forEach(b => b.classList.toggle('active', b === btn));
+  });
   list.addEventListener('dragstart', e => {
     const item = e.target.closest('.cw-item'); if (!item) return;
     _cwDragSrc = item; item.classList.add('dragging');
