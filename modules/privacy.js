@@ -3,11 +3,13 @@ import { $, toast } from './utils.js';
 import { CONTACT_ENDPOINT } from './constants.js';
 
 export function openPrivacy() {
-  $('privacy-panel')?.classList.add('open');
+  const p = $('privacy-panel'); if (!p) return;
+  p.style.display = 'block'; void p.offsetWidth; p.style.opacity = '1';
 }
 
 export function closePrivacy() {
-  $('privacy-panel')?.classList.remove('open');
+  const p = $('privacy-panel'); if (!p) return;
+  p.style.opacity = '0'; setTimeout(() => p.style.display = 'none', 220);
 }
 
 export function initContactForm() {
