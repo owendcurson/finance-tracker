@@ -7,6 +7,7 @@ import { initAuth } from './modules/auth.js';
 import { initOfflineListeners } from './modules/offline.js';
 import { initDensity, renderSettingsScreen } from './modules/settings.js';
 import { initContactForm } from './modules/privacy.js';
+import { initSplashDemo } from './modules/demo.js';
 import { attachChartTypeListeners } from './modules/charts.js';
 import { initBackToTop } from './modules/ui.js';
 import { checkPaydayNotifications } from './modules/notifications.js';
@@ -19,6 +20,7 @@ function init() {
   initOfflineListeners();
   initAuth();           // sets up onAuthStateChanged → triggers showDashboard or showAuth
   initContactForm();
+  initSplashDemo();
   checkPaydayNotifications();
 
   // Version display

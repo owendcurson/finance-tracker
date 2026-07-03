@@ -211,7 +211,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .dash-section-hdr:hover { background: var(--bg); }
 .ds-chevron { transition: transform 0.25s ease; font-size: 1rem; color: var(--text-secondary); flex-shrink: 0; }
 .ds-chevron.rotated { transform: rotate(-180deg); }
-.dash-section-body { overflow: hidden; transition: max-height 0.3s ease, opacity 0.3s ease; max-height: 9999px; opacity: 1; }
+.dash-section-body { overflow: hidden; transition: max-height 0.3s ease, opacity 0.3s ease; max-height: 9999px; opacity: 1; margin-top: 10px; }
 .dash-section-body.collapsed { max-height: 0; opacity: 0; }
 
 /* ── Customise panel ── */
@@ -451,6 +451,16 @@ textarea { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); b
 .demo-next { background: var(--primary); color: #fff; }
 .demo-next:hover { opacity: 0.9; }
 .demo-back { background: rgba(255,255,255,0.1); color: #fff; }
+.demo-pot-row { display: flex; gap: 8px; margin-bottom: 8px; }
+.demo-cta-card { background: rgba(255,255,255,0.08); border-radius: 8px; padding: 16px; margin-top: 14px; text-align: center; }
+.demo-cta-card p { font-size: 0.88rem; opacity: 0.85; margin-bottom: 10px; }
+.demo-cta-btn { padding: 10px 20px; background: var(--green); color: #fff; border: none; border-radius: 6px; font-size: 0.9rem; font-weight: 500; font-family: inherit; cursor: pointer; }
+.demo-restart { background: none; border: none; color: rgba(255,255,255,0.5); font-size: 0.8rem; font-family: inherit; cursor: pointer; margin-top: 8px; }
+.outcome-item { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+.outcome-item i { font-size: 1.3rem; margin-top: 2px; flex-shrink: 0; }
+.outcome-item div { display: flex; flex-direction: column; gap: 2px; }
+.outcome-item strong { font-size: 0.88rem; font-weight: 600; }
+.outcome-item span { font-size: 0.8rem; }
 .demo-cta-card { background: rgba(255,255,255,0.08); border-radius: 8px; padding: 16px; margin-top: 14px; text-align: center; }
 .demo-cta-card p { font-size: 0.88rem; opacity: 0.85; margin-bottom: 10px; }
 .demo-cta-btn { padding: 10px 20px; background: var(--green); color: #fff; border: none; border-radius: 6px; font-size: 0.9rem; font-weight: 500; font-family: inherit; cursor: pointer; }

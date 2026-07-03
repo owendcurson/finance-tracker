@@ -35,6 +35,7 @@
         <li><i class="ti ti-devices"></i>Syncs across all your devices</li>
         <li><i class="ti ti-chart-bar"></i>Saves your monthly history with charts and analytics</li>
       </ul>
+      <button class="splash-demo-btn" id="demo-scroll-btn" style="margin-top:24px">Demo me</button>
     </div>
     <div class="splash-right">
       <div class="splash-card">
@@ -68,6 +69,65 @@
           <svg viewBox="0 0 21 21" width="20" height="20"><rect x="1" y="1" width="9" height="9" fill="#f25022"/><rect x="11" y="1" width="9" height="9" fill="#7fba00"/><rect x="1" y="11" width="9" height="9" fill="#00a4ef"/><rect x="11" y="11" width="9" height="9" fill="#ffb900"/></svg>
           Continue with Microsoft
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive demo section -->
+  <div class="splash-showcase" id="demo-section">
+    <div class="showcase-inner">
+      <h2>Try it yourself</h2>
+      <p class="showcase-sub">See how Finance Tracker works — no account needed.</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:40px" class="demo-layout">
+        <div class="demo-panel open" id="demo-panel" style="margin:0;background:var(--navy);color:#fff">
+          <div class="demo-banner">Demo mode — your data won't be saved</div>
+
+          <div class="demo-step active" id="demo-step-1">
+            <div class="demo-field">
+              <label>Annual gross salary</label>
+              <input class="demo-input" type="number" id="demo-salary" value="32000" placeholder="e.g. 32000">
+            </div>
+            <div class="demo-breakdown" id="demo-tax-breakdown"></div>
+            <div class="demo-nav"><button class="demo-next" id="demo-next-1">Next — add your outgoings</button></div>
+          </div>
+
+          <div class="demo-step" id="demo-step-2">
+            <div id="demo-pots-list"></div>
+            <button class="demo-back" id="demo-add-pot" style="margin-bottom:10px;font-size:0.82rem;color:rgba(255,255,255,0.7)">+ Add pot</button>
+            <div class="demo-breakdown" id="demo-pots-summary"></div>
+            <div class="demo-nav">
+              <button class="demo-back" id="demo-back-2">Back</button>
+              <button class="demo-next" id="demo-next-2">Next — see your summary</button>
+            </div>
+          </div>
+
+          <div class="demo-step" id="demo-step-3">
+            <div class="demo-breakdown" id="demo-summary"></div>
+            <div class="demo-cta-card">
+              <p>Like what you see? Create a free account to save your results and track every month.</p>
+              <button class="demo-cta-btn" id="demo-signup-btn">Create account</button><br>
+              <button class="demo-restart" id="demo-restart-btn">Start over</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="splash-trust" style="margin:0;padding:0;border:none">
+            <p style="color:var(--text);opacity:1;font-weight:500;font-size:0.95rem;margin-bottom:8px">Built specifically for UK workers</p>
+            <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:16px">Uses real HMRC PAYE rates, National Insurance thresholds, and England bank holidays. Not a generic budget app.</p>
+            <div class="trust-icons" style="margin-bottom:24px">
+              <div class="trust-icon" style="opacity:1;color:var(--text-secondary)"><i class="ti ti-building-bank" style="color:var(--primary)"></i>HMRC 2026/27 rates</div>
+              <div class="trust-icon" style="opacity:1;color:var(--text-secondary)"><i class="ti ti-calendar-check" style="color:var(--primary)"></i>Bank holiday aware</div>
+              <div class="trust-icon" style="opacity:1;color:var(--text-secondary)"><i class="ti ti-device-mobile" style="color:var(--primary)"></i>Works on any device</div>
+            </div>
+          </div>
+          <p style="font-weight:700;font-size:1rem;margin-bottom:14px;color:var(--text)">After your first month you'll know...</p>
+          <div class="outcome-item" style="color:var(--text)"><i class="ti ti-cash" style="color:var(--primary)"></i><div><strong>Exactly how much free money you have</strong><span style="color:var(--text-secondary)">Not an estimate — your precise take-home minus every outgoing, down to the penny.</span></div></div>
+          <div class="outcome-item" style="color:var(--text)"><i class="ti ti-calendar-dollar" style="color:var(--primary)"></i><div><strong>When you'll actually get paid</strong><span style="color:var(--text-secondary)">We check every month if your payday falls on a weekend or bank holiday and adjust automatically.</span></div></div>
+          <div class="outcome-item" style="color:var(--text)"><i class="ti ti-chart-line" style="color:var(--primary)"></i><div><strong>Whether your spending is creeping up</strong><span style="color:var(--text-secondary)">Monthly charts show where your money goes and whether anything is quietly growing.</span></div></div>
+          <div class="outcome-item" style="color:var(--text)"><i class="ti ti-pig-money" style="color:var(--primary)"></i><div><strong>How much you're actually saving</strong><span style="color:var(--text-secondary)">Your savings rate tracked over time — so you can see the progress you're making.</span></div></div>
+        </div>
       </div>
     </div>
   </div>
