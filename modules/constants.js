@@ -81,6 +81,12 @@ export function groupForPot(p) {
   return 'Unassigned';
 }
 
+// Default dashboard widget sizes (full = spans 2 cols, half = spans 1 col)
+export const DEFAULT_SIZES = {
+  countdown: 'full', overview: 'full', takehome: 'full', breakdown: 'half',
+  stacked: 'full', free: 'half', savings: 'half', ytd: 'full', insights: 'half', achievements: 'half',
+};
+
 // Default dashboard widget order & visibility
 export const DEFAULT_WIDGETS = {
   countdown: true, overview: true, takehome: true, breakdown: true,

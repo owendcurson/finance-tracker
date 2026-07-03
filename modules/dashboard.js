@@ -1,6 +1,6 @@
 import { state } from './state.js';
 import { $, esc, fmt, toast, emptyState } from './utils.js';
-import { MF, MS, GREETINGS, DEFAULT_WIDGETS, DEFAULT_ORDER, WIDGET_LABELS } from './constants.js';
+import { MF, MS, GREETINGS, DEFAULT_WIDGETS, DEFAULT_ORDER, DEFAULT_SIZES, WIDGET_LABELS } from './constants.js';
 import { db, doc, setDoc } from './firebase.js';
 import { getPD, getNextPD, movedReason, taxYearStart, inTaxYear, ytdMonths } from './payday.js';
 import { renderCharts, renderSavingsChart, initChartObserver, attachChartTypeListeners } from './charts.js';
@@ -20,6 +20,7 @@ export async function showDashboard() {
   const screens = document.querySelectorAll('.screen');
   screens.forEach(s => s.style.display = 'none');
   const ds = $('dashboard-screen'); if (ds) ds.style.display = 'block';
+  const hb = $('header-back'); if (hb) hb.style.display = 'none';
   setBottomNav('dashboard');
   showSkeleton();
   if (state.currentUser && !state.fsSynced) {
@@ -31,14 +32,15 @@ export async function showDashboard() {
 
 // ── Full dashboard render ─────────────────────────────────────────────────────
 export function renderDashboard() {
-  const container = document.querySelector('#dashboard-screen > .container:not(#dash-skeleton)');
+  const container = document.getElementById('dash-container');
   if (!container) return;
   const widgets = state.dashWidgets || DEFAULT_WIDGETS;
   const order   = state.dashOrder   || DEFAULT_ORDER;
+  const sizes   = state.dashSizes   || DEFAULT_SIZES;
   const now = new Date();
   const greeting = GREETINGS[now.getHours() % GREETINGS.length] || GREETINGS[0];
 
-  let html = `<div class="dash-header">
+  let html = `<div class="dash-header" style="grid-column:1/-1">
     <div>
       <div class="dash-greeting">${esc(greeting)}</div>
       <div class="dash-date">${now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
@@ -51,11 +53,11 @@ export function renderDashboard() {
 
   order.forEach(key => {
     if (!widgets[key]) return;
-    html += buildSection(key);
+    html += buildSection(key, sizes[key] || 'full');
   });
 
   // History section — always visible, non-collapsible widget
-  html += `<div class="dash-section" data-section="history" id="ds-history">
+  html += `<div class="dash-section ds-full" data-section="history" id="ds-history">
     <div class="dash-section-hdr" onclick="window._toggleDsSection('history')">
       <span>${esc('Monthly History')}</span>
       <i class="ti ti-chevron-down ds-chevron"></i>
@@ -77,7 +79,7 @@ export function renderDashboard() {
     </div>
   </div>`;
 
-  html += `<div class="dash-customise-shortcut">
+  html += `<div class="dash-customise-shortcut" style="grid-column:1/-1">
     <button class="btn btn-outline btn-sm" onclick="window._openCustomise()"><i class="ti ti-layout-dashboard"></i> Customise dashboard</button>
   </div>`;
 
@@ -101,10 +103,11 @@ export function renderDashboard() {
   initBackToTop();
 }
 
-function buildSection(key) {
+function buildSection(key, size) {
   const collapsed = state.collapsedSections[key];
   const chevCls = collapsed ? ' rotated' : '';
   const bodyCls = collapsed ? ' collapsed' : '';
+  const sizeCls = size === 'half' ? ' ds-half' : ' ds-full';
   let inner = '';
   switch (key) {
     case 'countdown': inner = `<div id="dash-countdown"></div>`; break;
@@ -119,7 +122,7 @@ function buildSection(key) {
     case 'achievements': inner = `<div id="dash-achievements"></div>`; break;
     default: return '';
   }
-  return `<div class="dash-section" data-section="${key}" id="ds-${key}">
+  return `<div class="dash-section${sizeCls}" data-section="${key}" data-size="${size||'full'}" id="ds-${key}">
     <div class="dash-section-hdr" onclick="window._toggleDsSection('${key}')">
       <span>${esc(SECTION_TITLES[key] || key)}</span>
       <i class="ti ti-chevron-down ds-chevron${chevCls}"></i>
@@ -326,22 +329,40 @@ let _dragSrc = null;
 export function openCustomise() {
   const widgets = state.dashWidgets || { ...DEFAULT_WIDGETS };
   const order   = state.dashOrder   || [...DEFAULT_ORDER];
+  const sizes   = state.dashSizes   || { ...DEFAULT_SIZES };
   const panel = $('customise-panel'); if (!panel) return;
 
-  const listItems = order.map((key, i) => {
-    const on = widgets[key] !== false;
-    return `<div class="cw-item" data-key="${key}" draggable="true">
+  const listItems = order.map(key => {
+    const on   = widgets[key] !== false;
+    const size = sizes[key] || 'full';
+    return `<div class="cw-item" data-key="${key}" data-size="${size}" draggable="true">
       <i class="ti ti-grip-vertical cw-grip"></i>
       <label class="cw-label">
         <input type="checkbox" class="cw-check" data-key="${key}" ${on?'checked':''}>
         <span>${esc(WIDGET_LABELS[key]||key)}</span>
       </label>
+      <div class="cw-size-btns">
+        <button class="cw-size-btn${size==='half'?' active':''}" data-size="half" title="Half width"><i class="ti ti-layout-sidebar"></i></button>
+        <button class="cw-size-btn${size==='full'?' active':''}" data-size="full" title="Full width"><i class="ti ti-layout-distribute-horizontal"></i></button>
+      </div>
     </div>`;
   }).join('');
 
   $('cw-list').innerHTML = listItems;
   panel.classList.add('open');
   initCustomiseDrag();
+  initSizeBtns();
+}
+
+function initSizeBtns() {
+  document.querySelectorAll('#cw-list .cw-size-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.preventDefault();
+      const item = btn.closest('.cw-item');
+      item.dataset.size = btn.dataset.size;
+      item.querySelectorAll('.cw-size-btn').forEach(b => b.classList.toggle('active', b === btn));
+    });
+  });
 }
 
 export function closeCustomise() {
@@ -353,17 +374,20 @@ export function closeCustomise() {
 export function saveWidgetSettings() {
   const items = document.querySelectorAll('#cw-list .cw-item');
   const newOrder = [...items].map(el => el.dataset.key);
-  const newWidgets = {};
+  const newWidgets = {}, newSizes = {};
   items.forEach(el => {
     const key = el.dataset.key;
     const cb  = el.querySelector('.cw-check');
     newWidgets[key] = cb ? cb.checked : true;
+    newSizes[key]   = el.dataset.size || 'full';
   });
   state.dashWidgets = newWidgets;
   state.dashOrder   = newOrder;
+  state.dashSizes   = newSizes;
+  try { localStorage.setItem('dash_sizes', JSON.stringify(newSizes)); } catch(e){}
   if (state.currentUser) {
     setDoc(doc(db,'users',state.currentUser.uid,'settings','dashboard'),
-      { widgets: newWidgets, order: newOrder }, { merge: true }).catch(()=>{});
+      { widgets: newWidgets, order: newOrder, sizes: newSizes }, { merge: true }).catch(()=>{});
   }
   renderDashboard();
   toast('Dashboard updated');

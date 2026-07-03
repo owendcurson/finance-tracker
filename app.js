@@ -62,6 +62,7 @@ function init() {
 function showSettingsScreen() {
   document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
   const ss = document.getElementById('settings-screen'); if (ss) ss.style.display = 'block';
+  const hb = document.getElementById('header-back'); if (hb) hb.style.display = 'flex';
   import('./modules/ui.js').then(m => m.setBottomNav('settings'));
   renderSettingsScreen();
 }

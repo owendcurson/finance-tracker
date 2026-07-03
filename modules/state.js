@@ -36,9 +36,10 @@ export const state = {
     free:      localStorage.getItem('chart_pref_free')      || 'line',
     savings:   localStorage.getItem('chart_pref_savings')   || 'line',
   },
-  // Dashboard widget visibility / order (Part 5)
+  // Dashboard widget visibility / order / sizes (Part 5)
   dashWidgets: null,
   dashOrder: null,
+  dashSizes: JSON.parse(localStorage.getItem('dash_sizes') || 'null'),
   // Collapsed sections (Part 7)
   collapsedSections: JSON.parse(localStorage.getItem('section_collapsed') || '{}'),
 };

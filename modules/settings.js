@@ -100,6 +100,17 @@ export function renderSettingsScreen() {
   initPDS();
   initDensity();
   loadEmailPrefs();
+  initSalCalc();
+}
+
+function initSalCalc() {
+  const cur = $('salcalc-current'), prop = $('salcalc-proposed');
+  if (!cur || !prop) return;
+  const calc = () => {
+    import('./tracker.js').then(m => m.renderSalCalc());
+  };
+  cur.oninput = calc;
+  prop.oninput = calc;
 }
 
 // ── Load all settings from Firestore ─────────────────────────────────────────
@@ -127,6 +138,7 @@ export async function loadSettingsFS() {
       const d = dashSnap.data();
       if (d.widgets) state.dashWidgets = d.widgets;
       if (d.order)   state.dashOrder   = d.order;
+      if (d.sizes)   { state.dashSizes = d.sizes; try { localStorage.setItem('dash_sizes', JSON.stringify(d.sizes)); } catch(e){} }
     }
   } catch(e) {}
 }
