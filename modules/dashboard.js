@@ -155,7 +155,7 @@ function buildSection(item, isEdit) {
   const resizeH = isEdit ? `<button class="ds-resize-handle" data-key="${id}" onclick="event.stopPropagation();window._openResizePopover('${id}',this)" title="Resize widget"><i class="ti ti-arrows-maximize"></i></button>` : '';
 
   return `<div class="dash-section${editCls}" data-section="${id}" id="ds-${id}"
-      style="--col:${colSpan};--row:${rowSpan}"${isEdit?' draggable="true"':''}>
+      style="grid-column:span ${colSpan};grid-row:span ${rowSpan}"${isEdit?' draggable="true"':''}>
     <div class="dash-section-hdr" onclick="window._toggleDsSection('${id}')">
       <div class="dsh-left">${dragH}<span>${esc(SECTION_TITLES[id]||id)}</span></div>
       <i class="ti ti-chevron-down ds-chevron${chevCls}"></i>
@@ -168,7 +168,7 @@ function buildSection(item, isEdit) {
 function buildHistorySection(isEdit) {
   const editCls = isEdit ? ' dash-edit-widget' : '';
   return `<div class="dash-section${editCls}" data-section="history" id="ds-history"
-      style="--col:12;--row:2">
+      style="grid-column:span 12;grid-row:span 2">
     <div class="dash-section-hdr" onclick="window._toggleDsSection('history')">
       <div class="dsh-left"><span>Monthly History</span></div>
       <i class="ti ti-chevron-down ds-chevron"></i>
@@ -515,8 +515,8 @@ function setWidgetSize(id, colSpan, rowSpan) {
   state.dashLayout = layout;
   const el = $('ds-' + id);
   if (el) {
-    el.style.setProperty('--col', item.colSpan);
-    el.style.setProperty('--row', item.rowSpan);
+    el.style.gridColumn = `span ${item.colSpan}`;
+    el.style.gridRow    = `span ${item.rowSpan}`;
   }
   saveLayout();
   resizeCharts();

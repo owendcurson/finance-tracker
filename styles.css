@@ -130,8 +130,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   align-items: start;
 }
 .dash-section {
-  grid-column: span var(--col, 12);
-  grid-row: span var(--row, 1);
   position: relative;
   min-width: 0;
 }
