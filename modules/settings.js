@@ -1,6 +1,6 @@
 import { state } from './state.js';
 import { $, toast } from './utils.js';
-import { APP_VERSION, EMAILJS_SERVICE, EMAILJS_TEMPLATE, EMAILJS_KEY } from './constants.js';
+import { APP_VERSION, EMAILJS_SERVICE, EMAILJS_TEMPLATE, EMAILJS_KEY, DEFAULT_LAYOUT, DEFAULT_WIDGETS, DEFAULT_ORDER, DEFAULT_SIZES } from './constants.js';
 import { db, doc, getDoc, setDoc } from './firebase.js';
 import { initBH } from './payday.js';
 
@@ -117,9 +117,10 @@ function initSalCalc() {
 export async function loadSettingsFS() {
   if (!state.currentUser) return;
   try {
-    const [pdSnap, densSnap, dashSnap] = await Promise.all([
+    const [pdSnap, densSnap, layoutSnap, oldDashSnap] = await Promise.all([
       getDoc(doc(db,'users',state.currentUser.uid,'settings','payDay')),
       getDoc(doc(db,'users',state.currentUser.uid,'settings','density')),
+      getDoc(doc(db,'users',state.currentUser.uid,'settings','dashboardLayout')),
       getDoc(doc(db,'users',state.currentUser.uid,'settings','dashboard')),
     ]);
     if (pdSnap.exists()) {
@@ -134,11 +135,32 @@ export async function loadSettingsFS() {
       localStorage.setItem('dash_density', d);
       applyDensity(d);
     }
-    if (dashSnap.exists()) {
-      const d = dashSnap.data();
-      if (d.widgets) state.dashWidgets = d.widgets;
-      if (d.order)   state.dashOrder   = d.order;
-      if (d.sizes)   { state.dashSizes = d.sizes; try { localStorage.setItem('dash_sizes', JSON.stringify(d.sizes)); } catch(e){} }
+    if (layoutSnap.exists()) {
+      const d = layoutSnap.data();
+      if (d.widgets && Array.isArray(d.widgets)) {
+        state.dashLayout = d.widgets;
+        try { localStorage.setItem('dashboard_layout', JSON.stringify(d.widgets)); } catch(e) {}
+      }
+    } else if (oldDashSnap.exists()) {
+      // Migrate from old format to new grid layout
+      const d = oldDashSnap.data();
+      const oldWidgets = d.widgets || DEFAULT_WIDGETS;
+      const oldOrder   = d.order   || DEFAULT_ORDER;
+      const oldSizes   = d.sizes   || DEFAULT_SIZES;
+      const migrated = DEFAULT_LAYOUT
+        .map(item => ({
+          ...item,
+          visible: oldWidgets[item.id] !== false,
+          colSpan: oldSizes[item.id] === 'half' ? 6 : 12,
+        }))
+        .sort((a, b) => {
+          const ai = oldOrder.indexOf(a.id), bi = oldOrder.indexOf(b.id);
+          return (ai < 0 ? 999 : ai) - (bi < 0 ? 999 : bi);
+        });
+      state.dashLayout = migrated;
+      try { localStorage.setItem('dashboard_layout', JSON.stringify(migrated)); } catch(e) {}
+      setDoc(doc(db,'users',state.currentUser.uid,'settings','dashboardLayout'),
+        { version: 1, widgets: migrated }, { merge: false }).catch(() => {});
     }
   } catch(e) {}
 }

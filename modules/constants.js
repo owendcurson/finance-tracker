@@ -1,6 +1,6 @@
 // Application-wide constants — no imports, no side effects
 
-export const APP_VERSION = '2.0.0';
+export const APP_VERSION = '2.1.0';
 
 // Contact / email
 export const CONTACT_ENDPOINT = 'https://formspree.io/f/maqgplzl';
@@ -81,13 +81,11 @@ export function groupForPot(p) {
   return 'Unassigned';
 }
 
-// Default dashboard widget sizes (full = spans 2 cols, half = spans 1 col)
+// Legacy (kept for Firestore migration path)
 export const DEFAULT_SIZES = {
   countdown: 'full', overview: 'full', takehome: 'full', breakdown: 'half',
   stacked: 'full', free: 'half', savings: 'half', ytd: 'full', insights: 'half', achievements: 'half',
 };
-
-// Default dashboard widget order & visibility
 export const DEFAULT_WIDGETS = {
   countdown: true, overview: true, takehome: true, breakdown: true,
   stacked: true, free: true, savings: true, ytd: true, insights: true, achievements: true,
@@ -95,8 +93,76 @@ export const DEFAULT_WIDGETS = {
 export const DEFAULT_ORDER = [
   'countdown','overview','takehome','breakdown','stacked','free','savings','ytd','insights','achievements',
 ];
+
 export const WIDGET_LABELS = {
   countdown: 'Payday countdown', overview: 'Overview cards', takehome: 'Monthly take-home chart',
   breakdown: 'Spending breakdown', stacked: 'Spending over time', free: 'Free money trend',
   savings: 'Savings rate tracker', ytd: 'Year-to-date summary', insights: 'Insights', achievements: 'Achievements',
+};
+
+// 12-column grid layout
+export const DEFAULT_LAYOUT = [
+  { id: 'countdown',    visible: true, colSpan: 12, rowSpan: 1 },
+  { id: 'overview',     visible: true, colSpan: 12, rowSpan: 1 },
+  { id: 'takehome',     visible: true, colSpan: 6,  rowSpan: 2 },
+  { id: 'breakdown',    visible: true, colSpan: 6,  rowSpan: 2 },
+  { id: 'free',         visible: true, colSpan: 6,  rowSpan: 2 },
+  { id: 'savings',      visible: true, colSpan: 6,  rowSpan: 2 },
+  { id: 'stacked',      visible: true, colSpan: 12, rowSpan: 2 },
+  { id: 'insights',     visible: true, colSpan: 4,  rowSpan: 3 },
+  { id: 'achievements', visible: true, colSpan: 8,  rowSpan: 3 },
+  { id: 'ytd',          visible: true, colSpan: 12, rowSpan: 2 },
+];
+
+export const WIDGET_MIN = {
+  countdown:    { minCols: 6,  minRows: 1 },
+  overview:     { minCols: 6,  minRows: 1 },
+  takehome:     { minCols: 4,  minRows: 2 },
+  breakdown:    { minCols: 3,  minRows: 2 },
+  free:         { minCols: 3,  minRows: 2 },
+  savings:      { minCols: 3,  minRows: 2 },
+  stacked:      { minCols: 6,  minRows: 2 },
+  insights:     { minCols: 4,  minRows: 2 },
+  achievements: { minCols: 4,  minRows: 2 },
+  ytd:          { minCols: 6,  minRows: 1 },
+};
+
+export const LAYOUT_PRESETS = {
+  default: {
+    label: 'Default',
+    description: 'Balanced layout with all widgets visible',
+    widgets: null,
+  },
+  focus: {
+    label: 'Focus',
+    description: 'Only the essentials — minimal and clean',
+    widgets: [
+      { id: 'countdown',    visible: true,  colSpan: 12, rowSpan: 1 },
+      { id: 'overview',     visible: true,  colSpan: 12, rowSpan: 1 },
+      { id: 'free',         visible: true,  colSpan: 12, rowSpan: 2 },
+      { id: 'takehome',     visible: false, colSpan: 12, rowSpan: 2 },
+      { id: 'breakdown',    visible: false, colSpan: 6,  rowSpan: 2 },
+      { id: 'savings',      visible: false, colSpan: 6,  rowSpan: 2 },
+      { id: 'stacked',      visible: false, colSpan: 12, rowSpan: 2 },
+      { id: 'insights',     visible: false, colSpan: 4,  rowSpan: 3 },
+      { id: 'achievements', visible: false, colSpan: 8,  rowSpan: 3 },
+      { id: 'ytd',          visible: false, colSpan: 12, rowSpan: 2 },
+    ],
+  },
+  analytics: {
+    label: 'Analytics',
+    description: 'All charts maximised, data-focused view',
+    widgets: [
+      { id: 'countdown',    visible: true,  colSpan: 12, rowSpan: 1 },
+      { id: 'ytd',          visible: true,  colSpan: 12, rowSpan: 2 },
+      { id: 'takehome',     visible: true,  colSpan: 12, rowSpan: 3 },
+      { id: 'stacked',      visible: true,  colSpan: 12, rowSpan: 3 },
+      { id: 'breakdown',    visible: true,  colSpan: 6,  rowSpan: 3 },
+      { id: 'free',         visible: true,  colSpan: 6,  rowSpan: 3 },
+      { id: 'savings',      visible: true,  colSpan: 12, rowSpan: 3 },
+      { id: 'overview',     visible: false, colSpan: 12, rowSpan: 1 },
+      { id: 'insights',     visible: false, colSpan: 4,  rowSpan: 3 },
+      { id: 'achievements', visible: false, colSpan: 8,  rowSpan: 3 },
+    ],
+  },
 };
