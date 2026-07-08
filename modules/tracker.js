@@ -19,8 +19,9 @@ export function showTracker() {
   const ds2 = $('dashboard-screen'), ts = $('tracker-screen');
   if (ds2) ds2.style.display = 'none';
   if (ts) { ts.style.display = 'block'; screenEnter(ts); }
-  $('header-back').style.display = 'flex';
-  $('template-banner').style.display = 'none';
+  const hb = $('header-back'); if (hb) hb.style.display = 'flex';
+  const tb = $('template-banner'); if (tb) tb.style.display = 'none';
+  initMP();
   goStep(state.currentStep || 1);
 }
 
@@ -33,14 +34,14 @@ export function goStep(n) {
   state.currentStep = n;
   const dir = n > prev ? 'left' : 'right';
   for (let i=1;i<=3;i++) {
-    const p=$('step-'+i);if(!p)continue;
+    const p=$('panel'+i);if(!p)continue;
     p.classList.remove('active','step-slide-left','step-slide-right');
     if(i===n){p.classList.add('active');void p.offsetWidth;p.classList.add(dir==='left'?'step-slide-left':'step-slide-right');}
   }
   for (let i=1;i<=3;i++) {
-    const c=$('step-circle-'+i);if(!c)continue;
+    const c=$('sc'+i);if(!c)continue;
     c.classList.toggle('active',i===n);c.classList.toggle('done',i<n);
-    const ln=$('step-line-'+i);if(ln)ln.classList.toggle('done',i<n);
+    const ln=$('sl'+i);if(ln)ln.classList.toggle('done',i<n);
   }
   if (n===3) renderPots();
 }
@@ -189,14 +190,18 @@ export function loadTemplate(id) {
 
 export function editEntry(id) {
   const h=state.financeHistory.find(e=>e.id===id);if(!h)return;
-  state.editingId=id;$('salary').value=h.salary;
+  state.editingId=id;
+  $('detail-modal').classList.remove('open');
+  showTracker(); // runs initMP() first, then we override with historical values below
+  state.currentStep=1; goStep(1);
+  $('salary').value=h.salary;
+  $('pick-month').value=h.month;$('pick-year').value=h.year;updPD();
   state.pots=h.pots.map(p=>({name:p.name||'',amount:p.amount||'',account:p.account||'',target:p.target||''}));
   renderPots();
   if(h.togExpenses&&h.workExpenses>0){$('tog-expenses').checked=true;toggleSection('expenses');$('work-expenses').value=h.workExpenses;}else{$('tog-expenses').checked=false;$('sec-expenses').classList.remove('open');$('work-expenses').value='';}
   if(h.togMileage&&h.miles>0){$('tog-mileage').checked=true;toggleSection('mileage');$('miles').value=h.miles;}else{$('tog-mileage').checked=false;$('sec-mileage').classList.remove('open');$('miles').value='';}
   if(h.togOvertime&&h.overtime>0){$('tog-overtime').checked=true;toggleSection('overtime');$('overtime').value=h.overtime;}else{$('tog-overtime').checked=false;$('sec-overtime').classList.remove('open');$('overtime').value='';}
-  $('pick-month').value=h.month;$('pick-year').value=h.year;updPD();
-  $('detail-modal').classList.remove('open');showTracker();calc();
+  calc();
   const b=$('template-banner');b.textContent=`Editing ${MF[h.month]} ${h.year} — make your changes then save`;b.style.display='block';
 }
 
@@ -262,7 +267,13 @@ export async function exportMonthPDF(id) {
 
 // window globals
 window._showTrackerNew = () => { state.editingId=null; clearTracker(); showTracker(); };
-window._xlMonth = exportMonthExcel;
-window._pdfMonth = exportMonthPDF;
-window._xlYTD = exportYTDExcel;
-window._showTracker = showTracker;
+window._xlMonth       = exportMonthExcel;
+window._pdfMonth      = exportMonthPDF;
+window._xlYTD         = exportYTDExcel;
+window._showTracker   = showTracker;
+window._goStep        = goStep;
+window._updPD         = updPD;
+window._shiftM        = shiftM;
+window._togSection    = (n) => toggleSection(n);
+window._addPot        = () => { addPotToState(); renderPots(); calc(); };
+window._initMP        = initMP;
