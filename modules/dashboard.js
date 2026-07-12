@@ -191,6 +191,28 @@ function buildHistorySection(isEdit) {
   </div>`;
 }
 
+// ── Count-up animation for overview values ───────────────────────────────────
+function _animateOverviewValues(container) {
+  container.querySelectorAll('.overview-card .ov-value').forEach(el => {
+    const raw = el.textContent.trim();
+    const isNeg = raw.startsWith('−');
+    const num = parseFloat(raw.replace(/[^0-9.]/g, ''));
+    if (isNaN(num) || num === 0) return;
+    const dur = 800, t0 = performance.now();
+    const savedClass = el.className;
+    const update = (now) => {
+      const p = Math.min((now - t0) / dur, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      const v = num * ease;
+      el.className = savedClass;
+      el.textContent = (isNeg ? '−' : '') + '£' + v.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      if (p < 1) requestAnimationFrame(update);
+      else el.textContent = raw;
+    };
+    requestAnimationFrame(update);
+  });
+}
+
 // ── Overview ──────────────────────────────────────────────────────────────────
 export function renderOverview() {
   const el = $('dash-overview'); if (!el) return;
@@ -203,17 +225,20 @@ export function renderOverview() {
   const freeFmt = (latest.freeMoney < 0 ? '−' : '') + fmt(Math.abs(latest.freeMoney || 0));
   const sorted = state.financeHistory.slice().reverse();
   const avgFree = sorted.length >= 2 ? sorted.reduce((s,h)=>s+(h.freeMoney||0),0)/sorted.length : null;
+  const freeNeg = (latest.freeMoney||0) < 0;
   el.innerHTML = `<div class="overview-grid">
     <div class="overview-card">
       <div class="ov-glow"></div>
       <i class="ti ti-wallet ov-ico"></i>
+      <i class="ti ti-wallet ov-bg-ico"></i>
       <div class="ov-label">LATEST TAKE-HOME</div>
       <div class="ov-value">${fmt(latest.takeHome||0)}</div>
       <div class="ov-sub">${esc(MF[latest.month]+' '+latest.year)}</div>
     </div>
-    <div class="overview-card">
+    <div class="overview-card${freeNeg?' ov-negative':''}">
       <div class="ov-glow"></div>
       <i class="ti ti-pig-money ov-ico"></i>
+      <i class="ti ti-pig-money ov-bg-ico"></i>
       <div class="ov-label">FREE MONEY</div>
       <div class="ov-value ${freeClass}">${freeFmt}</div>
       <div class="ov-sub">${(latest.freeMoney||0)>=0?'Under budget':'Over budget'}</div>
@@ -221,6 +246,7 @@ export function renderOverview() {
     <div class="overview-card">
       <div class="ov-glow"></div>
       <i class="ti ti-credit-card ov-ico"></i>
+      <i class="ti ti-credit-card ov-bg-ico"></i>
       <div class="ov-label">OUTGOINGS</div>
       <div class="ov-value">${fmt(latest.outgoings||0)}</div>
       <div class="ov-sub">This month</div>
@@ -228,6 +254,7 @@ export function renderOverview() {
     ${avgFree !== null ? `<div class="overview-card">
       <div class="ov-glow"></div>
       <i class="ti ti-trending-up ov-ico"></i>
+      <i class="ti ti-trending-up ov-bg-ico"></i>
       <div class="ov-label">AVG FREE MONEY</div>
       <div class="ov-value ${avgFree>=0?'positive':'negative'}">${(avgFree<0?'−':'')+fmt(Math.abs(avgFree))}</div>
       <div class="ov-sub">All time avg</div>
@@ -235,11 +262,13 @@ export function renderOverview() {
     ${(latest.mileage||0)>0?`<div class="overview-card">
       <div class="ov-glow"></div>
       <i class="ti ti-car ov-ico"></i>
+      <i class="ti ti-car ov-bg-ico"></i>
       <div class="ov-label">MILEAGE THIS MONTH</div>
       <div class="ov-value">${fmt(latest.mileage)}</div>
       <div class="ov-sub">${latest.miles||0} miles @ 55p</div>
     </div>`:''}
   </div>`;
+  _animateOverviewValues(el);
 }
 
 // ── Countdown ─────────────────────────────────────────────────────────────────

@@ -9,7 +9,7 @@ export function initPDS() {
   const sel = $('pay-day-select'); if (!sel) return;
   for (let i = 1; i <= 28; i++) {
     const opt = document.createElement('option');
-    opt.value = i; opt.textContent = i + (i===1?'st':i===2?'nd':i===3?'rd':'th');
+    opt.value = i; opt.textContent = i + (i===1||i===21?'st':i===2||i===22?'nd':i===3||i===23?'rd':'th');
     if (i === state.payDay) opt.selected = true;
     sel.appendChild(opt);
   }

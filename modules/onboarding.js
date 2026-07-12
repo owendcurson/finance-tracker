@@ -11,8 +11,21 @@ export function initOnboarding() {
   if (!state.isNewUser) return;
   state.isNewUser = false;
   obStep = 1;
+  _populateObPayday();
   showObStep(1);
   $('onboarding-modal')?.classList.add('open');
+}
+
+function _populateObPayday() {
+  const sel = $('ob-payday'); if (!sel || sel.options.length > 1) return;
+  sel.innerHTML = '';
+  for (let i = 1; i <= 28; i++) {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = i + (i===1||i===21?'st':i===2||i===22?'nd':i===3||i===23?'rd':'th');
+    if (i === (state.payDay || 23)) opt.selected = true;
+    sel.appendChild(opt);
+  }
 }
 
 export function closeOnboarding() {

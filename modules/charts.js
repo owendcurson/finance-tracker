@@ -128,14 +128,27 @@ export function renderCharts() {
 }
 
 function axisOpts(tc, gc, prefix, showLegend, zeroLine) {
+  const dark = document.documentElement.dataset.theme === 'dark';
   return {
     responsive:true,
-    plugins:{ legend:{display:!!showLegend}, tooltip:{callbacks:{label:c=>'£'+c.raw.toLocaleString('en-GB',{minimumFractionDigits:2})}} },
+    plugins:{
+      legend:{display:!!showLegend},
+      tooltip:{
+        backgroundColor: dark ? 'rgba(8,11,20,0.92)' : 'rgba(255,255,255,0.96)',
+        borderColor: dark ? 'rgba(255,255,255,0.1)' : 'rgba(99,102,241,0.15)',
+        borderWidth: 1,
+        titleColor: dark ? '#e2e8f0' : '#1a1a2e',
+        bodyColor: dark ? '#94a3b8' : '#64748b',
+        padding: 10,
+        cornerRadius: 10,
+        callbacks:{label:c=>'£'+c.raw.toLocaleString('en-GB',{minimumFractionDigits:2})}
+      }
+    },
     scales:{
-      y:{ beginAtZero:!zeroLine, ticks:{color:tc,callback:v=>prefix+v.toLocaleString()},
+      y:{ beginAtZero:!zeroLine, ticks:{color:tc,callback:v=>prefix+v.toLocaleString(),font:{size:11}},
           grid:{ color: zeroLine ? c => c.tick.value===0?chartZeroColor():gc : gc,
                  lineWidth: zeroLine ? c => c.tick.value===0?2:1 : 1 }},
-      x:{ grid:{display:false}, ticks:{color:tc} }
+      x:{ grid:{display:false}, ticks:{color:tc,font:{size:11}} }
     },
   };
 }

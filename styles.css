@@ -1307,3 +1307,425 @@ textarea.contact-input { resize: vertical; min-height: 100px; }
 [data-theme="dark"] .ov-value.positive { color: #34d399; }
 [data-theme="dark"] .ov-value.negative { color: #f87171; }
 [data-theme="dark"] .ov-sub   { color: rgba(148,163,184,0.62); }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   v30 — COMPLETE VISUAL REDESIGN
+   Premium dark-first finance app · Inter · glassmorphism · mesh gradient
+   Inspired by 21st.dev · Linear · Vercel · Monzo
+   All changes are CSS only — no functionality affected
+═══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. TYPOGRAPHY — Inter ── */
+body, button, input, select, textarea {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+h1, h2, h3, .ov-value, .stat-value, .metric-value, .ytd-value,
+.paydate-days, .countdown-num {
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.ov-label, .stat-label, .section-title, .dash-section-hdr h2 {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+/* ── 2. BACKGROUND — mesh gradient ── */
+:root {
+  --bg-dark: #080B14;
+  --card-glass-dark: rgba(255,255,255,0.04);
+  --border-glass-dark: rgba(255,255,255,0.08);
+  --card-glass-light: rgba(255,255,255,0.72);
+  --border-glass-light: rgba(99,102,241,0.12);
+}
+
+[data-theme="dark"] body {
+  background-color: #080B14;
+  background-image:
+    radial-gradient(ellipse 80% 60% at 18% 0%,   rgba(99,102,241,0.16) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 82% 100%,  rgba(59,130,246,0.13) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 35% at 62% 42%,   rgba(16,185,129,0.06) 0%, transparent 55%);
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+body {
+  background-color: #F8FAFF;
+  background-image: radial-gradient(ellipse 80% 60% at 18% 0%, rgba(99,102,241,0.07) 0%, transparent 55%);
+  background-attachment: fixed;
+}
+
+/* ── 3. HEADER — glass dock ── */
+.app-header {
+  height: 56px;
+  background: rgba(248,250,255,0.88) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border-bottom: 1px solid rgba(99,102,241,0.1) !important;
+}
+[data-theme="dark"] .app-header {
+  background: rgba(8,11,20,0.85) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+}
+.app-logo { font-weight: 600; }
+.app-logo span { color: #6366f1; font-weight: 300; }
+
+/* ── 4. GLASSMORPHISM CARDS ── */
+.card, .chart-card, .chart-card-full, .paydate-card,
+.cw-item, .privacy-section, .payday-modal, .presets-modal {
+  background: var(--card-glass-light);
+  border: 1px solid var(--border-glass-light);
+  box-shadow: 0 4px 24px rgba(99,102,241,0.07), 0 1px 2px rgba(0,0,0,0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+[data-theme="dark"] .card,
+[data-theme="dark"] .chart-card,
+[data-theme="dark"] .chart-card-full {
+  background: var(--card-glass-dark) !important;
+  border: 1px solid var(--border-glass-dark) !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06) !important;
+}
+[data-theme="dark"] .card:hover,
+[data-theme="dark"] .chart-card:hover {
+  border-color: rgba(255,255,255,0.14) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08) !important;
+}
+
+/* ── 5. OVERVIEW CARDS v30 — gradient + left border + bg icon ── */
+/* Override v29 per-card colours to match new spec */
+.overview-card:nth-child(1) { --cr: 99,102,241;  }  /* indigo  — take-home */
+.overview-card:nth-child(2) { --cr: 16,185,129;  }  /* emerald — free money */
+.overview-card.ov-negative  { --cr: 239,68,68;   }  /* red     — negative free money */
+.overview-card:nth-child(3) { --cr: 249,115,22;  }  /* orange  — outgoings */
+.overview-card:nth-child(4) { --cr: 14,165,233;  }  /* sky     — avg free */
+.overview-card:nth-child(5) { --cr: 234,179,8;   }  /* amber   — mileage */
+
+/* Light mode gradient */
+.overview-card {
+  background: linear-gradient(135deg, rgba(var(--cr),0.12) 0%, rgba(var(--cr),0.04) 100%) !important;
+  border: 1px solid rgba(var(--cr),0.2) !important;
+  border-left: 3px solid rgb(var(--cr)) !important;
+  box-shadow: 0 4px 20px rgba(var(--cr),0.12), 0 1px 4px rgba(0,0,0,0.04) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-radius: 16px;
+}
+[data-theme="dark"] .overview-card {
+  background: linear-gradient(135deg, rgba(var(--cr),0.16) 0%, rgba(var(--cr),0.04) 100%) !important;
+  border: 1px solid rgba(var(--cr),0.28) !important;
+  border-left: 3px solid rgb(var(--cr)) !important;
+  box-shadow: 0 4px 24px rgba(var(--cr),0.18), 0 1px 4px rgba(0,0,0,0.4) !important;
+}
+[data-theme="dark"] .overview-card:hover {
+  border-color: rgba(var(--cr),0.45) !important;
+  border-left-color: rgb(var(--cr)) !important;
+  box-shadow: 0 10px 36px rgba(var(--cr),0.28), 0 2px 8px rgba(0,0,0,0.5) !important;
+}
+
+/* Large decorative bg icon */
+.ov-bg-ico {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  font-size: 48px;
+  line-height: 1;
+  color: rgb(var(--cr));
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 0;
+}
+[data-theme="dark"] .ov-bg-ico { opacity: 0.1; }
+
+/* Value size per spec */
+.ov-value {
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.1 !important;
+  margin-bottom: 4px !important;
+}
+[data-theme="dark"] .ov-value { color: #fff !important; }
+[data-theme="dark"] .ov-value.positive { color: #34d399 !important; }
+[data-theme="dark"] .ov-value.negative { color: #f87171 !important; }
+
+/* ── 6. PAYDAY COUNTDOWN — hero banner ── */
+.paydate-card {
+  background: linear-gradient(135deg, rgba(99,102,241,0.18), rgba(59,130,246,0.1)) !important;
+  border: 1px solid rgba(99,102,241,0.3) !important;
+  border-left: none !important;
+  box-shadow: 0 4px 32px rgba(99,102,241,0.15) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+[data-theme="dark"] .paydate-card {
+  background: linear-gradient(135deg, rgba(99,102,241,0.22), rgba(59,130,246,0.12)) !important;
+  border-color: rgba(99,102,241,0.35) !important;
+  box-shadow: 0 8px 40px rgba(99,102,241,0.2), inset 0 1px 0 rgba(255,255,255,0.06) !important;
+}
+.paydate-days {
+  font-size: 72px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  color: #fff;
+  text-shadow: 0 0 40px rgba(99,102,241,0.5);
+}
+[data-theme="dark"] .paydate-days { color: #fff; text-shadow: 0 0 50px rgba(99,102,241,0.6); }
+body:not([data-theme="dark"]) .paydate-days { color: #3730a3; text-shadow: none; }
+.paydate-label { font-size: 13px; font-weight: 500; letter-spacing: 0.04em; opacity: 0.65; }
+.paydate-date { font-size: 16px; font-weight: 600; }
+[data-theme="dark"] .paydate-date { color: #a5b4fc !important; }
+body:not([data-theme="dark"]) .paydate-date { color: #4f46e5 !important; }
+.progress-track {
+  background: rgba(255,255,255,0.1) !important;
+  height: 6px !important;
+  border-radius: 3px !important;
+  overflow: hidden;
+}
+.progress-fill {
+  background: linear-gradient(90deg, #6366f1, #60a5fa) !important;
+  height: 6px !important;
+  border-radius: 3px !important;
+  transition: width 0.6s ease-out !important;
+}
+.progress-fill.warning { background: linear-gradient(90deg, #f59e0b, #fb923c) !important; }
+.progress-fill.danger  { background: linear-gradient(90deg, #ef4444, #f97316) !important; }
+.progress-fill.ok      { background: linear-gradient(90deg, #10b981, #34d399) !important; }
+
+/* ── 7. SECTION HEADERS — left accent ── */
+.dash-section-hdr {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+.dash-section-hdr h2 {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.07em !important;
+  color: var(--text-secondary) !important;
+  border-left: 2px solid #6366f1;
+  padding-left: 10px;
+}
+[data-theme="dark"] .dash-section-hdr { background: transparent !important; }
+[data-theme="dark"] .dash-section-hdr h2 { color: rgba(148,163,184,0.75) !important; }
+
+/* ── 8. BUTTONS ── */
+/* Primary */
+.btn-primary, .btn.btn-primary, .splash-submit, input[type="submit"] {
+  background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(99,102,241,0.4) !important;
+  border-radius: 10px !important;
+  font-weight: 500 !important;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.18s ease !important;
+}
+.btn-primary:hover, .btn.btn-primary:hover, .splash-submit:hover {
+  background: linear-gradient(135deg, #818cf8, #6366f1) !important;
+  box-shadow: 0 6px 20px rgba(99,102,241,0.55) !important;
+  transform: translateY(-1px);
+}
+.btn-primary:active, .btn.btn-primary:active {
+  transform: scale(0.97) !important;
+}
+
+/* Secondary / outline */
+.btn-outline, .btn-secondary {
+  background: rgba(255,255,255,0.06) !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  border-radius: 10px !important;
+  font-weight: 500 !important;
+  transition: all 0.18s ease !important;
+}
+body:not([data-theme="dark"]) .btn-outline,
+body:not([data-theme="dark"]) .btn-secondary {
+  background: rgba(0,0,0,0.03) !important;
+  border-color: rgba(0,0,0,0.1) !important;
+  color: var(--text) !important;
+}
+.btn-outline:hover, .btn-secondary:hover {
+  border-color: rgba(99,102,241,0.5) !important;
+  color: #6366f1 !important;
+  background: rgba(99,102,241,0.06) !important;
+}
+[data-theme="dark"] .btn-outline:hover,
+[data-theme="dark"] .btn-secondary:hover {
+  background: rgba(99,102,241,0.1) !important;
+  border-color: rgba(99,102,241,0.45) !important;
+  color: #818cf8 !important;
+}
+
+/* Danger */
+.btn-danger {
+  background: rgba(239,68,68,0.1) !important;
+  border: 1px solid rgba(239,68,68,0.3) !important;
+  color: #f87171 !important;
+  border-radius: 10px !important;
+}
+.btn-danger:hover {
+  background: rgba(239,68,68,0.2) !important;
+  border-color: rgba(239,68,68,0.5) !important;
+}
+
+/* All buttons — active press */
+button:active:not(:disabled) { transform: scale(0.97); }
+
+/* ── 9. INPUTS & SELECTS ── */
+input[type="text"], input[type="number"], input[type="email"],
+input[type="password"], select, textarea {
+  border-radius: 10px !important;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease !important;
+}
+input[type="text"]:focus, input[type="number"]:focus, input[type="email"]:focus,
+input[type="password"]:focus, select:focus, textarea:focus {
+  border-color: rgba(99,102,241,0.65) !important;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15) !important;
+  outline: none !important;
+}
+[data-theme="dark"] input[type="text"],
+[data-theme="dark"] input[type="number"],
+[data-theme="dark"] input[type="email"],
+[data-theme="dark"] input[type="password"],
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background: rgba(255,255,255,0.05) !important;
+  border-color: rgba(255,255,255,0.1) !important;
+  color: #e2e8f0 !important;
+}
+[data-theme="dark"] input::placeholder { color: rgba(255,255,255,0.28) !important; }
+
+/* ── 10. BOTTOM NAV ── */
+#bottom-nav {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+body:not([data-theme="dark"]) #bottom-nav {
+  background: rgba(248,250,255,0.9) !important;
+  border-top: 1px solid rgba(99,102,241,0.1) !important;
+}
+[data-theme="dark"] #bottom-nav {
+  background: rgba(8,11,20,0.88) !important;
+  border-top: 1px solid rgba(255,255,255,0.07) !important;
+}
+.bnav-btn { color: rgba(148,163,184,0.6); font-size: 10px; }
+.bnav-btn.active { color: #6366f1 !important; }
+.bnav-btn.active i { color: #6366f1 !important; }
+.bnav-btn i { font-size: 22px; }
+.bnav-btn.active::before {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #6366f1, #818cf8);
+  margin: 0 auto 4px;
+}
+
+/* ── 11. SKELETON SHIMMER — indigo tinted ── */
+@keyframes skeletonShimmerV30 {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg,
+    rgba(99,102,241,0.06) 25%,
+    rgba(99,102,241,0.12) 37%,
+    rgba(99,102,241,0.06) 63%) !important;
+  background-size: 800px 100% !important;
+  animation: skeletonShimmerV30 1.4s ease infinite !important;
+}
+[data-theme="dark"] .skeleton {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.04) 25%,
+    rgba(99,102,241,0.12) 37%,
+    rgba(255,255,255,0.04) 63%) !important;
+  background-size: 800px 100% !important;
+}
+
+/* ── 12. TOAST — dark glass ── */
+.toast {
+  background: rgba(8,11,20,0.95) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3) !important;
+  color: #e2e8f0 !important;
+  font-family: 'Inter', sans-serif;
+}
+body:not([data-theme="dark"]) .toast {
+  background: rgba(255,255,255,0.97) !important;
+  border-color: rgba(99,102,241,0.12) !important;
+  color: var(--text) !important;
+  box-shadow: 0 8px 32px rgba(99,102,241,0.1), 0 2px 8px rgba(0,0,0,0.08) !important;
+}
+
+/* ── 13. INBOX & SLIDE PANELS ── */
+[data-theme="dark"] .inbox-panel {
+  background: rgba(8,11,20,0.96) !important;
+  border-left: 1px solid rgba(255,255,255,0.08) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+}
+
+/* ── 14. ACHIEVEMENT BADGES ── */
+[data-theme="dark"] .achievement-badge.unlocked {
+  background: rgba(16,185,129,0.06) !important;
+  border: 1px solid rgba(16,185,129,0.4) !important;
+  box-shadow: 0 0 20px rgba(16,185,129,0.15) !important;
+}
+[data-theme="dark"] .achievement-badge:not(.unlocked) {
+  opacity: 0.35;
+  filter: saturate(0);
+}
+
+/* ── 15. MISC REFINEMENTS ── */
+/* Smooth card transitions */
+.card, .chart-card, .overview-card, .paydate-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+/* Insight cards */
+[data-theme="dark"] .insight-card.info     { background: rgba(99,102,241,0.1)  !important; border-left-color: #6366f1 !important; }
+[data-theme="dark"] .insight-card.positive { background: rgba(16,185,129,0.1)  !important; border-left-color: #10b981 !important; }
+[data-theme="dark"] .insight-card.warning  { background: rgba(245,158,11,0.1)  !important; border-left-color: #f59e0b !important; }
+[data-theme="dark"] .insight-card.alert    { background: rgba(239,68,68,0.1)   !important; border-left-color: #ef4444 !important; }
+
+/* YTD / metric stat chips */
+[data-theme="dark"] .ytd-stat,
+[data-theme="dark"] .metric-stat,
+[data-theme="dark"] .summary-stat {
+  background: rgba(255,255,255,0.04) !important;
+  border: 1px solid rgba(255,255,255,0.07) !important;
+  border-radius: 12px !important;
+}
+
+/* Positive/negative colour parity across light mode */
+.ov-value.positive, .positive { color: #059669; }
+.ov-value.negative, .negative { color: #dc2626; }
+[data-theme="dark"] .positive { color: #34d399 !important; }
+[data-theme="dark"] .negative { color: #f87171 !important; }
+
+/* Edit mode drag handle */
+[data-theme="dark"] .ds-resize-handle { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.1); }
+[data-theme="dark"] .dash-edit-banner { background: linear-gradient(90deg, #4f46e5, #6366f1, #7c3aed); }
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.5); }
+
+/* Smooth focus for all interactive elements */
+:focus-visible {
+  outline: 2px solid rgba(99,102,241,0.6);
+  outline-offset: 2px;
+}
