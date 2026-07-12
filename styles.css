@@ -1147,3 +1147,163 @@ textarea.contact-input { resize: vertical; min-height: 100px; }
   color: #818cf8;
   background: rgba(99,102,241,0.08);
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   GLOWING STAT CARDS — v29
+   Inspired by 21st.dev Glowing Card (id: 5328)
+   Each card gets a unique accent colour; glow orb + diagonal ray
+   give depth in both light and dark mode.
+═══════════════════════════════════════════════════════════════ */
+
+/* Default accent + per-card accent overrides */
+.overview-card               { --cr: 99,102,241; }   /* fallback indigo */
+.overview-card:nth-child(1)  { --cr: 99,102,241; }   /* indigo   — take-home     */
+.overview-card:nth-child(2)  { --cr: 16,185,129; }   /* emerald  — free money    */
+.overview-card:nth-child(3)  { --cr: 225,29,72;  }   /* rose     — outgoings     */
+.overview-card:nth-child(4)  { --cr: 14,165,233; }   /* sky      — avg free      */
+.overview-card:nth-child(5)  { --cr: 245,158,11; }   /* amber    — mileage       */
+
+/* ── Grid ── */
+.overview-grid {
+  grid-template-columns: repeat(auto-fill, minmax(164px, 1fr));
+  gap: 16px;
+}
+
+/* ── Card base (light mode) ── */
+.overview-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  padding: 20px 18px 18px;
+  min-height: 118px;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  background: linear-gradient(148deg,
+    rgba(var(--cr), 0.07) 0%,
+    #ffffff 58%);
+  border: 1px solid rgba(var(--cr), 0.22);
+  box-shadow:
+    0 4px 24px rgba(var(--cr), 0.13),
+    0 1px 4px rgba(0,0,0,0.05);
+}
+
+.overview-card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 12px 36px rgba(var(--cr), 0.24),
+    0 2px 8px rgba(0,0,0,0.07);
+}
+
+/* Diagonal light-streak ray */
+.overview-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -25%;
+  width: 60%;
+  height: 200%;
+  background: linear-gradient(to bottom left,
+    transparent 0%,
+    rgba(var(--cr), 0.04) 40%,
+    rgba(var(--cr), 0.09) 50%,
+    rgba(var(--cr), 0.04) 60%,
+    transparent 100%);
+  transform: rotate(15deg);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Top glow orb */
+.ov-glow {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 110px;
+  height: 68px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center,
+    rgba(var(--cr), 0.22) 0%,
+    transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* All card content above pseudo layers */
+.ov-ico, .ov-label, .ov-value, .ov-sub { position: relative; z-index: 1; }
+
+/* Icon */
+.ov-ico {
+  display: block;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: rgb(var(--cr));
+  opacity: 0.78;
+}
+
+/* Label */
+.ov-label {
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: rgb(var(--cr));
+  opacity: 0.7;
+  margin-bottom: 6px;
+}
+
+/* Value — larger + bolder */
+.ov-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+/* Sub */
+.ov-sub {
+  font-size: 0.7rem;
+  margin-top: 0;
+}
+
+/* ── Dark mode — full glow treatment ── */
+[data-theme="dark"] .overview-card {
+  background: linear-gradient(148deg,
+    rgba(var(--cr), 0.2) 0%,
+    rgba(7,9,26,0.97) 68%);
+  border: 1px solid rgba(var(--cr), 0.35);
+  box-shadow:
+    0 8px 32px rgba(var(--cr), 0.26),
+    0 2px 8px rgba(0,0,0,0.55),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+[data-theme="dark"] .overview-card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 16px 48px rgba(var(--cr), 0.4),
+    0 4px 14px rgba(0,0,0,0.55),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+[data-theme="dark"] .overview-card::before {
+  background: linear-gradient(to bottom left,
+    transparent 0%,
+    rgba(255,255,255,0.02) 40%,
+    rgba(255,255,255,0.05) 50%,
+    rgba(255,255,255,0.02) 60%,
+    transparent 100%);
+}
+
+[data-theme="dark"] .ov-glow {
+  background: radial-gradient(ellipse at center,
+    rgba(var(--cr), 0.5) 0%,
+    transparent 70%);
+}
+
+[data-theme="dark"] .ov-ico   { opacity: 0.92; }
+[data-theme="dark"] .ov-label { opacity: 0.88; }
+[data-theme="dark"] .ov-value { color: #fff; }
+[data-theme="dark"] .ov-value.positive { color: #34d399; }
+[data-theme="dark"] .ov-value.negative { color: #f87171; }
+[data-theme="dark"] .ov-sub   { color: rgba(148,163,184,0.62); }

@@ -205,26 +205,36 @@ export function renderOverview() {
   const avgFree = sorted.length >= 2 ? sorted.reduce((s,h)=>s+(h.freeMoney||0),0)/sorted.length : null;
   el.innerHTML = `<div class="overview-grid">
     <div class="overview-card">
+      <div class="ov-glow"></div>
+      <i class="ti ti-wallet ov-ico"></i>
       <div class="ov-label">LATEST TAKE-HOME</div>
       <div class="ov-value">${fmt(latest.takeHome||0)}</div>
       <div class="ov-sub">${esc(MF[latest.month]+' '+latest.year)}</div>
     </div>
     <div class="overview-card">
+      <div class="ov-glow"></div>
+      <i class="ti ti-pig-money ov-ico"></i>
       <div class="ov-label">FREE MONEY</div>
       <div class="ov-value ${freeClass}">${freeFmt}</div>
       <div class="ov-sub">${(latest.freeMoney||0)>=0?'Under budget':'Over budget'}</div>
     </div>
     <div class="overview-card">
+      <div class="ov-glow"></div>
+      <i class="ti ti-credit-card ov-ico"></i>
       <div class="ov-label">OUTGOINGS</div>
       <div class="ov-value">${fmt(latest.outgoings||0)}</div>
       <div class="ov-sub">This month</div>
     </div>
     ${avgFree !== null ? `<div class="overview-card">
+      <div class="ov-glow"></div>
+      <i class="ti ti-trending-up ov-ico"></i>
       <div class="ov-label">AVG FREE MONEY</div>
       <div class="ov-value ${avgFree>=0?'positive':'negative'}">${(avgFree<0?'−':'')+fmt(Math.abs(avgFree))}</div>
       <div class="ov-sub">All time avg</div>
     </div>` : ''}
     ${(latest.mileage||0)>0?`<div class="overview-card">
+      <div class="ov-glow"></div>
+      <i class="ti ti-car ov-ico"></i>
       <div class="ov-label">MILEAGE THIS MONTH</div>
       <div class="ov-value">${fmt(latest.mileage)}</div>
       <div class="ov-sub">${latest.miles||0} miles @ 55p</div>
