@@ -672,3 +672,214 @@ textarea.contact-input { resize: vertical; min-height: 100px; }
 @media (min-width: 768px) {
   #bottom-nav { display: none !important; }
 }
+
+/* ═══════════════════════════════════════════════════════
+   ✨ VISUAL REDESIGN — Modern Finance UI
+   Inspired by 21st.dev Financial Dashboard components
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Entrance animations ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 22px rgba(99,102,241,0.18), inset 0 1px 0 rgba(255,255,255,0.15); }
+  50%       { box-shadow: 0 0 40px rgba(99,102,241,0.38), inset 0 1px 0 rgba(255,255,255,0.2); }
+}
+
+/* ── Splash left panel — rich dark gradient ── */
+.splash-left {
+  background: linear-gradient(155deg, #06091a 0%, #0c1140 55%, #1a063a 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Mesh grid texture */
+.splash-left::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(99,102,241,0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99,102,241,0.07) 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Radial glow orb */
+.splash-left::after {
+  content: '';
+  position: absolute;
+  top: -15%;
+  right: -10%;
+  width: 65%;
+  height: 70%;
+  background: radial-gradient(ellipse, rgba(99,102,241,0.2) 0%, transparent 65%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Keep content above pseudo-elements */
+.splash-left > * { position: relative; z-index: 1; }
+
+/* Gradient title */
+.splash-left h1 {
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  background: linear-gradient(135deg, #fff 25%, rgba(167,139,250,0.92) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Feature icon pills — coloured per item */
+.splash-features li { align-items: center; }
+.splash-features li i {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  font-size: 0.95rem;
+  opacity: 1;
+  flex-shrink: 0;
+}
+.splash-features li:nth-child(1) i { background: rgba(139,92,246,0.28); color: #a78bfa; }
+.splash-features li:nth-child(2) i { background: rgba(59,130,246,0.28); color: #60a5fa; }
+.splash-features li:nth-child(3) i { background: rgba(16,185,129,0.28); color: #34d399; }
+.splash-features li:nth-child(4) i { background: rgba(20,184,166,0.28); color: #2dd4bf; }
+.splash-features li:nth-child(5) i { background: rgba(245,158,11,0.28); color: #fbbf24; }
+
+/* Demo button — glass glow */
+.splash-demo-btn {
+  background: linear-gradient(135deg, rgba(99,102,241,0.25), rgba(139,92,246,0.2));
+  border: 1.5px solid rgba(167,139,250,0.4);
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.01em;
+  box-shadow: 0 0 24px rgba(99,102,241,0.2), inset 0 1px 0 rgba(255,255,255,0.15);
+  transition: all 0.25s ease;
+}
+.splash-demo-btn:hover {
+  background: linear-gradient(135deg, rgba(99,102,241,0.38), rgba(139,92,246,0.32));
+  border-color: rgba(167,139,250,0.65);
+  box-shadow: 0 0 38px rgba(99,102,241,0.38), inset 0 1px 0 rgba(255,255,255,0.2);
+  transform: translateY(-2px);
+}
+
+/* ── Dark mode: full-bleed gradient across both panels ── */
+[data-theme="dark"] .splash-inner {
+  background: linear-gradient(135deg, #06091a 0%, #0c1140 45%, #1a063a 80%, #060917 100%);
+}
+[data-theme="dark"] .splash-right { background: transparent; }
+
+/* ── Auth card — glassmorphism ── */
+.splash-card {
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+}
+[data-theme="dark"] .splash-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+/* Tabs, divider, Google button in dark mode */
+[data-theme="dark"] .splash-tabs { border-bottom-color: rgba(255,255,255,0.12); }
+[data-theme="dark"] .splash-tab { color: rgba(160,160,176,0.7); }
+[data-theme="dark"] .splash-tab.active { color: #818cf8; border-bottom-color: #818cf8; }
+[data-theme="dark"] .splash-divider { color: rgba(160,160,176,0.55); }
+[data-theme="dark"] .splash-divider::before,
+[data-theme="dark"] .splash-divider::after { background: rgba(255,255,255,0.1); }
+[data-theme="dark"] .splash-google {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.12);
+}
+[data-theme="dark"] .splash-google:hover { background: rgba(255,255,255,0.1); }
+
+/* Inputs in dark mode */
+[data-theme="dark"] .splash-input {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.11);
+}
+[data-theme="dark"] .splash-input::placeholder { color: rgba(160,160,176,0.55); }
+[data-theme="dark"] .splash-input:focus {
+  border-color: rgba(99,102,241,0.6);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+}
+
+/* ── Submit / sign-in button — indigo gradient ── */
+.splash-submit {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  border-radius: 10px;
+  font-weight: 600;
+  padding: 12px;
+  font-size: 0.98rem;
+  box-shadow: 0 4px 16px rgba(79,70,229,0.4);
+  transition: all 0.2s ease;
+}
+.splash-submit:hover {
+  background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+  box-shadow: 0 6px 24px rgba(79,70,229,0.55);
+  transform: translateY(-1px);
+}
+
+/* ── Primary button — gradient across the app ── */
+.btn-primary {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  box-shadow: 0 2px 10px rgba(79,70,229,0.28);
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+  box-shadow: 0 4px 18px rgba(79,70,229,0.45);
+}
+
+/* ── Dark mode body — subtle gradient ── */
+[data-theme="dark"] body {
+  background: linear-gradient(180deg, #0f1129 0%, #1a1a2e 40%, #1a1a2e 100%);
+  background-attachment: fixed;
+}
+
+/* ── Dark mode cards — glass treatment ── */
+[data-theme="dark"] .card,
+[data-theme="dark"] .overview-card,
+[data-theme="dark"] .chart-card,
+[data-theme="dark"] .chart-card-full,
+[data-theme="dark"] .paydate-card {
+  background: rgba(255,255,255,0.045);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+/* ── Dark mode dashboard section headers ── */
+[data-theme="dark"] .dash-section-hdr {
+  background: rgba(255,255,255,0.045);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+[data-theme="dark"] .dash-section-hdr:hover { background: rgba(255,255,255,0.08); }
+
+/* ── Countdown number glow ── */
+[data-theme="dark"] .countdown-num {
+  text-shadow: 0 0 32px rgba(99,102,241,0.5);
+}
+
+/* ── App header — richer dark gradient ── */
+[data-theme="dark"] .app-header {
+  background: linear-gradient(90deg, #06091a 0%, #0c1140 100%);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+/* ── Splash screen entrance animations ── */
+@media (prefers-reduced-motion: no-preference) {
+  .splash.active .splash-left h1   { animation: fadeUp 0.65s ease 0.05s both; }
+  .splash.active .splash-tagline   { animation: fadeUp 0.65s ease 0.15s both; }
+  .splash.active .splash-features  { animation: fadeUp 0.65s ease 0.25s both; }
+  .splash.active .splash-trust     { animation: fadeUp 0.65s ease 0.35s both; }
+  .splash.active .splash-demo-btn  { animation: fadeUp 0.65s ease 0.3s both, glowPulse 3s ease 1.5s infinite; }
+  .splash.active .splash-card      { animation: fadeUp 0.65s ease 0.18s both; }
+}
