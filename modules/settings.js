@@ -101,6 +101,21 @@ export function renderSettingsScreen() {
   initDensity();
   loadEmailPrefs();
   initSalCalc();
+  initSavingsGoal();
+}
+
+function initSavingsGoal() {
+  const inp = $('savings-goal-input');
+  if (!inp) return;
+  inp.value = state.savingsGoal || 20;
+  inp.addEventListener('change', () => {
+    const v = Math.max(0, Math.min(100, parseFloat(inp.value) || 20));
+    inp.value = v;
+    state.savingsGoal = v;
+    localStorage.setItem('finance_savings_goal', v);
+    import('./charts.js').then(m => m.renderSavingsChart?.());
+    toast('Savings goal updated');
+  });
 }
 
 function initSalCalc() {

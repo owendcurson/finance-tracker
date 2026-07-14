@@ -117,7 +117,10 @@ export async function signInMicrosoft() {
 }
 
 export async function doSignOut() {
-  if (!confirm('Sign out?')) return;
+  window._showSignOutConfirm?.();
+}
+
+export async function confirmSignOut() {
   state.fsSynced = false;
   state.currentUser = null;
   state.financeHistory = [];
@@ -168,10 +171,11 @@ function friendlyAuthError(code) {
 }
 
 // ── Window globals ────────────────────────────────────────────────────────────
-window._signIn       = signIn;
-window._signUp       = signUp;
+window._signIn          = signIn;
+window._signUp          = signUp;
 window._signInGoogle    = signInGoogle;
 window._signInMicrosoft = signInMicrosoft;
-window._doSignOut    = doSignOut;
-window._sendReset    = sendReset;
-window._deleteAccount= deleteAccount;
+window._doSignOut       = doSignOut;
+window._confirmSignOut  = confirmSignOut;
+window._sendReset       = sendReset;
+window._deleteAccount   = deleteAccount;

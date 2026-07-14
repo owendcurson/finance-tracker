@@ -18,7 +18,8 @@ function chartTypeCtrl(key, options) {
 function setChartPref(key, val) {
   state.chartPrefs[key] = val;
   localStorage.setItem(`chart_pref_${key}`, val);
-  renderCharts();
+  if (key === 'savings') renderSavingsChart();
+  else renderCharts();
 }
 
 export function attachChartTypeListeners() {
@@ -195,12 +196,21 @@ export function renderSavingsChart() {
   const nonZero = rates.filter(r=>r>0);
   const cur=rates[rates.length-1]||0, avg=nonZero.length?nonZero.reduce((a,b)=>a+b,0)/nonZero.length:0, high=rates.length?Math.max(...rates):0;
   const ctrl = chartTypeCtrl('savings', [['line','Line','ti-chart-line'],['bar','Bar','ti-chart-bar']]);
+  const goalPct = state.savingsGoal || 20;
+  const goalLabel = `${goalPct}% goal`;
+  const curRate = cur.toFixed(1);
+  const onTrack = cur >= goalPct;
   el.innerHTML = `<div class="card">
     <div class="card-header-row"><h2>Savings Rate</h2>${ctrl}</div>
     <div class="metric-grid">
-      <div class="metric-stat"><div class="stat-label">Current Rate</div><div class="stat-value positive">${cur.toFixed(1)}%</div></div>
+      <div class="metric-stat"><div class="stat-label">Current Rate</div><div class="stat-value positive">${curRate}%</div></div>
       <div class="metric-stat"><div class="stat-label">Average Rate</div><div class="stat-value">${avg.toFixed(1)}%</div></div>
       <div class="metric-stat"><div class="stat-label">Highest Rate</div><div class="stat-value positive">${high.toFixed(1)}%</div></div>
+    </div>
+    <div class="savings-goal-row">
+      <span class="savings-goal-label"><i class="ti ti-target"></i> Savings goal</span>
+      <span class="savings-goal-value">${goalPct}%</span>
+      <span class="savings-goal-status ${onTrack?'on-track':'off-track'}">${onTrack?'✓ On track':'Below goal'}</span>
     </div>
     <canvas id="chart-savings" style="max-height:220px"></canvas></div>`;
   const C = window.Chart; if (!C) return;
@@ -209,9 +219,9 @@ export function renderSavingsChart() {
   if (state.chartSavings) state.chartSavings.destroy();
   const pref = state.chartPrefs.savings;
   if (pref === 'bar') {
-    state.chartSavings = new C($('chart-savings'),{type:'bar',data:{labels,datasets:[{label:'Savings rate',data:rates,backgroundColor:'#0d904f',borderRadius:4},{label:'20% target',data:labels.map(()=>20),type:'line',borderColor:'#e37400',borderDash:[6,4],pointRadius:0,fill:false}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:tc,boxWidth:12,font:{size:11}}}},scales:{y:{beginAtZero:true,ticks:{color:tc,callback:v=>v+'%'},grid:{color:gc}},x:{grid:{display:false},ticks:{color:tc}}}}});
+    state.chartSavings = new C($('chart-savings'),{type:'bar',data:{labels,datasets:[{label:'Savings rate',data:rates,backgroundColor:'#0d904f',borderRadius:4},{label:goalLabel,data:labels.map(()=>goalPct),type:'line',borderColor:'#e37400',borderDash:[6,4],pointRadius:0,fill:false}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:tc,boxWidth:12,font:{size:11}}}},scales:{y:{beginAtZero:true,ticks:{color:tc,callback:v=>v+'%'},grid:{color:gc}},x:{grid:{display:false},ticks:{color:tc}}}}});
   } else {
-    state.chartSavings = new C($('chart-savings'),{type:'line',data:{labels,datasets:[{label:'Savings rate',data:rates,borderColor:'#0d904f',backgroundColor:'rgba(13,144,79,0.1)',fill:true,tension:0.3,pointRadius:3},{label:'20% target',data:labels.map(()=>20),borderColor:'#e37400',borderDash:[6,4],pointRadius:0,fill:false}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:tc,boxWidth:12,font:{size:11}}}},scales:{y:{beginAtZero:true,ticks:{color:tc,callback:v=>v+'%'},grid:{color:gc}},x:{grid:{display:false},ticks:{color:tc}}}}});
+    state.chartSavings = new C($('chart-savings'),{type:'line',data:{labels,datasets:[{label:'Savings rate',data:rates,borderColor:'#0d904f',backgroundColor:'rgba(13,144,79,0.1)',fill:true,tension:0.3,pointRadius:3},{label:goalLabel,data:labels.map(()=>goalPct),borderColor:'#e37400',borderDash:[6,4],pointRadius:0,fill:false}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:tc,boxWidth:12,font:{size:11}}}},scales:{y:{beginAtZero:true,ticks:{color:tc,callback:v=>v+'%'},grid:{color:gc}},x:{grid:{display:false},ticks:{color:tc}}}}});
   }
 }
 

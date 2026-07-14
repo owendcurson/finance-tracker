@@ -2458,3 +2458,126 @@ body:not([data-theme="dark"]) .toast {
   .hero-microcopy, .hero-demo-link { opacity: 1 !important; transform: none !important; transition: none !important; }
   .auth-card-wrap { transition: none !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   v33 — Bug fixes & new features
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Fix hero title descender clipping */
+.hero-title { padding-bottom: 6px; }
+
+/* Fix overview card number overflow */
+.ov-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  font-size: clamp(1.1rem, 3vw, 1.6rem);
+}
+
+/* Fix history search on narrow viewports */
+.hist-search-input { padding-left: 36px !important; }
+.hist-filter-row { flex-wrap: wrap; row-gap: 6px; }
+.hist-results-count { white-space: nowrap; }
+
+/* ── Sign-out confirm modal ──────────────────────────────────────────────── */
+.confirm-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.confirm-modal {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px 28px;
+  max-width: 340px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+  animation: confirm-in 0.22s cubic-bezier(0.34,1.2,0.64,1);
+}
+@keyframes confirm-in {
+  from { opacity:0; transform: scale(0.93) translateY(10px); }
+  to   { opacity:1; transform: none; }
+}
+.confirm-modal-icon {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  background: rgba(239,68,68,0.12);
+  border: 1px solid rgba(239,68,68,0.22);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem; color: #ef4444;
+  margin: 0 auto 18px;
+}
+.confirm-modal h3 { font-size: 1.15rem; font-weight: 700; margin: 0 0 6px; color: var(--text); }
+.confirm-modal p  { font-size: 0.88rem; color: var(--text-secondary); margin: 0 0 24px; }
+.confirm-modal-btns { display: flex; gap: 10px; }
+.confirm-modal-btns .btn { flex: 1; padding: 10px; }
+
+/* ── Dashboard side navigation ───────────────────────────────────────────── */
+.dash-sidenav { display: none; }
+
+@media (min-width: 1280px) {
+  .dash-sidenav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    position: fixed;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 50;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.28s ease;
+  }
+  .dash-sidenav.sidenav-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .sidenav-item {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 400;
+    color: rgba(255,255,255,0.28);
+    text-decoration: none;
+    padding: 4px 10px 4px 10px;
+    border-left: 2px solid transparent;
+    white-space: nowrap;
+    transition: color 0.18s, border-color 0.18s, font-weight 0.1s;
+    letter-spacing: 0.02em;
+  }
+  .sidenav-item:hover { color: rgba(255,255,255,0.65); }
+  .sidenav-item.active {
+    color: #fff;
+    font-weight: 700;
+    border-left-color: #6366f1;
+  }
+}
+
+/* ── Savings goal strip in Savings Rate widget ───────────────────────────── */
+.savings-goal-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0 14px;
+  padding: 9px 14px;
+  background: rgba(99,102,241,0.07);
+  border: 1px solid rgba(99,102,241,0.16);
+  border-radius: 10px;
+  font-size: 0.84rem;
+}
+.savings-goal-label { color: var(--text-secondary); flex: 1; display: flex; align-items: center; gap: 6px; }
+.savings-goal-label i { color: #6366f1; }
+.savings-goal-value { font-weight: 600; color: var(--text); }
+.savings-goal-status { font-size: 0.78rem; font-weight: 600; }
+.savings-goal-status.on-track  { color: #34d399; }
+.savings-goal-status.off-track { color: #f87171; }

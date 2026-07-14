@@ -262,6 +262,7 @@
       <i class="ti ti-info-circle"></i>
       <span>Edit mode — drag widgets to reorder, use the <i class="ti ti-arrows-maximize"></i> handle in each corner to resize. Changes save automatically.</span>
     </div>
+    <nav id="dash-sidenav" class="dash-sidenav"></nav>
     <div class="container" id="dash-container"></div>
   </div>
 
@@ -356,6 +357,16 @@
         </div>
       </div>
 
+      <!-- Savings goal -->
+      <div class="card">
+        <h2>Savings Goal</h2>
+        <div class="settings-field">
+          <label for="savings-goal-input">Target monthly savings rate</label>
+          <div class="input-wrap"><input type="number" id="savings-goal-input" class="has-suffix" min="0" max="100" step="1" placeholder="20"><span class="suffix">%</span></div>
+          <p class="settings-note">Sets the goal line on your Savings Rate chart.</p>
+        </div>
+      </div>
+
       <!-- Email notifications -->
       <div class="card">
         <h2>Email Notifications</h2>
@@ -430,6 +441,19 @@
     </div>
   </div>
   <div class="inbox-list" id="inbox-list"></div>
+</div>
+
+<!-- Sign-out confirm modal -->
+<div id="signout-confirm-modal" class="confirm-modal-overlay" style="display:none" onclick="if(event.target===this)window._closeSignOutConfirm()">
+  <div class="confirm-modal">
+    <div class="confirm-modal-icon"><i class="ti ti-logout"></i></div>
+    <h3>Sign out?</h3>
+    <p>You'll be signed out of Finance Tracker.</p>
+    <div class="confirm-modal-btns">
+      <button class="btn btn-outline" onclick="window._closeSignOutConfirm()">Cancel</button>
+      <button class="btn btn-danger-solid" onclick="window._closeSignOutConfirm();window._confirmSignOut()">Sign out</button>
+    </div>
+  </div>
 </div>
 
 <!-- Toast -->
@@ -618,6 +642,14 @@ window._openPrivacy = function() {
 window._closePrivacy = function() {
   var p = document.getElementById('privacy-panel');
   p.style.opacity='0'; setTimeout(function(){p.style.display='none';}, 220);
+};
+window._showSignOutConfirm = function() {
+  var m = document.getElementById('signout-confirm-modal');
+  if (m) m.style.display = 'flex';
+};
+window._closeSignOutConfirm = function() {
+  var m = document.getElementById('signout-confirm-modal');
+  if (m) m.style.display = 'none';
 };
 </script>
 </body>

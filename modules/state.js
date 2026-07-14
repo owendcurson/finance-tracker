@@ -29,6 +29,7 @@ export const state = {
   histFilter: 'all',
   histSortNewest: localStorage.getItem('hist_sort') !== 'oldest',
   // Chart type preferences (Part 3)
+  savingsGoal: parseFloat(localStorage.getItem('finance_savings_goal')) || 20,
   chartPrefs: {
     takehome:  localStorage.getItem('chart_pref_takehome')  || 'bar',
     breakdown: localStorage.getItem('chart_pref_breakdown') || 'doughnut',
