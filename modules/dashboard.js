@@ -85,11 +85,6 @@ export function renderDashboard() {
     </div>
     <div class="dash-header-actions">
       <a href="#" class="dash-collapseall-link" id="dash-collapseall-link" onclick="event.preventDefault();window._dashCollapseAll()">Collapse all</a>
-      <button class="btn btn-sm btn-outline" onclick="window._openPresetsPanel()"><i class="ti ti-layout-grid-add"></i> Presets</button>
-      <button class="btn btn-sm ${isEdit?'btn-primary':'btn-outline'}" onclick="window._toggleEditMode()">
-        <i class="ti ${isEdit?'ti-check':'ti-pencil'}"></i> ${isEdit?'Done editing':'Edit layout'}
-      </button>
-      <button class="btn btn-sm btn-outline" onclick="window._openCustomise()"><i class="ti ti-layout-dashboard"></i> Customise</button>
     </div>
   </div>`;
 
@@ -100,11 +95,6 @@ export function renderDashboard() {
 
   html += buildHistorySection(isEdit);
 
-  html += `<div style="grid-column:1/-1;text-align:center;padding-top:4px">
-    <button class="btn btn-outline btn-sm" onclick="window._openCustomise()">
-      <i class="ti ti-layout-dashboard"></i> Customise widgets
-    </button>
-  </div>`;
 
   container.innerHTML = html;
   container.classList.toggle('dash-edit-mode', isEdit);
