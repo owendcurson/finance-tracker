@@ -122,8 +122,12 @@ export function initSplashDemo() {
     if (demoPots.length < 6) { demoPots.push({ name:'', amount:0 }); demoRenderPots(); }
   });
   if (signupBtn)  signupBtn.addEventListener('click', () => {
-    window.scrollTo({ top:0, behavior:'smooth' });
-    setTimeout(() => document.getElementById('tab-signup')?.click(), 400);
+    if (typeof window._openAuth === 'function') {
+      window._openAuth('signup');
+    } else {
+      window.scrollTo({ top:0, behavior:'smooth' });
+      setTimeout(() => document.getElementById('tab-signup')?.click(), 400);
+    }
   });
   if (restartBtn) restartBtn.addEventListener('click', () => {
     demoPots = [{ name:'Rent', amount:800 }, { name:'Food', amount:300 }, { name:'Subscriptions', amount:50 }];

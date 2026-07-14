@@ -20,12 +20,16 @@ function showAuthScreen() {
   hideLoading();
   const a = $('auth-screen'); if (a) a.style.display = 'block';
   const c = $('app-container'); if (c) c.style.display = 'none';
+  const ov = $('auth-overlay'); if (ov) ov.style.display = 'none';
+  import('./splash.js').then(m => m.resumeSplash?.());
 }
 
 function showApp() {
   hideLoading();
   const a = $('auth-screen'); if (a) a.style.display = 'none';
   const c = $('app-container'); if (c) c.style.display = '';
+  window._closeAuth?.();
+  import('./splash.js').then(m => m.pauseSplash?.());
   import('./dashboard.js').then(m => m.showDashboard());
 }
 

@@ -24,133 +24,214 @@
 <!-- Loading -->
 <div class="loading-screen" id="loading-screen"><div class="spinner"></div><span>Loading...</span></div>
 
-<!-- Auth / Splash screen -->
+<!-- Auth / Splash screen — cinematic hero -->
 <div class="splash" id="auth-screen">
+
+  <!-- Particle canvas -->
+  <canvas id="splash-canvas" aria-hidden="true"></canvas>
+
+  <!-- Animated gradient blobs -->
+  <div class="splash-blobs" aria-hidden="true">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <!-- Floating geometric shapes -->
+  <div class="splash-shapes" aria-hidden="true">
+    <div class="fshape fshape-ring"></div>
+    <div class="fshape fshape-dot"></div>
+    <div class="fshape fshape-large"></div>
+    <div class="fshape fshape-cross"></div>
+  </div>
+
+  <!-- Theme toggle -->
   <button class="splash-theme-toggle" id="splash-theme-btn" title="Toggle dark mode"><i class="ti ti-moon"></i></button>
-  <div class="splash-inner">
-    <div class="splash-left">
-      <h1>Finance Tracker</h1>
-      <p class="splash-tagline">Know exactly where your money goes, every month.</p>
-      <ul class="splash-features">
-        <li><i class="ti ti-calculator"></i>Calculates your exact UK take-home pay using 2026/27 tax and NI rates</li>
-        <li><i class="ti ti-wallet"></i>Tracks your monthly pots and outgoings</li>
-        <li><i class="ti ti-car"></i>Claims mileage at 55p per mile, tax-free</li>
-        <li><i class="ti ti-devices"></i>Syncs across all your devices</li>
-        <li><i class="ti ti-chart-bar"></i>Saves your monthly history with charts and analytics</li>
-      </ul>
-      <button class="splash-demo-btn" id="demo-scroll-btn" style="margin-top:24px">Demo me</button>
-    </div>
-    <div class="splash-right">
-      <div class="splash-card">
-        <div class="splash-tabs">
-          <div class="splash-tab active" id="tab-signin" onclick="window._authTab('signin')">Sign in</div>
-          <div class="splash-tab" id="tab-signup" onclick="window._authTab('signup')">Sign up</div>
-        </div>
 
-        <div class="splash-form active" id="form-signin">
-          <div class="splash-error" id="signin-error"></div>
-          <input class="splash-input" type="email" id="signin-email" placeholder="Email" autocomplete="email">
-          <input class="splash-input" type="password" id="signin-pass" placeholder="Password" autocomplete="current-password" minlength="6">
-          <button class="splash-submit" onclick="window._signIn()">Sign In</button>
-          <div style="text-align:center;margin-top:10px"><button style="background:none;border:none;color:var(--primary);font-size:0.82rem;font-family:inherit;cursor:pointer" onclick="window._sendReset()">Forgot password?</button></div>
-        </div>
+  <!-- Hero section -->
+  <section class="hero">
+    <div class="hero-inner">
 
-        <div class="splash-form" id="form-signup">
-          <div class="splash-error" id="signup-error"></div>
-          <input class="splash-input" type="email" id="signup-email" placeholder="Email" autocomplete="email">
-          <input class="splash-input" type="password" id="signup-pass" placeholder="Password" autocomplete="new-password" minlength="6">
-          <input class="splash-input" type="password" id="signup-pass2" placeholder="Confirm password" autocomplete="new-password" minlength="6">
-          <button class="splash-submit" onclick="window._signUp()">Create Account</button>
-        </div>
+      <div class="hero-badge"><span>✦ Built for UK workers</span></div>
 
-        <div class="splash-divider">or</div>
-        <button class="splash-google" onclick="window._signInGoogle()">
-          <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24.1 24.1 0 0 0 0 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-          Continue with Google
-        </button>
-        <button class="splash-google" onclick="window._signInMicrosoft()" style="margin-top:8px">
-          <svg viewBox="0 0 21 21" width="20" height="20"><rect x="1" y="1" width="9" height="9" fill="#f25022"/><rect x="11" y="1" width="9" height="9" fill="#7fba00"/><rect x="1" y="11" width="9" height="9" fill="#00a4ef"/><rect x="11" y="11" width="9" height="9" fill="#ffb900"/></svg>
-          Continue with Microsoft
-        </button>
+      <h1 class="hero-title">
+        <span class="hero-line1"><span class="hero-word">Know</span> <span class="hero-word">exactly</span></span>
+        <span class="hero-line2 hero-word">where your money goes.</span>
+      </h1>
+
+      <p class="hero-sub">Track your UK take-home pay, manage your monthly pots, and always know your free money before payday.</p>
+
+      <div class="hero-ctas">
+        <button class="hero-btn-primary" onclick="window._openAuth('signup')">Get started free</button>
+        <button class="hero-btn-secondary" onclick="window._openAuth('signin')">Sign in</button>
       </div>
+      <p class="hero-microcopy">Free forever · No bank connection needed · UK tax rates built in</p>
+      <p class="hero-demo-link">or <button id="demo-scroll-btn">try a live demo first</button></p>
+
     </div>
-  </div>
+  </section>
 
-  <!-- Interactive demo section -->
-  <div class="splash-showcase" id="demo-section">
-    <div class="showcase-inner">
-      <h2>Try it yourself</h2>
-      <p class="showcase-sub">See how Finance Tracker works — no account needed.</p>
+  <!-- Scroll indicator -->
+  <div class="hero-scroll-ind" aria-hidden="true"><i class="ti ti-chevron-down"></i></div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:40px" class="demo-layout">
-        <div class="demo-panel open" id="demo-panel" style="margin:0;background:var(--navy);color:#fff">
-          <div class="demo-banner">Demo mode — your data won't be saved</div>
+  <!-- Below-hero content -->
+  <div class="splash-below">
 
-          <div class="demo-step active" id="demo-step-1">
-            <div class="demo-field">
-              <label>Annual gross salary</label>
-              <input class="demo-input" type="number" id="demo-salary" value="32000" placeholder="e.g. 32000">
-            </div>
-            <div class="demo-breakdown" id="demo-tax-breakdown"></div>
-            <div class="demo-nav"><button class="demo-next" id="demo-next-1">Next — add your outgoings</button></div>
+    <!-- What you'll know after one month -->
+    <section class="below-section below-outcomes">
+      <div class="below-inner">
+        <h2 class="below-title">What you'll know after one month</h2>
+        <div class="outcomes-grid2">
+          <div class="outcome-glass">
+            <div class="og-icon"><i class="ti ti-cash"></i></div>
+            <div class="og-text"><strong>Exactly how much free money you have</strong><span>Not an estimate — your precise take-home minus every outgoing, down to the penny.</span></div>
           </div>
-
-          <div class="demo-step" id="demo-step-2">
-            <div id="demo-pots-list"></div>
-            <button class="demo-back" id="demo-add-pot" style="margin-bottom:10px;font-size:0.82rem;color:rgba(255,255,255,0.7)">+ Add pot</button>
-            <div class="demo-breakdown" id="demo-pots-summary"></div>
-            <div class="demo-nav">
-              <button class="demo-back" id="demo-back-2">Back</button>
-              <button class="demo-next" id="demo-next-2">Next — see your summary</button>
-            </div>
+          <div class="outcome-glass">
+            <div class="og-icon"><i class="ti ti-calendar-dollar"></i></div>
+            <div class="og-text"><strong>When you'll actually get paid</strong><span>We check every month if your payday falls on a weekend or bank holiday and adjust automatically.</span></div>
           </div>
-
-          <div class="demo-step" id="demo-step-3">
-            <div class="demo-breakdown" id="demo-summary"></div>
-            <div class="demo-cta-card">
-              <p>Like what you see? Create a free account to save your results and track every month.</p>
-              <button class="demo-cta-btn" id="demo-signup-btn">Create account</button><br>
-              <button class="demo-restart" id="demo-restart-btn">Start over</button>
-            </div>
+          <div class="outcome-glass">
+            <div class="og-icon"><i class="ti ti-chart-line"></i></div>
+            <div class="og-text"><strong>Whether your spending is creeping up</strong><span>Monthly charts show where your money goes and whether anything is quietly growing.</span></div>
           </div>
-        </div>
-
-        <div>
-          <div class="splash-trust" style="margin:0;padding:0;border:none">
-            <p style="color:var(--text);opacity:1;font-weight:500;font-size:0.95rem;margin-bottom:8px">Built specifically for UK workers</p>
-            <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:16px">Uses real HMRC PAYE rates, National Insurance thresholds, and England bank holidays. Not a generic budget app.</p>
-            <div class="trust-icons" style="margin-bottom:24px">
-              <div class="trust-icon" style="opacity:1;color:var(--text-secondary)"><i class="ti ti-building-bank" style="color:var(--primary)"></i>HMRC 2026/27 rates</div>
-              <div class="trust-icon" style="opacity:1;color:var(--text-secondary)"><i class="ti ti-calendar-check" style="color:var(--primary)"></i>Bank holiday aware</div>
-              <div class="trust-icon" style="opacity:1;color:var(--text-secondary)"><i class="ti ti-device-mobile" style="color:var(--primary)"></i>Works on any device</div>
-            </div>
+          <div class="outcome-glass">
+            <div class="og-icon"><i class="ti ti-pig-money"></i></div>
+            <div class="og-text"><strong>How much you're actually saving</strong><span>Your savings rate tracked over time — so you can see the progress you're making.</span></div>
           </div>
-          <p style="font-weight:700;font-size:1rem;margin-bottom:14px;color:var(--text)">After your first month you'll know...</p>
-          <div class="outcome-item" style="color:var(--text)"><i class="ti ti-cash" style="color:var(--primary)"></i><div><strong>Exactly how much free money you have</strong><span style="color:var(--text-secondary)">Not an estimate — your precise take-home minus every outgoing, down to the penny.</span></div></div>
-          <div class="outcome-item" style="color:var(--text)"><i class="ti ti-calendar-dollar" style="color:var(--primary)"></i><div><strong>When you'll actually get paid</strong><span style="color:var(--text-secondary)">We check every month if your payday falls on a weekend or bank holiday and adjust automatically.</span></div></div>
-          <div class="outcome-item" style="color:var(--text)"><i class="ti ti-chart-line" style="color:var(--primary)"></i><div><strong>Whether your spending is creeping up</strong><span style="color:var(--text-secondary)">Monthly charts show where your money goes and whether anything is quietly growing.</span></div></div>
-          <div class="outcome-item" style="color:var(--text)"><i class="ti ti-pig-money" style="color:var(--primary)"></i><div><strong>How much you're actually saving</strong><span style="color:var(--text-secondary)">Your savings rate tracked over time — so you can see the progress you're making.</span></div></div>
         </div>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <!-- Showcase section -->
-  <div class="splash-showcase">
-    <div class="showcase-inner">
-      <h2>Everything you need to manage your money</h2>
-      <p class="showcase-sub">Built for UK employees — accurate tax, simple budgeting, zero hassle.</p>
-      <div class="showcase-grid">
-        <div class="showcase-card"><i class="ti ti-receipt-tax"></i><h3>Accurate UK Tax Calculations</h3><p>Income tax bands, personal allowance tapering, and employee NI — all calculated using 2026/27 rates.</p></div>
-        <div class="showcase-card"><i class="ti ti-pig-money"></i><h3>Budget With Pots</h3><p>Split your outgoings into named pots — rent, bills, food, savings — and see if you're on track.</p></div>
-        <div class="showcase-card"><i class="ti ti-building-bank"></i><h3>Account Breakdown</h3><p>Assign each pot to a bank account so you know exactly how much to transfer on payday.</p></div>
-        <div class="showcase-card"><i class="ti ti-car"></i><h3>Mileage Claims</h3><p>Log your business miles and get the tax-free amount calculated instantly at 55p per mile.</p></div>
-        <div class="showcase-card"><i class="ti ti-calendar-event"></i><h3>Smart Payday Logic</h3><p>Set your pay day and the app figures out weekends and UK bank holidays automatically.</p></div>
-        <div class="showcase-card"><i class="ti ti-chart-area-line"></i><h3>Charts &amp; History</h3><p>Save each month and build up a picture over time with bar charts, breakdowns, and trend lines.</p></div>
+    <!-- Feature highlights -->
+    <section class="below-section below-features">
+      <div class="below-inner">
+        <h2 class="below-title">Everything you need to manage your money</h2>
+        <p class="below-sub">Built for UK employees — accurate tax, simple budgeting, zero hassle.</p>
+        <div class="features-grid2">
+          <div class="feature-glass"><i class="ti ti-receipt-tax"></i><h3>Accurate UK Tax</h3><p>Income tax bands, personal allowance tapering, and employee NI — all calculated using 2026/27 rates.</p></div>
+          <div class="feature-glass"><i class="ti ti-pig-money"></i><h3>Budget With Pots</h3><p>Split your outgoings into named pots — rent, bills, food, savings — and see if you're on track.</p></div>
+          <div class="feature-glass"><i class="ti ti-building-bank"></i><h3>Account Breakdown</h3><p>Assign each pot to a bank account so you know exactly how much to transfer on payday.</p></div>
+          <div class="feature-glass"><i class="ti ti-car"></i><h3>Mileage Claims</h3><p>Log your business miles and get the tax-free amount calculated instantly at 55p per mile.</p></div>
+          <div class="feature-glass"><i class="ti ti-calendar-event"></i><h3>Smart Payday</h3><p>Set your pay day and the app figures out weekends and UK bank holidays automatically.</p></div>
+          <div class="feature-glass"><i class="ti ti-chart-area-line"></i><h3>Charts &amp; History</h3><p>Save each month and build up a picture over time with bar charts, breakdowns, and trend lines.</p></div>
+        </div>
       </div>
-      <div class="showcase-cta">
-        <p>Free to use. Sign up in seconds.</p>
-        <button class="btn btn-primary" onclick="window.scrollTo({top:0,behavior:'smooth'})">Get Started</button>
+    </section>
+
+    <!-- Interactive demo section -->
+    <section class="below-section below-demo" id="demo-section">
+      <div class="below-inner">
+        <h2 class="below-title">Try it yourself</h2>
+        <p class="below-sub">See how Finance Tracker works — no account needed.</p>
+
+        <div class="demo-layout2">
+          <div class="demo-panel open" id="demo-panel">
+            <div class="demo-banner">Demo mode — your data won't be saved</div>
+
+            <div class="demo-step active" id="demo-step-1">
+              <div class="demo-field">
+                <label>Annual gross salary</label>
+                <input class="demo-input" type="number" id="demo-salary" value="32000" placeholder="e.g. 32000">
+              </div>
+              <div class="demo-breakdown" id="demo-tax-breakdown"></div>
+              <div class="demo-nav"><button class="demo-next" id="demo-next-1">Next — add your outgoings</button></div>
+            </div>
+
+            <div class="demo-step" id="demo-step-2">
+              <div id="demo-pots-list"></div>
+              <button class="demo-back" id="demo-add-pot" style="margin-bottom:10px;font-size:0.82rem;color:rgba(255,255,255,0.7)">+ Add pot</button>
+              <div class="demo-breakdown" id="demo-pots-summary"></div>
+              <div class="demo-nav">
+                <button class="demo-back" id="demo-back-2">Back</button>
+                <button class="demo-next" id="demo-next-2">Next — see your summary</button>
+              </div>
+            </div>
+
+            <div class="demo-step" id="demo-step-3">
+              <div class="demo-breakdown" id="demo-summary"></div>
+              <div class="demo-cta-card">
+                <p>Like what you see? Create a free account to save your results and track every month.</p>
+                <button class="demo-cta-btn" id="demo-signup-btn">Create account</button><br>
+                <button class="demo-restart" id="demo-restart-btn">Start over</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="demo-trust-col">
+            <p style="font-weight:600;font-size:0.9rem;margin-bottom:6px;color:rgba(255,255,255,0.85)">Built specifically for UK workers</p>
+            <p style="color:rgba(255,255,255,0.42);font-size:0.82rem;margin-bottom:18px">Uses real HMRC PAYE rates, National Insurance thresholds, and England bank holidays. Not a generic budget app.</p>
+            <div class="trust-icons-list">
+              <div class="trust-icon-item"><i class="ti ti-building-bank"></i>HMRC 2026/27 rates</div>
+              <div class="trust-icon-item"><i class="ti ti-calendar-check"></i>Bank holiday aware</div>
+              <div class="trust-icon-item"><i class="ti ti-device-mobile"></i>Works on any device</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trust strip -->
+    <div class="trust-strip">
+      <div class="trust-strip-inner">
+        <div class="trust-strip-item"><i class="ti ti-building-bank"></i>HMRC 2026/27 rates</div>
+        <div class="trust-strip-sep"></div>
+        <div class="trust-strip-item"><i class="ti ti-calendar-check"></i>Bank holiday aware</div>
+        <div class="trust-strip-sep"></div>
+        <div class="trust-strip-item"><i class="ti ti-wifi-off"></i>No bank connection</div>
+      </div>
+    </div>
+
+    <!-- Final CTA -->
+    <section class="below-section final-cta-sect">
+      <div class="below-inner" style="text-align:center">
+        <h2 class="below-title">Ready to take control of your money?</h2>
+        <p class="below-sub" style="margin-bottom:32px">Join thousands of UK workers who know exactly where every penny goes.</p>
+        <button class="hero-btn-primary" onclick="window._openAuth('signup')">Create your free account</button>
+      </div>
+    </section>
+
+  </div><!-- /splash-below -->
+</div><!-- /#auth-screen -->
+
+<!-- Auth overlay (sign in / sign up) -->
+<div id="auth-overlay" class="auth-overlay" style="display:none" role="dialog" aria-modal="true" aria-label="Sign in or create account">
+  <button class="auth-ov-close" onclick="window._closeAuth()" title="Close (Esc)"><i class="ti ti-x"></i></button>
+  <div class="auth-card-wrap">
+    <div class="auth-card">
+      <div class="auth-logo-mark"><i class="ti ti-chart-line"></i></div>
+      <div class="auth-card-title" id="auth-card-title">Welcome back</div>
+      <div class="auth-card-sub" id="auth-card-sub">Sign in to your Finance Tracker</div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-signin" onclick="window._authTab('signin')">Sign in</button>
+        <button class="auth-tab" id="tab-signup" onclick="window._authTab('signup')">Sign up</button>
+      </div>
+
+      <button class="auth-social-btn auth-google" onclick="window._signInGoogle()">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24.1 24.1 0 0 0 0 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Continue with Google
+      </button>
+      <button class="auth-social-btn auth-microsoft" onclick="window._signInMicrosoft()">
+        <svg width="18" height="18" viewBox="0 0 21 21"><rect x="1" y="1" width="9" height="9" fill="#f25022"/><rect x="11" y="1" width="9" height="9" fill="#7fba00"/><rect x="1" y="11" width="9" height="9" fill="#00a4ef"/><rect x="11" y="11" width="9" height="9" fill="#ffb900"/></svg>
+        Continue with Microsoft
+      </button>
+
+      <div class="auth-divider"><span>or continue with email</span></div>
+
+      <div class="auth-form active" id="form-signin">
+        <div class="auth-error" id="signin-error"></div>
+        <input class="auth-input" type="email" id="signin-email" placeholder="Email" autocomplete="email">
+        <input class="auth-input" type="password" id="signin-pass" placeholder="Password" autocomplete="current-password" minlength="6">
+        <button class="auth-submit" onclick="window._signIn()">Sign In</button>
+        <div class="auth-forgot"><button onclick="window._sendReset()">Forgot password?</button></div>
+      </div>
+
+      <div class="auth-form" id="form-signup">
+        <div class="auth-error" id="signup-error"></div>
+        <input class="auth-input" type="email" id="signup-email" placeholder="Email" autocomplete="email">
+        <input class="auth-input" type="password" id="signup-pass" placeholder="Password" autocomplete="new-password" minlength="6">
+        <input class="auth-input" type="password" id="signup-pass2" placeholder="Confirm password" autocomplete="new-password" minlength="6">
+        <button class="auth-submit" onclick="window._signUp()">Create Account</button>
       </div>
     </div>
   </div>
@@ -489,14 +570,50 @@
 <script type="module" src="./app.js"></script>
 
 <script>
-// Auth tab switching
+// Auth tab switching — shared by overlay tab buttons
 window._authTab = function(tab) {
-  ['signin','signup'].forEach(t => {
+  ['signin','signup'].forEach(function(t) {
     document.getElementById('tab-'+t)?.classList.toggle('active', t===tab);
     document.getElementById('form-'+t)?.classList.toggle('active', t===tab);
   });
+  var titles = {
+    signin:  ['Welcome back',        'Sign in to your Finance Tracker'],
+    signup:  ['Create your account', 'Start tracking your money today']
+  };
+  var pair = titles[tab] || titles.signin;
+  var tEl = document.getElementById('auth-card-title');
+  var sEl = document.getElementById('auth-card-sub');
+  if (tEl) tEl.textContent = pair[0];
+  if (sEl) sEl.textContent = pair[1];
 };
-// Privacy panel open/close helpers
+
+// Open auth overlay
+window._openAuth = function(tab) {
+  var ov = document.getElementById('auth-overlay');
+  if (!ov) return;
+  ov.style.display = 'flex';
+  void ov.offsetWidth; // force reflow for transition
+  ov.classList.add('auth-ov-open');
+  window._authTab(tab || 'signin');
+  document.body.style.overflow = 'hidden';
+  var onEsc = function(e) {
+    if (e.key === 'Escape') { window._closeAuth(); document.removeEventListener('keydown', onEsc); }
+  };
+  document.addEventListener('keydown', onEsc);
+};
+
+// Close auth overlay
+window._closeAuth = function() {
+  var ov = document.getElementById('auth-overlay');
+  if (!ov) return;
+  ov.classList.remove('auth-ov-open');
+  document.body.style.overflow = '';
+  setTimeout(function() {
+    if (!ov.classList.contains('auth-ov-open')) ov.style.display = 'none';
+  }, 240);
+};
+
+// Privacy panel
 window._openPrivacy = function() {
   var p = document.getElementById('privacy-panel');
   p.style.display='block'; void p.offsetWidth; p.style.opacity='1';

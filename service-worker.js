@@ -1,4 +1,4 @@
-var CACHE_NAME = 'finance-tracker-v30';
+var CACHE_NAME = 'finance-tracker-v31';
 var ASSETS = [
   './index.html',
   './styles.css',
@@ -30,6 +30,7 @@ var ASSETS = [
   './modules/onboarding.js',
   './modules/demo.js',
   './modules/offline.js',
+  './modules/splash.js',
 ];
 var CDN_ASSETS = [
   'https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js',

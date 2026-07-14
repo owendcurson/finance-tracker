@@ -11,6 +11,7 @@ import { initSplashDemo } from './modules/demo.js';
 import { attachChartTypeListeners } from './modules/charts.js';
 import { initBackToTop } from './modules/ui.js';
 import { checkPaydayNotifications } from './modules/notifications.js';
+import { initSplash } from './modules/splash.js';
 
 // ── Bootstrap ─────────────────────────────────────────────────────────────────
 function init() {
@@ -18,6 +19,7 @@ function init() {
   initTheme();
   initDensity();
   initOfflineListeners();
+  initSplash();
   initAuth();           // sets up onAuthStateChanged → triggers showDashboard or showAuth
   initContactForm();
   initSplashDemo();
