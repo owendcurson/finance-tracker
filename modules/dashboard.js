@@ -84,6 +84,7 @@ export function renderDashboard() {
       <div class="dash-date">${now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
     </div>
     <div class="dash-header-actions">
+      <button class="btn btn-primary btn-sm" onclick="window._showTrackerNew()">+ New month</button>
       <a href="#" class="dash-collapseall-link" id="dash-collapseall-link" onclick="event.preventDefault();window._dashCollapseAll()">Collapse all</a>
     </div>
   </div>`;

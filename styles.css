@@ -2464,7 +2464,8 @@ body:not([data-theme="dark"]) .toast {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* Fix hero title descender clipping */
-.hero-title { padding-bottom: 6px; }
+.hero-title { padding-bottom: 20px; }
+.hero-line2 { padding-bottom: 6px; }
 
 /* Fix overview card number overflow */
 .ov-value {
@@ -2473,6 +2474,11 @@ body:not([data-theme="dark"]) .toast {
   white-space: nowrap;
   min-width: 0;
   font-size: clamp(1.1rem, 3vw, 1.6rem);
+}
+
+/* YTD stats use smaller font so full values fit */
+.ytd-stat .ov-value {
+  font-size: clamp(0.85rem, 2vw, 1.05rem);
 }
 
 /* Fix history search on narrow viewports */
