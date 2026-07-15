@@ -2467,18 +2467,30 @@ body:not([data-theme="dark"]) .toast {
 .hero-title { padding-bottom: 20px; }
 .hero-line2 { padding-bottom: 6px; }
 
-/* Fix overview card number overflow */
+/* Overview card numbers — fluid font, ellipsis as last resort */
 .ov-value {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   min-width: 0;
-  font-size: clamp(1.1rem, 3vw, 1.6rem);
+  font-size: clamp(0.9rem, 2.4vw, 1.5rem);
 }
 
-/* YTD stats use smaller font so full values fit */
+/* YTD stat numbers — always show in full, wrap if needed */
 .ytd-stat .ov-value {
-  font-size: clamp(0.85rem, 2vw, 1.05rem);
+  font-size: clamp(0.8rem, 2.2vw, 1.1rem);
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  word-break: break-word;
+}
+
+/* Fluid YTD grid: 4 cols desktop → 2 cols mobile */
+.ytd-stats {
+  grid-template-columns: repeat(auto-fill, minmax(min(140px, 100%), 1fr));
+}
+@media (max-width: 480px) {
+  .ytd-stats { grid-template-columns: 1fr 1fr; }
 }
 
 /* Fix history search on narrow viewports */
