@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { $, fmt, esc, row, rowT, st, toast, debounce, loadScript } from './utils.js';
+import { $, fmt, esc, row, rowT, st, toast, debounce, loadScript, friendlyFsError } from './utils.js';
 import { MF, MS } from './constants.js';
 import { cTax, cNI, gPA } from './tax.js';
 import { getPD, getNextPD, movedReason, taxYearStart } from './payday.js';
@@ -110,8 +110,20 @@ export function loadLocal() {
 }
 
 export async function saveMonth() {
-  const sal=parseFloat($('salary').value)||0;
-  if(sal===0){toast('Enter a salary before saving');return;}
+  const salRaw = parseFloat($('salary').value)||0;
+  if (salRaw === 0) { toast('Enter a salary before saving'); return; }
+  if (salRaw < 0)   { toast('Salary must be a positive number'); return; }
+  if (salRaw > 10_000_000) { toast('Salary looks too high — please check the value'); return; }
+  // Validate miles
+  const milesRaw = parseFloat($('miles').value)||0;
+  if ($('tog-mileage').checked && milesRaw > 10000) { toast('Mileage over 10,000 miles — please check the value'); return; }
+  // Validate pots
+  for (const pot of state.pots) {
+    const a = parseFloat(pot.amount)||0;
+    if (a > 100_000) { toast(`Pot "${pot.name||'Unnamed'}" amount looks too high — please check`); return; }
+    if ((parseFloat(pot.target)||0) > 100_000) { toast(`Pot "${pot.name||'Unnamed'}" target looks too high — please check`); return; }
+  }
+  const sal=salRaw;
   const sm=parseInt($('pick-month').value),sy=parseInt($('pick-year').value),pr=getPD(sy,sm),tp=state.pots.reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
   const entryId=state.editingId||Date.now();
   const entry={id:entryId,month:sm,year:sy,label:MS[sm]+' '+sy,payDate:ds(pr.payDate),payDateLong:fdl(pr.payDate),payDateMoved:pr.moved,payDateReason:pr.moved?movedReason(pr.original):'',payDayUsed:state.payDay,salary:sal,togExpenses:$('tog-expenses').checked,workExpenses:parseFloat($('work-expenses').value)||0,togMileage:$('tog-mileage').checked,miles:parseFloat($('miles').value)||0,togOvertime:$('tog-overtime').checked,overtime:parseFloat($('overtime').value)||0,takeHome:Math.round(state.lastTakeHome*100)/100,mileage:Math.round(state.lastMileage*100)/100,outgoings:Math.round(tp*100)/100,freeMoney:Math.round((state.lastTakeHome+state.lastMileage-tp)*100)/100,pots:state.pots.filter(p=>p.name||(parseFloat(p.amount)||0)>0).map(p=>({name:p.name||'Unnamed',amount:parseFloat(p.amount)||0,account:p.account||'',target:parseFloat(p.target)||0}))};
@@ -119,7 +131,7 @@ export async function saveMonth() {
   else state.financeHistory.unshift(entry);
   state.editingId=null;
   persistHL();
-  if(state.currentUser){try{await setDoc(doc(db,'users',state.currentUser.uid,'months',String(entry.id)),entry);}catch(e){}}
+  if(state.currentUser){try{await setDoc(doc(db,'users',state.currentUser.uid,'months',String(entry.id)),entry);}catch(e){console.error('saveMonth Firestore write failed:',e);toast(friendlyFsError(e));}}
   await addInboxItem('ti-circle-check',MF[entry.month]+' '+entry.year+' saved successfully',(entry.freeMoney<0?'Over budget by ':'Free money: ')+(entry.freeMoney<0?'−':'')+fmt(Math.abs(entry.freeMoney)));
   const overPots=entry.pots.filter(p=>(p.target||0)>0&&p.amount>p.target).map(p=>p.name);
   if(overPots.length) await addInboxItem('ti-alert-triangle',overPots.length+' pot'+(overPots.length===1?'':'s')+' went over budget this month',overPots.join(', '));

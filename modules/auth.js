@@ -1,11 +1,56 @@
 import { state } from './state.js';
-import { $, toast } from './utils.js';
+import { $, toast, friendlyFsError } from './utils.js';
 import { auth, db, doc, getDoc, setDoc, collection, getDocs,
          onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword,
          signOut, sendPasswordResetEmail, deleteUser,
-         signInWithPopup, googleProvider, microsoftProvider } from './firebase.js';
+         signInWithPopup, googleProvider, microsoftProvider,
+         setPersistence, browserLocalPersistence, browserSessionPersistence } from './firebase.js';
 import { initBH } from './payday.js';
 import { loadSettingsFS } from './settings.js';
+
+// ── Session inactivity timeout (60 minutes) ───────────────────────────────────
+const SESSION_TIMEOUT_MS = 60 * 60 * 1000;
+let _sessionTimer = null;
+
+function resetSessionTimer() {
+  clearTimeout(_sessionTimer);
+  _sessionTimer = setTimeout(async () => {
+    if (!state.currentUser) return;
+    toast('Your session has expired. Please sign in again.');
+    await confirmSignOut();
+    showSessionExpiredModal();
+  }, SESSION_TIMEOUT_MS);
+}
+
+function startSessionWatcher() {
+  const events = ['click', 'keydown', 'touchstart', 'scroll'];
+  const handler = () => resetSessionTimer();
+  events.forEach(e => window.addEventListener(e, handler, { passive: true }));
+  resetSessionTimer();
+}
+
+function stopSessionWatcher() {
+  clearTimeout(_sessionTimer);
+  _sessionTimer = null;
+}
+
+function showSessionExpiredModal() {
+  const existing = document.getElementById('session-expired-modal');
+  if (existing) { existing.style.display = 'flex'; return; }
+  const modal = document.createElement('div');
+  modal.id = 'session-expired-modal';
+  modal.className = 'confirm-modal-overlay';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6)';
+  modal.innerHTML = `<div class="confirm-modal">
+    <div class="confirm-modal-icon"><i class="ti ti-lock"></i></div>
+    <h3>Session expired</h3>
+    <p>Your session has expired for security. Please sign in again.</p>
+    <div class="confirm-modal-btns">
+      <button class="btn btn-primary" onclick="document.getElementById('session-expired-modal').remove();window._openAuth?.('signin')">Sign in again</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+}
 
 // ── UI helpers ─────────────────────────────────────────────────────────────────
 function authErr(id, msg) {
@@ -36,7 +81,6 @@ function showApp() {
 // ── Load user data from Firestore ─────────────────────────────────────────────
 async function loadUserData(uid) {
   try {
-    // months
     const mSnap = await getDocs(collection(db,'users',uid,'months'));
     const months = [];
     mSnap.forEach(d => months.push({ ...d.data(), id: parseInt(d.id) }));
@@ -48,8 +92,13 @@ async function loadUserData(uid) {
     }
     state.fsSynced = true;
   } catch(e) {
+    console.error('loadUserData failed:', e);
     import('./tracker.js').then(m => m.loadLocal());
     state.fsSynced = true;
+    // Show cached-data notice only if we actually have local data
+    if (localStorage.getItem('finance_history')) {
+      toast('Showing cached data. Could not connect to sync.');
+    }
   }
   await loadSettingsFS();
 }
@@ -65,11 +114,13 @@ export function initAuth() {
       if (emailEl) emailEl.textContent = user.email || '';
       if (!state.fsSynced) await loadUserData(user.uid);
       showApp();
+      startSessionWatcher();
       import('./notifications.js').then(m => m.maybeShowNotifBanner?.());
       import('./payday_modal.js').then(m => m.maybeShowPayday?.());
     } else {
       state.currentUser = null;
       state.fsSynced = false;
+      stopSessionWatcher();
       import('./tracker.js').then(m => m.loadLocal());
       showAuthScreen();
     }
@@ -80,11 +131,14 @@ export function initAuth() {
 export async function signIn() {
   const email = $('signin-email')?.value.trim();
   const pass  = $('signin-pass')?.value;
+  const keepSignedIn = $('signin-remember')?.checked ?? true;
   authErr('signin-error','');
   if (!email || !pass) { authErr('signin-error','Enter email and password.'); return; }
   try {
+    await setPersistence(auth, keepSignedIn ? browserLocalPersistence : browserSessionPersistence);
     await signInWithEmailAndPassword(auth, email, pass);
   } catch(e) {
+    console.error('signIn failed:', e);
     authErr('signin-error', friendlyAuthError(e.code));
   }
 }
@@ -101,19 +155,34 @@ export async function signUp() {
     state.isNewUser = true;
     await createUserWithEmailAndPassword(auth, email, pass);
   } catch(e) {
+    console.error('signUp failed:', e);
     state.isNewUser = false;
     authErr('signup-error', friendlyAuthError(e.code));
   }
 }
 
 export async function signInGoogle() {
-  try { await signInWithPopup(auth, googleProvider); }
-  catch(e) { if (e.code !== 'auth/popup-closed-by-user') toast('Google sign-in failed: '+e.message); }
+  try {
+    await setPersistence(auth, browserLocalPersistence);
+    await signInWithPopup(auth, googleProvider);
+  } catch(e) {
+    if (e.code !== 'auth/popup-closed-by-user') {
+      console.error('Google sign-in failed:', e);
+      toast('Google sign-in failed. Please try again.');
+    }
+  }
 }
 
 export async function signInMicrosoft() {
-  try { await signInWithPopup(auth, microsoftProvider); }
-  catch(e) { if (e.code !== 'auth/popup-closed-by-user') toast('Microsoft sign-in failed: '+e.message); }
+  try {
+    await setPersistence(auth, browserLocalPersistence);
+    await signInWithPopup(auth, microsoftProvider);
+  } catch(e) {
+    if (e.code !== 'auth/popup-closed-by-user') {
+      console.error('Microsoft sign-in failed:', e);
+      toast('Microsoft sign-in failed. Please try again.');
+    }
+  }
 }
 
 export async function doSignOut() {
@@ -121,6 +190,7 @@ export async function doSignOut() {
 }
 
 export async function confirmSignOut() {
+  stopSessionWatcher();
   state.fsSynced = false;
   state.currentUser = null;
   state.financeHistory = [];
@@ -134,7 +204,8 @@ export async function sendReset() {
     await sendPasswordResetEmail(auth, email);
     toast('Reset email sent to '+email);
   } catch(e) {
-    toast('Could not send reset: '+friendlyAuthError(e.code));
+    console.error('sendReset failed:', e);
+    toast('Could not send reset email. Please try again.');
   }
 }
 
@@ -143,7 +214,6 @@ export async function deleteAccount() {
   if (!confirm('Delete your account and all data permanently? This cannot be undone.')) return;
   try {
     const uid = state.currentUser.uid;
-    // Delete Firestore data (best effort)
     const mSnap = await getDocs(collection(db,'users',uid,'months'));
     await Promise.all(mSnap.docs.map(d => d.ref.delete?.())).catch(()=>{});
     await deleteUser(state.currentUser);
@@ -152,22 +222,31 @@ export async function deleteAccount() {
     localStorage.clear();
     toast('Account deleted');
   } catch(e) {
-    toast('Could not delete account: '+e.message);
+    console.error('deleteAccount failed:', e);
+    toast('Could not delete account. Please sign out and sign back in, then try again.');
   }
 }
 
+/**
+ * Maps Firebase Auth error codes to user-friendly messages.
+ * Security note: user-not-found and wrong-password return the same message
+ * so attackers cannot enumerate valid email addresses.
+ * @param {string} code - Firebase Auth error code
+ * @returns {string} User-friendly message
+ */
 function friendlyAuthError(code) {
   const map = {
-    'auth/user-not-found':   'No account found with this email.',
-    'auth/wrong-password':   'Incorrect password.',
-    'auth/invalid-email':    'Invalid email address.',
-    'auth/email-already-in-use': 'An account already exists with this email.',
-    'auth/weak-password':    'Password is too weak.',
-    'auth/too-many-requests':'Too many attempts. Please try again later.',
-    'auth/network-request-failed':'Network error. Check your connection.',
-    'auth/invalid-credential':'Invalid email or password.',
+    'auth/user-not-found':        'Incorrect email or password.',
+    'auth/wrong-password':        'Incorrect email or password.',
+    'auth/invalid-credential':    'Incorrect email or password.',
+    'auth/invalid-email':         'Invalid email address.',
+    'auth/email-already-in-use':  'An account with this email already exists. Try signing in instead.',
+    'auth/weak-password':         'Password must be at least 6 characters.',
+    'auth/too-many-requests':     'Too many attempts. Please wait a few minutes and try again.',
+    'auth/network-request-failed':'Network error. Please check your connection.',
+    'auth/user-disabled':         'This account has been disabled. Please contact support.',
   };
-  return map[code] || 'An error occurred. Please try again.';
+  return map[code] || 'Sign in failed. Please try again.';
 }
 
 // ── Window globals ────────────────────────────────────────────────────────────

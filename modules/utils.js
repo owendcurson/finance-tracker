@@ -39,11 +39,18 @@ export function emptyState(icon, title, text, btnLabel, btnAction) {
   const btn = btnLabel ? `<button class="btn btn-primary" style="margin-top:4px" onclick="${btnAction}">${btnLabel}</button>` : '';
   return `<div class="empty-state"><i class="ti ${icon} empty-state-icon"></i><div class="empty-state-title">${title}</div><p class="empty-state-text">${text}</p>${btn}</div>`;
 }
+
+/**
+ * Shows a toast notification. The toast element carries role="alert" so
+ * screen readers announce it automatically.
+ * @param {string} m - Message to display
+ */
 export function toast(m) {
   const t = $('toast'); if (!t) return;
   t.textContent = m; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
 }
+
 export function debounce(fn, ms) {
   let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
 }
@@ -54,4 +61,30 @@ export function loadScript(src) {
     s.src = src; s.onload = resolve; s.onerror = reject;
     document.head.appendChild(s);
   });
+}
+
+/**
+ * Strips HTML tags and trims whitespace from a user-supplied string.
+ * Use this before displaying any content that came from user input or Firestore.
+ * @param {string} str - Raw input
+ * @returns {string} Safe plain text
+ */
+export function sanitise(str) {
+  const tmp = document.createElement('div');
+  tmp.textContent = String(str);
+  return tmp.textContent.trim();
+}
+
+/**
+ * Maps Firebase Firestore error codes to user-friendly messages.
+ * Never expose raw Firebase codes or messages to the UI.
+ * @param {Error} err - Firebase error object (has .code property)
+ * @returns {string} User-friendly error message
+ */
+export function friendlyFsError(err) {
+  const code = err?.code || '';
+  if (code.includes('permission-denied')) return "You don't have permission to access this data. Please sign out and sign back in.";
+  if (code.includes('unavailable'))       return 'You appear to be offline. Changes will sync when you reconnect.';
+  if (code.includes('quota-exceeded'))    return 'Storage limit reached. Please contact support.';
+  return 'Something went wrong. Please try again.';
 }

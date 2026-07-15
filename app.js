@@ -1,4 +1,4 @@
-// Finance Tracker v2.0.0 — ES module entry point
+// Finance Tracker v2.1.2 — ES module entry point
 import { APP_VERSION } from './modules/constants.js';
 import { state } from './modules/state.js';
 import { initBH } from './modules/payday.js';
@@ -12,6 +12,20 @@ import { attachChartTypeListeners } from './modules/charts.js';
 import { initBackToTop } from './modules/ui.js';
 import { checkPaydayNotifications } from './modules/notifications.js';
 import { initSplash } from './modules/splash.js';
+
+// ── Global error handlers ─────────────────────────────────────────────────────
+// Log details to console for debugging; show only a generic message to users.
+window.onerror = (msg, src, line, col, err) => {
+  console.error('Uncaught error:', msg, src, line, col, err);
+  import('./modules/utils.js').then(m => m.toast('Something went wrong. Please refresh the page.'));
+  return false; // allow default browser error handling
+};
+
+window.addEventListener('unhandledrejection', e => {
+  console.error('Unhandled promise rejection:', e.reason);
+  // Don't show a toast for every rejected promise (e.g. network, lazy imports)
+  // — only when the rejection carries no message we'd want to surface.
+});
 
 // ── Bootstrap ─────────────────────────────────────────────────────────────────
 function init() {
@@ -80,14 +94,12 @@ window._showTrackerNew= () => import('./modules/tracker.js').then(m => { state.e
 document.addEventListener('DOMContentLoaded', () => {
   init();
 
-  // Density buttons (Part 4)
   document.querySelectorAll('.density-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       import('./modules/settings.js').then(m => m.setDensity(btn.dataset.density));
     });
   });
 
-  // Sign out
   const soBtn = document.getElementById('signout-btn');
   if (soBtn) soBtn.addEventListener('click', () => {
     import('./modules/auth.js').then(m => m.doSignOut());

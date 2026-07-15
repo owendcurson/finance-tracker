@@ -2599,3 +2599,16 @@ body:not([data-theme="dark"]) .toast {
 .savings-goal-status { font-size: 0.78rem; font-weight: 600; }
 .savings-goal-status.on-track  { color: #34d399; }
 .savings-goal-status.off-track { color: #f87171; }
+
+/* ── Keep me signed in checkbox ─────────────────────────────────────────── */
+.auth-remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.84rem;
+  color: rgba(255,255,255,0.65);
+  margin: 2px 0 8px;
+  cursor: pointer;
+  user-select: none;
+}
+.auth-remember input[type="checkbox"] { accent-color: #6366f1; width: 15px; height: 15px; }

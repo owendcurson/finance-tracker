@@ -1,7 +1,8 @@
 import { initializeApp }                   from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js';
 import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider,
          OAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword,
-         signOut, deleteUser, sendPasswordResetEmail }
+         signOut, deleteUser, sendPasswordResetEmail,
+         setPersistence, browserLocalPersistence, browserSessionPersistence }
   from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js';
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, deleteDoc }
   from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
@@ -24,5 +25,6 @@ export const microsoftProvider= new OAuthProvider('microsoft.com');
 export {
   onAuthStateChanged, signInWithPopup, signInWithEmailAndPassword,
   createUserWithEmailAndPassword, signOut, deleteUser, sendPasswordResetEmail,
+  setPersistence, browserLocalPersistence, browserSessionPersistence,
   collection, doc, setDoc, getDoc, getDocs, deleteDoc,
 };

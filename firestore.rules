@@ -1,0 +1,55 @@
+// Firestore Security Rules — Finance Tracker
+//
+// Deploy with: firebase deploy --only firestore:rules
+// Requires Firebase CLI: npm install -g firebase-tools
+// Then: firebase login && firebase use financial-tracker-f8d47
+//
+// Structure:
+//   /users/{userId}/months/{monthId}   — saved monthly records
+//   /users/{userId}/settings/{settingId} — user preferences
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Only the authenticated user matching the userId path segment may access their data.
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    // A month document must contain month (0–11), year (2020–2035), and takeHome as numbers.
+    // This prevents malformed writes from corrupting the UI.
+    function validMonth() {
+      let d = request.resource.data;
+      return d.keys().hasAll(['month', 'year', 'takeHome'])
+          && d.month is number
+          && d.year  is number
+          && d.takeHome is number
+          && d.month >= 0   && d.month <= 11
+          && d.year  >= 2020 && d.year  <= 2035
+          && d.takeHome >= 0;
+    }
+
+    // Settings documents (payDay, density, dashboardLayout, emailPrefs).
+    // No structural validation — these are small and trusted.
+    match /users/{userId}/settings/{settingId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // Month documents: reads are owner-only; writes require valid structure.
+    // Firestore enforces the 1 MB per-document hard limit automatically,
+    // so field validation here ensures no junk data is accepted at all.
+    match /users/{userId}/months/{monthId} {
+      allow read:          if isOwner(userId);
+      allow create, update: if isOwner(userId) && validMonth();
+      allow delete:        if isOwner(userId);
+    }
+
+    // Deny everything else — including unauthenticated access and
+    // any collection not listed above.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

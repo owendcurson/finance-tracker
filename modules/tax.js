@@ -1,24 +1,70 @@
+/**
+ * modules/tax.js
+ * UK PAYE income tax and National Insurance calculations for 2026/27.
+ *
+ * Exports: gPA, cTax, cNI
+ *
+ * All inputs are annual gross income in pounds (GBP).
+ * All outputs are annual amounts in pounds (GBP).
+ * Constants are imported from constants.js — update those when HMRC
+ * announces new rates for the following tax year.
+ */
+
 import { PA, BU, HU, TS, BR, HR, AR, NL, NU, NM, NH } from './constants.js';
 
-// Adjusted personal allowance (tapered above £100k)
-export function gPA(g) {
-  if (g <= TS) return PA;
-  return Math.max(0, PA - Math.floor((g - TS) / 2));
+/**
+ * Calculates the adjusted personal allowance for a given gross income.
+ * The personal allowance is tapered by £1 for every £2 of income above £100,000,
+ * reaching zero at £125,140 (2026/27 threshold).
+ *
+ * @param {number} grossIncome - Annual gross income in pounds
+ * @returns {number} Adjusted personal allowance in pounds (0–12,570)
+ */
+export function gPA(grossIncome) {
+  if (grossIncome <= TS) return PA;
+  return Math.max(0, PA - Math.floor((grossIncome - TS) / 2));
 }
 
-// Annual income tax
-export function cTax(g) {
-  const pa = gPA(g);
-  let tx = Math.max(0, g - pa), t = 0;
-  const b = Math.min(tx, Math.max(0, BU - pa));
-  t += b * BR; tx -= b;
-  const h = Math.min(tx, HU - BU);
-  t += h * HR; tx -= h;
-  return t + tx * AR;
+/**
+ * Calculates annual UK income tax (PAYE) for 2026/27.
+ *
+ * Bands applied after personal allowance:
+ *   Basic rate (20%)  — up to £50,270
+ *   Higher rate (40%) — £50,271 to £125,140
+ *   Additional rate (45%) — above £125,140
+ *
+ * @param {number} grossIncome - Annual gross income in pounds
+ * @returns {number} Annual income tax liability in pounds
+ */
+export function cTax(grossIncome) {
+  const pa = gPA(grossIncome);
+  let taxable = Math.max(0, grossIncome - pa);
+  let tax = 0;
+
+  const basicBand = Math.min(taxable, Math.max(0, BU - pa));
+  tax += basicBand * BR;
+  taxable -= basicBand;
+
+  const higherBand = Math.min(taxable, HU - BU);
+  tax += higherBand * HR;
+  taxable -= higherBand;
+
+  tax += taxable * AR; // Additional rate on remainder
+  return tax;
 }
 
-// Annual National Insurance
-export function cNI(g) {
-  if (g <= NL) return 0;
-  return Math.max(0, Math.min(g, NU) - NL) * NM + (g > NU ? (g - NU) * NH : 0);
+/**
+ * Calculates annual employee National Insurance contributions for 2026/27.
+ *
+ * Rates applied:
+ *   8% (NM) on earnings between £12,570 (NL) and £50,270 (NU)
+ *   2% (NH) on earnings above £50,270
+ *
+ * @param {number} grossIncome - Annual gross income in pounds
+ * @returns {number} Annual NI contributions in pounds
+ */
+export function cNI(grossIncome) {
+  if (grossIncome <= NL) return 0;
+  return Math.max(0, Math.min(grossIncome, NU) - NL) * NM
+       + (grossIncome > NU ? (grossIncome - NU) * NH : 0);
 }
