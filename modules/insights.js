@@ -23,14 +23,14 @@ export function generateInsights() {
   else if(subDiff<0) out.push({icon:'ti-trending-down',title:'Subscriptions trimmed',body:`You've cut ${fmt(Math.abs(subDiff))} from subscriptions since ${MS[oldest.month]} ${oldest.year}. Nice.`,type:'positive',key:'subs_down'});
   const start=taxYearStart(new Date()), tyMonths=state.financeHistory.filter(h=>inTaxYear(h,start));
   let totMiles=0,totMileageVal=0; tyMonths.forEach(h=>{if(h.togMileage)totMiles+=(h.miles||0);totMileageVal+=(h.mileage||0);});
-  if(totMiles>0) out.push({icon:'ti-car',title:'Mileage this tax year',body:`You've claimed ${totMiles.toLocaleString('en-GB')} miles — worth ${fmt(totMileageVal)} tax-free.`,type:'info',key:'mileage_'+start.getFullYear()});
+  if(totMiles>0) out.push({icon:'ti-car',title:'Mileage this tax year',body:`You've claimed ${totMiles.toLocaleString('en-GB')} miles, worth ${fmt(totMileageVal)} tax-free.`,type:'info',key:'mileage_'+start.getFullYear()});
   if(sorted.length>=3){const last3=sorted.slice(-3),srates=last3.map(h=>{const sv=monthSavings(h),th=h.takeHome||0;return th>0?(sv/th*100):0;});
-    if(srates[0]>srates[1]&&srates[1]>srates[2]) out.push({icon:'ti-trending-down',title:'Savings rate is slipping',body:`Your savings rate has fallen three months running — now ${srates[2].toFixed(1)}%.`,type:'warning',key:'savings_down'});
-    else if(srates[0]<srates[1]&&srates[1]<srates[2]) out.push({icon:'ti-trending-up',title:'Savings rate is climbing',body:`Three months of rising savings — now ${srates[2].toFixed(1)}%. Keep it up.`,type:'positive',key:'savings_up'});
+    if(srates[0]>srates[1]&&srates[1]>srates[2]) out.push({icon:'ti-trending-down',title:'Savings rate is slipping',body:`Your savings rate has fallen three months running, now ${srates[2].toFixed(1)}%.`,type:'warning',key:'savings_down'});
+    else if(srates[0]<srates[1]&&srates[1]<srates[2]) out.push({icon:'ti-trending-up',title:'Savings rate is climbing',body:`Three months of rising savings, now ${srates[2].toFixed(1)}%. Keep it up.`,type:'positive',key:'savings_up'});
   }
   if(sorted.length>=3){const f3=sorted.slice(-3).map(h=>h.freeMoney||0);
-    if(f3[0]>f3[1]&&f3[1]>f3[2]) out.push({icon:'ti-arrow-down-right',title:'Free money is shrinking',body:`Your free money has dropped three months in a row — now ${f3[2]<0?'−':''}${fmt(f3[2])}.`,type:'warning',key:'free_down'});
-    else if(f3[0]<f3[1]&&f3[1]<f3[2]) out.push({icon:'ti-arrow-up-right',title:'Free money is growing',body:`Free money has risen three months in a row — now ${fmt(f3[2])}.`,type:'positive',key:'free_up'});
+    if(f3[0]>f3[1]&&f3[1]>f3[2]) out.push({icon:'ti-arrow-down-right',title:'Free money is shrinking',body:`Your free money has dropped three months in a row, now ${f3[2]<0?'−':''}${fmt(f3[2])}.`,type:'warning',key:'free_down'});
+    else if(f3[0]<f3[1]&&f3[1]<f3[2]) out.push({icon:'ti-arrow-up-right',title:'Free money is growing',body:`Free money has risen three months in a row, now ${fmt(f3[2])}.`,type:'positive',key:'free_up'});
   }
   if(newest.pots&&newest.pots.length){const big=newest.pots.slice().sort((a,b)=>(b.amount||0)-(a.amount||0))[0];if(big&&big.amount>0)out.push({icon:'ti-receipt',title:'Biggest outgoing this month',body:`${big.name} was your largest pot at ${fmt(big.amount)}.`,type:'info',key:'biggest_'+newest.year+'_'+newest.month});}
   const over=(newest.pots||[]).filter(p=>(p.target||0)>0&&p.amount>p.target);
@@ -40,7 +40,7 @@ export function generateInsights() {
   let shown=[]; try{shown=JSON.parse(localStorage.getItem('tax_milestones_'+start.getFullYear())||'[]');}catch(e){}
   for(const ms of milestones){if(totTax>=ms){out.push({icon:'ti-flag',title:'Tax milestone reached',body:`You've paid over ${fmt(ms)} in income tax this tax year (${fmt(totTax)} so far).`,type:'info',key:'tax_'+start.getFullYear()+'_'+ms});if(!shown.includes(ms)){shown.push(ms);localStorage.setItem('tax_milestones_'+start.getFullYear(),JSON.stringify(shown));}break;}}
   const now=new Date(), pr=getPD(now.getFullYear(),now.getMonth());
-  if(pr.moved) out.push({icon:'ti-calendar-event',title:'Payday moved this month',body:movedReason(pr.original)+' — you\'ll be paid '+fdl(pr.payDate)+' instead.',type:'info',key:'payday_moved_'+now.getFullYear()+'_'+now.getMonth()});
+  if(pr.moved) out.push({icon:'ti-calendar-event',title:'Payday moved this month',body:movedReason(pr.original)+'. You\'ll be paid '+fdl(pr.payDate)+' instead.',type:'info',key:'payday_moved_'+now.getFullYear()+'_'+now.getMonth()});
   return out;
 }
 

@@ -79,7 +79,7 @@ export function calcAchievements() {
 
 export function showAchievementToast(icon, title) {
   const el = document.createElement('div'); el.className = 'achievement-toast';
-  el.innerHTML = `<i class="ti ${icon}"></i> Achievement unlocked — ${title}`;
+  el.innerHTML = `<i class="ti ${icon}"></i> Achievement unlocked: ${title}`;
   document.body.appendChild(el);
   setTimeout(() => el.classList.add('show'), 50);
   setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.parentNode?.removeChild(el), 400); }, 4500);

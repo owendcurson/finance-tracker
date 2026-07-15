@@ -37,7 +37,7 @@ export const DN = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','
 export const GREETINGS = [
   'Time to track your money!','Let\'s save some money!','Here comes the money!',
   'Bling bling!','We\'re here to help!','Are we rich yet?','Show me the money!',
-  'Every penny counts!','Budget like a boss!','Money moves!','Stack that cash!','Payday vibes!',
+  'Every penny counts!','Budget like a boss!','Money moves!','Stack that cash!',
 ];
 
 export const SAVINGS_CATS = [
@@ -135,7 +135,7 @@ export const LAYOUT_PRESETS = {
   },
   focus: {
     label: 'Focus',
-    description: 'Only the essentials — minimal and clean',
+    description: 'Only the essentials: minimal and clean',
     widgets: [
       { id: 'countdown',    visible: true,  colSpan: 12, rowSpan: 1 },
       { id: 'overview',     visible: true,  colSpan: 12, rowSpan: 1 },

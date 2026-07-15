@@ -144,8 +144,8 @@ export function updPD() {
   const m=parseInt($('pick-month').value),y=parseInt($('pick-year').value),r=getPD(y,m),nx=getNextPD(y,m),cs=new Date(r.payDate);
   cs.setDate(cs.getDate()+1);
   let h=`<div class="paydate-card"><div class="paydate-header"><span class="paydate-icon">&#128197;</span><span class="paydate-title">Pay Date for ${MF[m]} ${y}</span></div><div class="paydate-date">${fdl(r.payDate)}</div>`;
-  if(r.moved)h+=`<div class="paydate-note">${movedReason(r.original)} — paid ${['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][r.payDate.getDay()]} ${r.payDate.getDate()}${os(r.payDate.getDate())} instead</div>`;
-  h+=`<div class="paydate-coverage"><strong>Budget coverage:</strong> ${fds(cs)} — ${fds(nx.payDate)} <span style="color:var(--primary);font-weight:600">(${Math.round((nx.payDate-cs)/86400000)} days)</span></div></div>`;
+  if(r.moved)h+=`<div class="paydate-note">${movedReason(r.original)}. Paid ${['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][r.payDate.getDay()]} ${r.payDate.getDate()}${os(r.payDate.getDate())} instead</div>`;
+  h+=`<div class="paydate-coverage"><strong>Budget coverage:</strong> ${fds(cs)} to ${fds(nx.payDate)} <span style="color:var(--primary);font-weight:600">(${Math.round((nx.payDate-cs)/86400000)} days)</span></div></div>`;
   $('paydate-info').innerHTML=h;
 }
 
@@ -186,7 +186,7 @@ export function loadTemplate(id) {
   $('sec-expenses').classList.remove('open');$('sec-mileage').classList.remove('open');$('sec-overtime').classList.remove('open');
   const now=new Date();$('pick-month').value=now.getMonth();$('pick-year').value=now.getFullYear();updPD();
   $('detail-modal').classList.remove('open');showTracker();calc();
-  const b=$('template-banner');b.textContent=`Template loaded from ${MF[h.month]} ${h.year} — salary and pots ready, fill in this month's adjustments`;b.style.display='block';
+  const b=$('template-banner');b.textContent=`Template loaded from ${MF[h.month]} ${h.year}. Salary and pots ready, fill in this month's adjustments`;b.style.display='block';
   setTimeout(()=>b.style.display='none',8000);
 }
 
@@ -204,7 +204,7 @@ export function editEntry(id) {
   if(h.togMileage&&h.miles>0){$('tog-mileage').checked=true;toggleSection('mileage');$('miles').value=h.miles;}else{$('tog-mileage').checked=false;$('sec-mileage').classList.remove('open');$('miles').value='';}
   if(h.togOvertime&&h.overtime>0){$('tog-overtime').checked=true;toggleSection('overtime');$('overtime').value=h.overtime;}else{$('tog-overtime').checked=false;$('sec-overtime').classList.remove('open');$('overtime').value='';}
   calc();
-  const b=$('template-banner');b.textContent=`Editing ${MF[h.month]} ${h.year} — make your changes then save`;b.style.display='block';
+  const b=$('template-banner');b.textContent=`Editing ${MF[h.month]} ${h.year}. Make your changes then save`;b.style.display='block';
 }
 
 // ── Salary calculator ─────────────────────────────────────────────────────────
@@ -256,7 +256,7 @@ export async function exportMonthPDF(id) {
   await loadScript(JSPDF_CDN);
   if(!window.jspdf){toast('Export unavailable');return;}
   const jsPDF=window.jspdf.jsPDF; const d=new jsPDF(); let y=18;
-  d.setFontSize(18);d.text('Finance Tracker — '+MF[h.month]+' '+h.year,14,y);y+=8;
+  d.setFontSize(18);d.text('Finance Tracker: '+MF[h.month]+' '+h.year,14,y);y+=8;
   d.setFontSize(10);d.setTextColor(120);d.text('Pay date: '+(h.payDateLong||h.payDate),14,y);y+=10;d.setTextColor(0);
   const sec=t=>{d.setFontSize(12);d.setFont(undefined,'bold');d.text(t,14,y);d.setFont(undefined,'normal');y+=6;d.setFontSize(10);};
   const line=(l,v)=>{d.text(l,16,y);d.text(v,190,y,{align:'right'});y+=6;};

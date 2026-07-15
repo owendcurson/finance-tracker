@@ -35,7 +35,7 @@ export function initContactForm() {
       });
       if (res.ok) {
         form.reset();
-        if (succEl) { succEl.textContent='Message sent — thanks!'; succEl.style.display='block'; }
+        if (succEl) { succEl.textContent='Message sent. Thanks!'; succEl.style.display='block'; }
       } else {
         showCfError(errEl,'Something went wrong. Please try again.');
       }

@@ -42,10 +42,10 @@ export function showOfflineBanner(mode) {
   const b = $('offline-banner'); if (!b) return;
   b.className = '';
   if (mode === 'offline') {
-    b.innerHTML = '<i class="ti ti-wifi-off"></i> You\'re offline — changes are saved locally and will sync when you reconnect';
+    b.innerHTML = '<i class="ti ti-wifi-off"></i> You\'re offline. Changes are saved locally and will sync when you reconnect';
     void b.offsetWidth; b.className = 'offline-show';
   } else {
-    b.innerHTML = '<i class="ti ti-wifi"></i> Back online — syncing your data...';
+    b.innerHTML = '<i class="ti ti-wifi"></i> Back online. Syncing your data...';
     void b.offsetWidth; b.className = 'online-show';
     setTimeout(() => { b.style.opacity='0'; setTimeout(() => { b.className=''; b.style.opacity=''; }, 400); }, 3000);
   }
