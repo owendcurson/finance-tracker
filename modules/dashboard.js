@@ -105,11 +105,9 @@ export function renderDashboard() {
   renderYTD();
   renderCharts();
   renderSavingsChart();
-  renderInsights();
-  renderAchievements();
-  renderDashHistory();
-  buildHistoryFilters();
-  initHistoryControls();
+  const idle = window.requestIdleCallback || (fn => setTimeout(fn, 0));
+  idle(() => { renderInsights(); renderAchievements(); });
+  idle(() => { renderDashHistory(); buildHistoryFilters(); initHistoryControls(); });
   initChartObserver();
   attachChartTypeListeners();
   restoreCollapsedState(layout.map(w => w.id));

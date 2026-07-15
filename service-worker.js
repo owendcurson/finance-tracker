@@ -1,4 +1,4 @@
-var CACHE_NAME = 'finance-tracker-v34';
+var CACHE_NAME = 'finance-tracker-v35';
 var ASSETS = [
   './index.html',
   './styles.css',
@@ -35,10 +35,7 @@ var ASSETS = [
 var CDN_ASSETS = [
   'https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js',
   'https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js',
-  'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js',
-  'https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js',
-  'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js',
-  'https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js'
+  'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js'
 ];
 
 self.addEventListener('install', function(event) {

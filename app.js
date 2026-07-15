@@ -74,7 +74,7 @@ function showSettingsScreen() {
 window._showSettings = showSettingsScreen;
 window._showDashboard = () => import('./modules/dashboard.js').then(m => m.showDashboard());
 window._showTracker   = () => import('./modules/tracker.js').then(m => m.showTracker());
-window._showTrackerNew= () => import('./modules/tracker.js').then(m => m.showTracker(true));
+window._showTrackerNew= () => import('./modules/tracker.js').then(m => { state.editingId = null; m.clearTracker?.(); m.showTracker(); });
 
 // ── Settings screen event wiring ──────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {

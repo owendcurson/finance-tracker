@@ -8,7 +8,17 @@ export function isPaydayToday() {
   return pd.getTime() === now.getTime();
 }
 
-export function fireConfetti() {
+export async function fireConfetti() {
+  if (typeof window.confetti !== 'function') {
+    try {
+      await new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js';
+        s.onload = res; s.onerror = rej;
+        document.head.appendChild(s);
+      });
+    } catch(e) { return; }
+  }
   if (typeof window.confetti !== 'function') return;
   const end = Date.now() + 4000;
   (function frame() {

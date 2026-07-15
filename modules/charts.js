@@ -4,6 +4,19 @@ import { MS } from './constants.js';
 import { GROUP_COLORS, ACCOUNT_GROUPS, groupForPot } from './constants.js';
 import { chartTextColor, chartGridColor, chartZeroColor } from './theme.js';
 
+const CHART_CDN = 'https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js';
+let _chartJsLoad = null;
+function loadChartJS() {
+  if (window.Chart) return Promise.resolve();
+  if (_chartJsLoad) return _chartJsLoad;
+  _chartJsLoad = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = CHART_CDN; s.onload = resolve; s.onerror = reject;
+    document.head.appendChild(s);
+  });
+  return _chartJsLoad;
+}
+
 // ── Chart type segmented control (Part 3) ────────────────────────────────────
 function chartTypeCtrl(key, options) {
   const cur = state.chartPrefs[key];
@@ -39,8 +52,8 @@ export function initChartObserver() {
   if (!wrap || chartsRendered) return;
   chartObserver = new IntersectionObserver(entries => {
     if (entries.some(e => e.isIntersecting)) {
-      renderCharts();
       chartObserver?.disconnect();
+      loadChartJS().then(() => renderCharts()).catch(() => {});
     }
   }, { threshold: 0.1 });
   chartObserver.observe(wrap);

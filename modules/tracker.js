@@ -134,8 +134,10 @@ export function clearTracker() {
   $('tog-expenses').checked=false;$('tog-mileage').checked=false;$('tog-overtime').checked=false;
   $('sec-expenses').classList.remove('open');$('sec-mileage').classList.remove('open');$('sec-overtime').classList.remove('open');
   state.lastTakeHome=0;state.lastMileage=0;saveLocal();
-  const n=new Date();$('pick-month').value=n.getMonth();$('pick-year').value=n.getFullYear();
-  updPD();
+  if (state.mpInit) {
+    const n=new Date();$('pick-month').value=n.getMonth();$('pick-year').value=n.getFullYear();
+    updPD();
+  }
 }
 
 export function updPD() {
