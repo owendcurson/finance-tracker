@@ -54,8 +54,6 @@
   <section class="hero">
     <div class="hero-inner">
 
-      <div class="hero-badge"><span>✦ Built for UK workers</span></div>
-
       <h1 class="hero-title">
         <span class="hero-line1"><span class="hero-word">Know</span> <span class="hero-word">exactly</span></span>
         <span class="hero-line2 hero-word">where your money goes.</span>
@@ -307,6 +305,70 @@
         </div>
         <div class="card" id="tax-card" style="display:none"><h2>Monthly Pay Breakdown</h2><table class="breakdown" id="monthly-table"></table></div>
         <div class="card" id="annual-card" style="display:none"><h2>Annual Tax Summary</h2><table class="breakdown" id="annual-table"></table></div>
+
+        <!-- Student loan -->
+        <div class="card">
+          <label class="toggle-row" style="margin-bottom:0"><input type="checkbox" id="tog-sl" onchange="window._togSection('sl');window._calc()"><span class="toggle-label">I repay a student loan</span></label>
+          <div class="toggle-content" id="sec-sl">
+            <div class="field" style="margin-top:12px">
+              <label for="sl-plan">Loan plan</label>
+              <select id="sl-plan" onchange="window._onSLPlan();window._calc()">
+                <option value="plan1">Plan 1 — pre-Sept 2012 / Scotland / NI (threshold: £24,990)</option>
+                <option value="plan2" selected>Plan 2 — England/Wales, Sept 2012+ (threshold: £28,470)</option>
+                <option value="plan4">Plan 4 — Scotland, Sept 2012+ (threshold: £32,745)</option>
+                <option value="plan5">Plan 5 — Aug 2023+ undergraduate (threshold: £25,000)</option>
+                <option value="pgl">Postgraduate Loan only (threshold: £21,000)</option>
+              </select>
+            </div>
+            <label class="toggle-row" id="sl-pgl-row" style="display:none"><input type="checkbox" id="tog-sl-pgl" onchange="window._calc()"><span class="toggle-label">I also have a Postgraduate Loan</span></label>
+            <div class="live-calc" id="sl-calc" style="margin-top:4px">Estimated monthly deduction: £0.00</div>
+            <label class="toggle-row" style="margin-top:10px;margin-bottom:0"><input type="checkbox" id="tog-sl-override" onchange="window._togSection('sl-override');window._calc()"><span class="toggle-label">I think I may be overpaying or underpaying my student loan</span></label>
+            <div class="toggle-content" id="sec-sl-override">
+              <div class="field" style="margin-top:10px">
+                <label for="sl-override">Adjusted monthly deduction (override)</label>
+                <div class="input-wrap"><span class="prefix">&pound;</span><input type="number" id="sl-override" class="has-prefix" placeholder="0.00" min="0" step="1" oninput="window._calc()"></div>
+              </div>
+              <div class="info-banner-amber"><i class="ti ti-alert-triangle"></i> If you believe your deduction is incorrect, contact the Student Loans Company at <strong>studentloanscompany.eu</strong> or call <strong>0300 100 0611</strong> to check your balance and repayment status.</div>
+            </div>
+            <p class="field-note">Student loan repayments are deducted from gross pay after tax and NI. Figures are estimates based on your salary — your actual deduction may vary.</p>
+          </div>
+        </div>
+
+        <!-- Pension -->
+        <div class="card">
+          <label class="toggle-row" style="margin-bottom:0"><input type="checkbox" id="tog-pension" onchange="window._togSection('pension');window._calc()"><span class="toggle-label">I contribute to a workplace or personal pension</span></label>
+          <div class="toggle-content" id="sec-pension">
+            <div class="field" style="margin-top:12px">
+              <label>Contribution type</label>
+              <div class="radio-group">
+                <label class="radio-opt"><input type="radio" name="pen-contrib-type" value="percentage" checked onchange="window._onPenType();window._calc()"> Percentage of salary</label>
+                <label class="radio-opt"><input type="radio" name="pen-contrib-type" value="fixed" onchange="window._onPenType();window._calc()"> Fixed monthly amount</label>
+              </div>
+              <div class="input-wrap" style="margin-top:8px">
+                <input type="number" id="pen-amount" class="has-suffix" placeholder="5" min="0" max="100" step="0.5" oninput="window._calc()">
+                <span class="suffix" id="pen-amount-suffix">%</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="pen-scheme">Pension scheme type</label>
+              <select id="pen-scheme" onchange="window._onPenScheme();window._calc()">
+                <option value="relief_at_source">Relief at source</option>
+                <option value="salary_sacrifice">Salary sacrifice</option>
+                <option value="net_pay">Net pay arrangement</option>
+              </select>
+              <p class="field-note" id="pen-scheme-note">Contributions taken from net pay. Your provider adds 20% basic rate tax relief automatically.</p>
+            </div>
+            <label class="toggle-row" style="margin-bottom:0"><input type="checkbox" id="tog-pen-employer" onchange="window._togSection('pen-employer');window._calc()"><span class="toggle-label">My employer also contributes</span></label>
+            <div class="toggle-content" id="sec-pen-employer">
+              <div class="field" style="margin-top:10px">
+                <label for="pen-employer-pct">Employer contribution</label>
+                <div class="input-wrap"><input type="number" id="pen-employer-pct" class="has-suffix" placeholder="3" min="0" max="100" step="0.5" oninput="window._calc()"><span class="suffix">%</span></div>
+              </div>
+            </div>
+            <div class="live-calc" id="pen-calc" style="margin-top:8px;display:none"></div>
+          </div>
+        </div>
+
         <div class="nav-row"><div></div><button class="btn btn-primary" id="nav-next-1" onclick="window._goStep(2)">Next &rarr;</button></div>
       </div>
 

@@ -90,6 +90,7 @@ async function loadUserData(uid) {
     } else {
       import('./tracker.js').then(m => m.loadLocal());
     }
+    await import('./goals.js').then(m => m.loadGoalsFS(uid));
     state.fsSynced = true;
   } catch(e) {
     console.error('loadUserData failed:', e);

@@ -42,4 +42,6 @@ export const state = {
   dashEditMode: false,
   // Collapsed sections (Part 7)
   collapsedSections: JSON.parse(localStorage.getItem('section_collapsed') || '{}'),
+  // Savings goals (2.2.0) — keyed by slug derived from pot name
+  savingsGoals: JSON.parse(localStorage.getItem('finance_goals') || '{}'),
 };

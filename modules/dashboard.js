@@ -12,7 +12,7 @@ import { hideSkeleton, showSkeleton, initBackToTop, setBottomNav } from './ui.js
 const SECTION_TITLES = {
   countdown:'Payday Countdown', overview:'Overview', takehome:'Monthly Take-Home Pay',
   breakdown:'Spending Breakdown', stacked:'Spending by Category', free:'Free Money Trend',
-  savings:'Savings Rate', ytd:'Year-to-Date Summary', insights:'Spending Insights', achievements:'Achievements',
+  savings:'Savings Goals', ytd:'Year-to-Date Summary', insights:'Spending Insights', achievements:'Achievements',
 };
 
 const COL_OPTIONS = [
@@ -129,7 +129,7 @@ function initSideNav() {
     { id:'ds-breakdown',    label:'Spending' },
     { id:'ds-stacked',      label:'By Category' },
     { id:'ds-free',         label:'Free Money' },
-    { id:'ds-savings',      label:'Savings Rate' },
+    { id:'ds-savings',      label:'Savings Goals' },
     { id:'ds-ytd',          label:'Year-to-Date' },
     { id:'ds-insights',     label:'Insights' },
     { id:'ds-achievements', label:'Achievements' },

@@ -197,51 +197,7 @@ export function renderStackedChart(tc, gc) {
 }
 
 export function renderSavingsChart() {
-  const el = $('dash-savings'); if (!el) return;
-  const monthSavings = h => { let s=0; (h.pots||[]).forEach(p=>{ if(isSavingsPot(p)) s+=(parseFloat(p.amount)||0); }); return s; };
-  const any = state.financeHistory.some(h=>monthSavings(h)>0);
-  if (!state.financeHistory.length || !any) {
-    el.innerHTML = '<div class="card"><h2>Savings Rate</h2>'+emptyState('ti-pig-money','No savings pots found','Add a savings pot to track your savings rate over time.','Open tracker →','window._showTrackerNew()')+'</div>';
-    if (state.chartSavings) { state.chartSavings.destroy(); state.chartSavings = null; } return;
-  }
-  const all = state.financeHistory.slice().reverse();
-  const rates = all.map(h=>{ const sv=monthSavings(h),th=h.takeHome||0; return th>0?(sv/th*100):0; });
-  const nonZero = rates.filter(r=>r>0);
-  const cur=rates[rates.length-1]||0, avg=nonZero.length?nonZero.reduce((a,b)=>a+b,0)/nonZero.length:0, high=rates.length?Math.max(...rates):0;
-  const ctrl = chartTypeCtrl('savings', [['line','Line','ti-chart-line'],['bar','Bar','ti-chart-bar']]);
-  const goalPct = state.savingsGoal || 20;
-  const goalLabel = `${goalPct}% goal`;
-  const curRate = cur.toFixed(1);
-  const onTrack = cur >= goalPct;
-  el.innerHTML = `<div class="card">
-    <div class="card-header-row"><h2>Savings Rate</h2>${ctrl}</div>
-    <div class="metric-grid">
-      <div class="metric-stat"><div class="stat-label">Current Rate</div><div class="stat-value positive">${curRate}%</div></div>
-      <div class="metric-stat"><div class="stat-label">Average Rate</div><div class="stat-value">${avg.toFixed(1)}%</div></div>
-      <div class="metric-stat"><div class="stat-label">Highest Rate</div><div class="stat-value positive">${high.toFixed(1)}%</div></div>
-    </div>
-    <div class="savings-goal-row">
-      <span class="savings-goal-label"><i class="ti ti-target"></i> Savings goal</span>
-      <span class="savings-goal-value">${goalPct}%</span>
-      <span class="savings-goal-status ${onTrack?'on-track':'off-track'}">${onTrack?'✓ On track':'Below goal'}</span>
-    </div>
-    <canvas id="chart-savings" style="max-height:220px"></canvas></div>`;
-  const C = window.Chart; if (!C) return;
-  const tc=chartTextColor(), gc=chartGridColor();
-  const labels = all.map(h=>MS[h.month]+' '+String(h.year).slice(2));
-  if (state.chartSavings) state.chartSavings.destroy();
-  const pref = state.chartPrefs.savings;
-  if (pref === 'bar') {
-    state.chartSavings = new C($('chart-savings'),{type:'bar',data:{labels,datasets:[{label:'Savings rate',data:rates,backgroundColor:'#0d904f',borderRadius:4},{label:goalLabel,data:labels.map(()=>goalPct),type:'line',borderColor:'#e37400',borderDash:[6,4],pointRadius:0,fill:false}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:tc,boxWidth:12,font:{size:11}}}},scales:{y:{beginAtZero:true,ticks:{color:tc,callback:v=>v+'%'},grid:{color:gc}},x:{grid:{display:false},ticks:{color:tc}}}}});
-  } else {
-    state.chartSavings = new C($('chart-savings'),{type:'line',data:{labels,datasets:[{label:'Savings rate',data:rates,borderColor:'#0d904f',backgroundColor:'rgba(13,144,79,0.1)',fill:true,tension:0.3,pointRadius:3},{label:goalLabel,data:labels.map(()=>goalPct),borderColor:'#e37400',borderDash:[6,4],pointRadius:0,fill:false}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:tc,boxWidth:12,font:{size:11}}}},scales:{y:{beginAtZero:true,ticks:{color:tc,callback:v=>v+'%'},grid:{color:gc}},x:{grid:{display:false},ticks:{color:tc}}}}});
-  }
-}
-
-function isSavingsPot(p) {
-  const SAVINGS = ['Emergency Fund','Holiday Savings','House Deposit','Car Savings','General Savings','Stocks & Shares ISA','Cash ISA','Pension Top-Up','Christmas Fund'];
-  if (SAVINGS.indexOf(p.account || '') !== -1) return true;
-  return (p.name || '').toLowerCase().indexOf('saving') !== -1;
+  import('./goals.js').then(m => m.renderSavingsGoals());
 }
 
 function showChartEmptyStates() {

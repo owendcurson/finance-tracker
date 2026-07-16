@@ -1,6 +1,6 @@
 // Application-wide constants — no imports, no side effects
 
-export const APP_VERSION = '2.1.2';
+export const APP_VERSION = '2.2.0';
 
 // Contact / email
 export const CONTACT_ENDPOINT = 'https://formspree.io/f/maqgplzl';
@@ -13,6 +13,15 @@ export const PA=12570,BU=50270,HU=125140,TS=100000;
 export const BR=0.20,HR=0.40,AR=0.45;
 export const NL=12570,NU=50270,NM=0.08,NH=0.02;
 export const MR=0.55; // mileage rate £/mile
+
+// Student loan repayment thresholds and rates 2026/27
+export const SL_PLANS = {
+  plan1: { threshold: 24990, rate: 0.09, label: 'Plan 1' },
+  plan2: { threshold: 28470, rate: 0.09, label: 'Plan 2' },
+  plan4: { threshold: 32745, rate: 0.09, label: 'Plan 4' },
+  plan5: { threshold: 25000, rate: 0.09, label: 'Plan 5' },
+  pgl:   { threshold: 21000, rate: 0.06, label: 'Postgraduate Loan' },
+};
 
 // Bank holidays (MM-DD format → name)
 export const BH_RAW = {

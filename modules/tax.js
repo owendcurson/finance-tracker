@@ -10,7 +10,7 @@
  * announces new rates for the following tax year.
  */
 
-import { PA, BU, HU, TS, BR, HR, AR, NL, NU, NM, NH } from './constants.js';
+import { PA, BU, HU, TS, BR, HR, AR, NL, NU, NM, NH, SL_PLANS } from './constants.js';
 
 /**
  * Calculates the adjusted personal allowance for a given gross income.
@@ -51,6 +51,20 @@ export function cTax(grossIncome) {
 
   tax += taxable * AR; // Additional rate on remainder
   return tax;
+}
+
+/**
+ * Calculates annual student loan repayment for a given plan (2026/27 thresholds).
+ * Student loan is deducted after tax and NI — it does not reduce taxable income.
+ *
+ * @param {number} grossIncome - Annual gross income in pounds
+ * @param {string} plan - Plan key: 'plan1' | 'plan2' | 'plan4' | 'plan5' | 'pgl'
+ * @returns {number} Annual repayment in pounds (0 if below threshold)
+ */
+export function cStudentLoan(grossIncome, plan) {
+  const p = SL_PLANS[plan];
+  if (!p) return 0;
+  return Math.max(0, grossIncome - p.threshold) * p.rate;
 }
 
 /**
