@@ -34,12 +34,56 @@ export function maybeShowPayday() {
   if (localStorage.getItem(key)) return;
   localStorage.setItem(key,'1');
   const modal = $('payday-modal'); if (!modal) return;
+
+  const predicted = state.lastTakeHome;
+  const matchSection   = $('payday-match-section');
+  const defaultSection = $('payday-default-section');
+  if (predicted > 0 && matchSection && defaultSection) {
+    const el = $('payday-predicted-th');
+    if (el) el.textContent = '£' + predicted.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    matchSection.style.display   = '';
+    defaultSection.style.display = 'none';
+  }
+
   modal.classList.add('open');
   setTimeout(fireConfetti, 300);
 }
 
 export function closePaydayModal() {
   $('payday-modal')?.classList.remove('open');
+  // Reset modal state for next time
+  const matchSection   = $('payday-match-section');
+  const defaultSection = $('payday-default-section');
+  const actualSection  = $('payday-actual-section');
+  const actualConfirm  = $('payday-actual-confirm');
+  const matchBtns      = $('payday-match-btns');
+  if (matchSection)   matchSection.style.display   = 'none';
+  if (defaultSection) defaultSection.style.display = '';
+  if (actualSection)  actualSection.style.display  = 'none';
+  if (actualConfirm)  actualConfirm.style.display  = 'none';
+  if (matchBtns)      matchBtns.style.display      = '';
+  const inp = $('payday-actual-input'); if (inp) inp.value = '';
 }
 
 window._closePaydayModal = closePaydayModal;
+
+window._paydayYes = () => {
+  closePaydayModal();
+  window._showTrackerNew?.();
+};
+
+window._paydayNo = () => {
+  $('payday-actual-section').style.display = '';
+  $('payday-match-btns').style.display     = 'none';
+  $('payday-actual-confirm').style.display = '';
+  $('payday-actual-input')?.focus();
+};
+
+window._paydayConfirmActual = () => {
+  const actual = parseFloat($('payday-actual-input')?.value) || 0;
+  if (actual <= 0) { import('./utils.js').then(m => m.toast('Please enter your actual take-home.')); return; }
+  state.paydayActualTH = actual;
+  closePaydayModal();
+  window._showTrackerNew?.();
+  setTimeout(() => import('./utils.js').then(m => m.toast(`Tracker loaded. Your actual take-home of £${actual.toFixed(2)} has been noted.`)), 500);
+};

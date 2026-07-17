@@ -491,11 +491,30 @@
   <div class="payday-modal">
     <button class="payday-close" onclick="window._closePaydayModal()"><i class="ti ti-x"></i></button>
     <div class="payday-icon"><i class="ti ti-pig-money"></i></div>
-    <h2 id="payday-modal-title">It's payday! 🎉</h2>
-    <div class="payday-msg">Your money should be hitting your account today.</div>
-    <div class="payday-actions">
-      <button class="btn btn-primary" onclick="window._closePaydayModal();window._showTrackerNew()">Update this month's figures</button>
-      <button class="btn btn-outline" onclick="window._closePaydayModal()">View my dashboard</button>
+    <h2 id="payday-modal-title">It's payday!</h2>
+    <!-- Shown when a predicted take-home exists -->
+    <div id="payday-match-section" style="display:none">
+      <p class="payday-msg">Your predicted take-home was <strong id="payday-predicted-th"></strong>.</p>
+      <p class="payday-msg" style="margin-top:6px">Did your actual pay match this?</p>
+      <div id="payday-actual-section" style="display:none;margin-top:12px;text-align:left">
+        <label style="font-size:0.85rem;color:var(--text-secondary)">Actual take-home received</label>
+        <div class="input-wrap" style="margin-top:6px"><span class="prefix">£</span><input type="number" id="payday-actual-input" class="has-prefix" placeholder="0.00" step="0.01" min="0"></div>
+      </div>
+      <div class="payday-actions" id="payday-match-btns">
+        <button class="btn btn-primary" onclick="window._paydayYes()">Yes, plan my money</button>
+        <button class="btn btn-outline" onclick="window._paydayNo()">No, I received different</button>
+      </div>
+      <div id="payday-actual-confirm" style="display:none;margin-top:10px">
+        <button class="btn btn-primary" style="width:100%" onclick="window._paydayConfirmActual()">Plan with my actual pay</button>
+      </div>
+    </div>
+    <!-- Default when no prediction available -->
+    <div id="payday-default-section">
+      <div class="payday-msg">Your money should be hitting your account today.</div>
+      <div class="payday-actions">
+        <button class="btn btn-primary" onclick="window._closePaydayModal();window._showTrackerNew()">Plan this month</button>
+        <button class="btn btn-outline" onclick="window._closePaydayModal()">View my dashboard</button>
+      </div>
     </div>
   </div>
 </div>

@@ -226,8 +226,9 @@ function _calc() {
   mh += rowT('Monthly take-home', th);
   $('monthly-table').innerHTML = mh;
 
-  // Annual breakdown table — use original sal for headline figures
-  const rawTax = cTax(sal), rawNI = cNI(sal);
+  // Annual breakdown table — use pension-adjusted salaries so salary sacrifice / net pay reduce tax correctly
+  const rawTax = cTax(pen.taxableSal);
+  const rawNI  = cNI(pen.niSal);
   const annPen = pen.enabled ? pen.employeeCost * 12 : 0;
   const annSL  = totalSL * 12;
   const eff    = sal > 0 ? ((rawTax + rawNI) / sal * 100) : 0;
@@ -411,6 +412,9 @@ export async function saveMonth() {
   const pr  = getPD(sy, sm);
   const tp  = state.pots.reduce((s,p) => s + (parseFloat(p.amount)||0), 0);
   const entryId = state.editingId || Date.now();
+  // Use actual payday take-home if the user confirmed a different amount on payday
+  const actualTH = state.paydayActualTH > 0 ? state.paydayActualTH : state.lastTakeHome;
+  state.paydayActualTH = 0;
 
   const entry = {
     id: entryId, month: sm, year: sy,
@@ -424,10 +428,10 @@ export async function saveMonth() {
     miles: parseFloat($('miles').value) || 0,
     togOvertime: $('tog-overtime').checked,
     overtime: parseFloat($('overtime').value) || 0,
-    takeHome:  Math.round(state.lastTakeHome * 100) / 100,
+    takeHome:  Math.round(actualTH * 100) / 100,
     mileage:   Math.round(state.lastMileage  * 100) / 100,
     outgoings: Math.round(tp * 100) / 100,
-    freeMoney: Math.round((state.lastTakeHome + state.lastMileage - tp) * 100) / 100,
+    freeMoney: Math.round((actualTH + state.lastMileage - tp) * 100) / 100,
     pots: state.pots.filter(p => p.name || (parseFloat(p.amount)||0) > 0).map(p => ({
       name: p.name || 'Unnamed', amount: parseFloat(p.amount) || 0,
       account: p.account || '', target: parseFloat(p.target) || 0,

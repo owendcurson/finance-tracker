@@ -75,17 +75,20 @@ function sparklineSVG(saved, target, startDate, targetDate) {
   const progress = Math.min(1, elapsedMs / totalMs);
   const pctSaved = Math.min(1, saved / target);
 
-  const w = 120, h = 36, pad = 4;
+  const w = 140, h = 44, pad = 6;
   const x1 = pad, y1 = h - pad;
   const x2 = w - pad, y2 = pad;
   const dotX = pad + progress * (w - 2 * pad);
   const dotY = h - pad - pctSaved * (h - 2 * pad);
-  const midX = (x1 + x2) / 2;
+  const midX = (x1 + dotX) / 2;
+  // Area fill under the progress path
+  const fillPath = `M${x1},${y1} Q${midX},${y1} ${dotX},${dotY} L${dotX},${y1} Z`;
 
   return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="goal-sparkline" aria-hidden="true">
-    <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--border)" stroke-width="1.5" stroke-dasharray="3 3"/>
-    <path d="M${x1},${y1} Q${midX},${y1} ${dotX},${dotY}" stroke="var(--primary)" stroke-width="1.5" fill="none"/>
-    <circle cx="${dotX}" cy="${dotY}" r="3" fill="var(--primary)"/>
+    <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--border)" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <path d="${fillPath}" fill="var(--primary)" fill-opacity="0.15"/>
+    <path d="M${x1},${y1} Q${midX},${y1} ${dotX},${dotY}" stroke="var(--primary)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <circle cx="${dotX}" cy="${dotY}" r="4.5" fill="var(--primary)" stroke="var(--surface)" stroke-width="1.5"/>
   </svg>`;
 }
 

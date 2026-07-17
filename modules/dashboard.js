@@ -64,6 +64,31 @@ export async function showDashboard() {
   }
   renderDashboard();
   hideSkeleton();
+  maybeShowNewMonthBanner();
+}
+
+function maybeShowNewMonthBanner() {
+  const latest = state.financeHistory[0];
+  if (!latest) return;
+  const now = new Date();
+  const nowYM  = now.getFullYear() * 100 + now.getMonth();
+  const savedYM = latest.year * 100 + latest.month;
+  if (nowYM <= savedYM) return;
+  const bannerKey = `new_month_banner_${nowYM}`;
+  if (localStorage.getItem(bannerKey)) return;
+  const monthName = MS[now.getMonth()] + ' ' + now.getFullYear();
+  const existing = document.getElementById('new-month-banner');
+  if (existing) return;
+  const banner = document.createElement('div');
+  banner.id = 'new-month-banner';
+  banner.className = 'info-banner-amber';
+  banner.style.cssText = 'display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 16px 0;';
+  banner.innerHTML = `<i class="ti ti-calendar-plus" style="font-size:1.1rem;flex-shrink:0"></i>
+    <span style="flex:1">Ready to start <strong>${monthName}</strong>? Your last saved month was ${MS[latest.month]} ${latest.year}.</span>
+    <button class="btn btn-primary" style="font-size:0.8rem;padding:6px 14px" onclick="localStorage.setItem('${bannerKey}','1');this.closest('#new-month-banner').remove();window._showTrackerNew()">Start ${monthName}</button>
+    <button style="background:none;border:none;cursor:pointer;color:var(--text-secondary);font-size:1.2rem;line-height:1" onclick="localStorage.setItem('${bannerKey}','1');this.closest('#new-month-banner').remove()" title="Dismiss">&times;</button>`;
+  const container = document.getElementById('dash-container') || document.getElementById('dashboard-screen');
+  if (container) container.prepend(banner);
 }
 
 // ── Full dashboard render ─────────────────────────────────────────────────────

@@ -35,6 +35,23 @@ function goalSlug(name) {
   return 'sg_' + (name||'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'') || 'unnamed';
 }
 
+function isoToDisplay(iso) {
+  if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return '';
+  const [y, m, d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function displayToIso(s) {
+  const m = (s || '').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (!m) return '';
+  return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+}
+
+window._goalDateChange = (i, val) => {
+  const iso = displayToIso(val);
+  if (iso) window._updateGoal(i, 'targetDate', iso);
+};
+
 function monthsBetween(fromDate, toIso) {
   const to = new Date(toIso);
   return (to.getFullYear() - fromDate.getFullYear()) * 12 + (to.getMonth() - fromDate.getMonth());
@@ -81,7 +98,7 @@ function goalPanelHTML(p, i) {
         <div class="field" style="margin-bottom:8px"><label style="font-size:0.8rem">Goal name</label><input type="text" placeholder="e.g. Holiday to Japan" value="${esc(goal.goalName||goal.potName)}" oninput="window._updateGoal(${i},'goalName',this.value)" style="font-size:0.85rem"></div>
         <div class="field" style="margin-bottom:8px"><label style="font-size:0.8rem">Amount already saved</label><div class="input-wrap"><span class="prefix">&pound;</span><input type="number" class="has-prefix" placeholder="0" min="0" step="10" value="${goal.currentSaved||''}" oninput="window._updateGoal(${i},'currentSaved',parseFloat(this.value)||0)" style="font-size:0.85rem"></div></div>
         <div class="field" style="margin-bottom:8px"><label style="font-size:0.8rem">Target amount</label><div class="input-wrap"><span class="prefix">&pound;</span><input type="number" class="has-prefix" placeholder="0" min="0" step="100" value="${goal.targetAmount||''}" oninput="window._updateGoal(${i},'targetAmount',parseFloat(this.value)||0)" style="font-size:0.85rem"></div></div>
-        <div class="field" style="margin-bottom:8px"><label style="font-size:0.8rem">Target date</label><input type="date" value="${goal.targetDate||''}" min="${now.toISOString().slice(0,10)}" oninput="window._updateGoal(${i},'targetDate',this.value)" style="width:100%;font-size:0.85rem;background:var(--input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;color:var(--text)"></div>
+        <div class="field" style="margin-bottom:8px"><label style="font-size:0.8rem">Target date <span style="font-weight:400;color:var(--text-secondary)">(DD/MM/YYYY)</span></label><input type="text" inputmode="numeric" placeholder="DD/MM/YYYY" value="${isoToDisplay(goal.targetDate||'')}" onchange="window._goalDateChange(${i},this.value)" style="width:100%;font-size:0.85rem;background:var(--input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;color:var(--text)"></div>
       </div>
       ${calcLine}
     </div>

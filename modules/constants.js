@@ -1,6 +1,6 @@
 // Application-wide constants — no imports, no side effects
 
-export const APP_VERSION = '2.2.0';
+export const APP_VERSION = '2.3.0';
 
 // Contact / email
 export const CONTACT_ENDPOINT = 'https://formspree.io/f/maqgplzl';

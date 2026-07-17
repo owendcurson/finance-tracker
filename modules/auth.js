@@ -86,15 +86,15 @@ async function loadUserData(uid) {
     mSnap.forEach(d => months.push({ ...d.data(), id: parseInt(d.id) }));
     if (months.length) {
       state.financeHistory = months.sort((a,b)=>b.id-a.id);
-      import('./tracker.js').then(m => m.saveLocal());
+      await import('./tracker.js').then(m => m.saveLocal());
     } else {
-      import('./tracker.js').then(m => m.loadLocal());
+      await import('./tracker.js').then(m => m.loadLocal());
     }
     await import('./goals.js').then(m => m.loadGoalsFS(uid));
     state.fsSynced = true;
   } catch(e) {
     console.error('loadUserData failed:', e);
-    import('./tracker.js').then(m => m.loadLocal());
+    await import('./tracker.js').then(m => m.loadLocal());
     state.fsSynced = true;
     // Show cached-data notice only if we actually have local data
     if (localStorage.getItem('finance_history')) {

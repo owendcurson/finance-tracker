@@ -7,6 +7,7 @@ export const state = {
   editingId: null,
   lastTakeHome: 0,
   lastMileage: 0,
+  paydayActualTH: 0,
   currentStep: 1,
   isNewUser: false,
   obPots: [],
