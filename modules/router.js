@@ -89,7 +89,7 @@ async function _render(path, { silent = false } = {}) {
       break;
     }
     case '/settings':
-      window._showSettings?.();
+      window._renderSettings?.();
       break;
     case '/settings/privacy':
       import('./privacy.js').then(m => m.showPrivacy?.());

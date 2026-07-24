@@ -162,6 +162,6 @@ window._updateGoal = (i, field, value) => {
     state.savingsGoals[slug][field] = value;
     import('./goals.js').then(m => m.saveGoal(pot.name, state.savingsGoals[slug])).catch(() => {});
     try { localStorage.setItem('finance_goals', JSON.stringify(state.savingsGoals)); } catch(e) {}
-    renderPots();
+    // Do NOT call renderPots() here — it destroys the input DOM and steals focus mid-typing
   }
 };

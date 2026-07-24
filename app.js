@@ -79,6 +79,7 @@ function showSettingsScreen() {
 }
 
 window._showSettings  = () => navigate('/settings');
+window._renderSettings = showSettingsScreen;
 window._showDashboard = () => navigate('/dashboard');
 window._showTracker   = () => navigate('/new-month');
 window._showTrackerNew = () => {

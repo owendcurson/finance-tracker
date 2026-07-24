@@ -788,8 +788,18 @@ function _prefillEntry(h) {
   else { $('tog-overtime').checked=false; $('sec-overtime')?.classList.remove('open'); $('overtime').value=''; }
   if (h.studentLoan?.enabled) _applySLPrefs({ enabled:true, plan:h.studentLoan.plan, hasPgl:false, overriding:false });
   else { if($('tog-sl')){$('tog-sl').checked=false;} $('sec-sl')?.classList.remove('open'); }
-  if (h.pension?.enabled) _applyPenPrefs({ enabled:true, schemeType:h.pension.scheme });
-  else { if($('tog-pension')){$('tog-pension').checked=false;} $('sec-pension')?.classList.remove('open'); }
+  // Restore pension from saved localStorage prefs (has full detail) if that month had pension enabled
+  if (h.pension?.enabled) {
+    try {
+      const penRaw = localStorage.getItem('finance_pension');
+      _applyPenPrefs(penRaw ? { enabled:true, ...JSON.parse(penRaw) } : { enabled:true, schemeType:h.pension.scheme });
+    } catch(e) { _applyPenPrefs({ enabled:true, schemeType:h.pension.scheme }); }
+  } else { if($('tog-pension')){$('tog-pension').checked=false;} $('sec-pension')?.classList.remove('open'); }
+  // Restore tax code from saved localStorage prefs
+  try {
+    const tcRaw = localStorage.getItem('finance_taxcode');
+    if (tcRaw) _applyTCPrefs(JSON.parse(tcRaw));
+  } catch(e) {}
   calc();
 }
 
