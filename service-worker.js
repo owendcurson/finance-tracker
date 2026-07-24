@@ -1,4 +1,4 @@
-var CACHE_NAME = 'finance-tracker-v43';
+var CACHE_NAME = 'payunite-v44';
 var ASSETS = [
   './index.html',
   './404.html',
@@ -71,9 +71,9 @@ self.addEventListener('activate', function(event) {
 self.addEventListener('push', function(event) {
   var data = {};
   if (event.data) {
-    try { data = event.data.json(); } catch (e) { data = { title: 'Finance Tracker', body: event.data.text() }; }
+    try { data = event.data.json(); } catch (e) { data = { title: 'PayUnite', body: event.data.text() }; }
   }
-  var title = data.title || 'Finance Tracker';
+  var title = data.title || 'PayUnite';
   var options = {
     body: data.body || '',
     icon: './icon-192.svg',
@@ -101,7 +101,7 @@ self.addEventListener('notificationclick', function(event) {
 self.addEventListener('message', function(event) {
   var d = event.data || {};
   if (d.type === 'show-notification') {
-    var title = d.title || 'Finance Tracker';
+    var title = d.title || 'PayUnite';
     var options = {
       body: d.body || '',
       icon: './icon-192.svg',

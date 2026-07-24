@@ -1,7 +1,7 @@
 {
-  "name": "Finance Tracker",
-  "short_name": "FinTracker",
-  "description": "UK Personal Finance Tracker: Tax Year 2026/27",
+  "name": "PayUnite",
+  "short_name": "PayUnite",
+  "description": "Know exactly where your pay goes. Track your UK take-home pay, manage monthly pots, and always know your free money before payday.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0d1b2a",

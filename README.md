@@ -1,6 +1,6 @@
-# UK Personal Finance Tracker
+# PayUnite
 
-A progressive web app (PWA) for UK PAYE employees to calculate exact take-home pay, manage monthly spending pots, track mileage expenses, and monitor financial progress over the tax year.
+PayUnite is a UK personal finance tracker that calculates your exact take-home pay using 2026/27 HMRC tax and National Insurance rates, helps you manage monthly pots and outgoings, tracks mileage at 55p per mile, handles pension and student loan deductions, and shows your free money before every payday.
 
 ## Features
 

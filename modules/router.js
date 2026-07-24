@@ -1,6 +1,6 @@
 /**
  * modules/router.js
- * Lightweight History API router for Finance Tracker.
+ * Lightweight History API router for PayUnite.
  * Works on GitHub Pages via the 404.html redirect trick.
  */
 
@@ -12,18 +12,18 @@ const BASE = location.hostname === 'localhost' || location.hostname === '127.0.0
   : '/finance-tracker';
 
 const TITLES = {
-  '/':                       'Finance Tracker',
-  '/dashboard':              'Dashboard — Finance Tracker',
-  '/new-month':              'New Month — Finance Tracker',
-  '/new-month/adjustments':  'Adjustments — Finance Tracker',
-  '/new-month/pots':         'Pots — Finance Tracker',
-  '/history':                'History — Finance Tracker',
-  '/settings':               'Settings — Finance Tracker',
-  '/settings/privacy':       'Privacy — Finance Tracker',
-  '/savings':                'Savings Goals — Finance Tracker',
-  '/insights':               'Insights — Finance Tracker',
-  '/achievements':           'Achievements — Finance Tracker',
-  '/salary-calculator':      'Salary Calculator — Finance Tracker',
+  '/':                       'PayUnite',
+  '/dashboard':              'Dashboard — PayUnite',
+  '/new-month':              'New Month — PayUnite',
+  '/new-month/adjustments':  'Adjustments — PayUnite',
+  '/new-month/pots':         'Pots & Summary — PayUnite',
+  '/history':                'History — PayUnite',
+  '/settings':               'Settings — PayUnite',
+  '/settings/privacy':       'Privacy — PayUnite',
+  '/savings':                'Savings Goals — PayUnite',
+  '/insights':               'Insights — PayUnite',
+  '/achievements':           'Achievements — PayUnite',
+  '/salary-calculator':      'Salary Calculator — PayUnite',
 };
 
 // Paths that require auth (everything except the root auth screen)
@@ -64,7 +64,7 @@ async function _render(path, { silent = false } = {}) {
   }
 
   if (!silent) {
-    document.title = TITLES[path] || 'Finance Tracker';
+    document.title = TITLES[path] || 'PayUnite';
     import('./ui.js').then(m => m.setBottomNav(_navTab(path)));
   }
 
@@ -113,7 +113,7 @@ export function navigate(path, { replace = false } = {}) {
   const url = BASE + (path === '/' ? '/' : path);
   if (replace) history.replaceState({ path }, '', url);
   else history.pushState({ path }, '', url);
-  document.title = TITLES[path] || 'Finance Tracker';
+  document.title = TITLES[path] || 'PayUnite';
   _render(path);
 }
 
@@ -125,7 +125,7 @@ export function initRouter() {
   // Handle browser back/forward
   window.addEventListener('popstate', () => {
     const path = _getPath();
-    document.title = TITLES[path] || 'Finance Tracker';
+    document.title = TITLES[path] || 'PayUnite';
     _render(path);
   });
 

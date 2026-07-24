@@ -22,7 +22,7 @@ export async function enableNotifications() {
     toast('Notifications enabled');
     $('notif-banner')?.style.setProperty('display','none');
     localStorage.setItem('notif_banner_dismissed','1');
-    fireNotification('Finance Tracker', 'Payday notifications are now enabled!');
+    fireNotification('PayUnite', 'Payday notifications are now enabled!');
   } else {
     toast('Notification permission denied');
   }
@@ -56,11 +56,11 @@ export function checkPaydayNotifications() {
     sent.d3=true; localStorage.setItem(key,JSON.stringify(sent));
   }
   if (diffDays === 1 && !sent.d1) {
-    fireNotification('Payday tomorrow! 🎉', `Don\'t forget to track your spending.`);
+    fireNotification('PayUnite — Payday tomorrow! 💰', `Don\'t forget to plan your money.`);
     sent.d1=true; localStorage.setItem(key,JSON.stringify(sent));
   }
   if (diffDays === 0 && !sent.d0) {
-    fireNotification('It\'s payday! 💸', `Time to update your finance tracker.`);
+    fireNotification('PayUnite — It\'s payday! 💰', `Time to plan your money for this month.`);
     sent.d0=true; localStorage.setItem(key,JSON.stringify(sent));
   }
 }
