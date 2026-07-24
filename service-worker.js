@@ -1,4 +1,4 @@
-var CACHE_NAME = 'finance-tracker-v42';
+var CACHE_NAME = 'finance-tracker-v43';
 var ASSETS = [
   './index.html',
   './404.html',
