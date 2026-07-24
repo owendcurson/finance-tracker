@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script>
+  // Restore deep-link URL from 404.html redirect
+  (function(){var p=new URLSearchParams(location.search).get('redirect');if(p)history.replaceState(null,'','/finance-tracker'+p);})();
+</script>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://formspree.io wss://*.firebaseio.com; img-src 'self' data: https:; frame-src https://accounts.google.com https://*.firebaseapp.com; object-src 'none';">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0d1b2a">
@@ -306,6 +310,33 @@
         <div class="card" id="tax-card" style="display:none"><h2>Monthly Pay Breakdown</h2><table class="breakdown" id="monthly-table"></table></div>
         <div class="card" id="annual-card" style="display:none"><h2>Annual Tax Summary</h2><table class="breakdown" id="annual-table"></table></div>
 
+        <!-- Tax code -->
+        <div class="card">
+          <label class="toggle-row" style="margin-bottom:0"><input type="checkbox" id="tog-taxcode" onchange="window._togSection('taxcode');window._calc()"><span class="toggle-label">I know my tax code</span></label>
+          <div class="toggle-content" id="sec-taxcode">
+            <div class="field" style="margin-top:12px">
+              <label for="tc-input">Tax code</label>
+              <input type="text" id="tc-input" class="tc-input" placeholder="e.g. 1257L" maxlength="14" autocomplete="off" oninput="window._onTaxCode()">
+            </div>
+            <div id="tc-explanation" class="live-calc" style="display:none;margin-top:8px"></div>
+            <div id="tc-warning" class="info-banner-amber" style="display:none;margin-top:8px"></div>
+            <div class="field" style="margin-top:14px">
+              <label>Tax basis</label>
+              <div class="radio-group">
+                <label class="radio-opt"><input type="radio" name="tc-basis" value="cumulative" checked onchange="window._calc()"> Cumulative (standard)</label>
+                <label class="radio-opt"><input type="radio" name="tc-basis" value="wm1" onchange="window._calc()"> Week 1 / Month 1 (non-cumulative)</label>
+              </div>
+              <p class="field-note">Cumulative tax considers all pay to date in the tax year. Week 1 / Month 1 treats each pay period independently — used with emergency codes and new employees.</p>
+            </div>
+            <div style="margin-top:14px">
+              <div class="toggle-row-label" style="font-size:0.88rem;font-weight:600;color:var(--text);margin-bottom:6px">Previous tax codes</div>
+              <div id="tc-history-list"></div>
+              <button class="btn btn-outline" style="font-size:0.8rem;margin-top:8px;padding:6px 14px" onclick="window._addTCHistory()">+ Add previous code</button>
+              <p class="field-note" style="margin-top:6px">Optional record of prior codes. Useful for spotting if you were overtaxed in a previous month — contact HMRC on 0300 200 3300 if you think a code was wrong.</p>
+            </div>
+          </div>
+        </div>
+
         <!-- Student loan -->
         <div class="card">
           <label class="toggle-row" style="margin-bottom:0"><input type="checkbox" id="tog-sl" onchange="window._togSection('sl');window._calc()"><span class="toggle-label">I repay a student loan</span></label>
@@ -340,16 +371,39 @@
           <div class="toggle-content" id="sec-pension">
             <div class="field" style="margin-top:12px">
               <label>Contribution type</label>
-              <div class="radio-group">
-                <label class="radio-opt"><input type="radio" name="pen-contrib-type" value="percentage" checked onchange="window._onPenType();window._calc()"> Percentage of salary</label>
-                <label class="radio-opt"><input type="radio" name="pen-contrib-type" value="fixed" onchange="window._onPenType();window._calc()"> Fixed monthly amount</label>
-              </div>
-              <div class="input-wrap" style="margin-top:8px">
-                <input type="number" id="pen-amount" class="has-suffix" placeholder="5" min="0" max="100" step="0.5" oninput="window._calc()">
-                <span class="suffix" id="pen-amount-suffix">%</span>
+              <div class="radio-group" style="flex-direction:column;gap:8px">
+                <label class="radio-opt"><input type="radio" name="pen-contrib-type" value="percentage_qualifying" onchange="window._onPenType();window._calc()"> Percentage of qualifying earnings</label>
+                <label class="radio-opt"><input type="radio" name="pen-contrib-type" value="percentage_gross" checked onchange="window._onPenType();window._calc()"> Percentage of gross salary</label>
+                <label class="radio-opt"><input type="radio" name="pen-contrib-type" value="fixed_monthly" onchange="window._onPenType();window._calc()"> Fixed monthly amount</label>
               </div>
             </div>
-            <div class="field">
+            <!-- Percentage inputs (shown for percentage_qualifying and percentage_gross) -->
+            <div id="pen-pct-inputs">
+              <p class="field-note" id="pen-qe-note" style="display:none">Qualifying earnings are your gross monthly pay between £520 and £4,189.17. This is the basis for auto-enrolment legal minimums.</p>
+              <div class="input-wrap" style="margin-top:8px">
+                <input type="number" id="pen-amount" class="has-suffix" placeholder="5" min="0" max="100" step="0.5" oninput="window._calc()">
+                <span class="suffix">%</span>
+              </div>
+              <label class="toggle-row" style="margin-top:10px;margin-bottom:0"><input type="checkbox" id="tog-pen-employer" onchange="window._togSection('pen-employer');window._calc()"><span class="toggle-label">My employer also contributes</span></label>
+              <div class="toggle-content" id="sec-pen-employer">
+                <div class="field" style="margin-top:10px">
+                  <label for="pen-employer-pct">Employer contribution (%)</label>
+                  <div class="input-wrap"><input type="number" id="pen-employer-pct" class="has-suffix" placeholder="3" min="0" max="100" step="0.5" oninput="window._calc()"><span class="suffix">%</span></div>
+                </div>
+              </div>
+            </div>
+            <!-- Fixed inputs (shown for fixed_monthly) -->
+            <div id="pen-fixed-inputs" style="display:none">
+              <div class="field" style="margin-top:8px">
+                <label for="pen-fixed-employee">Your monthly contribution</label>
+                <div class="input-wrap"><span class="prefix">&pound;</span><input type="number" id="pen-fixed-employee" class="has-prefix" placeholder="0.00" min="0" step="1" oninput="window._calc()"></div>
+              </div>
+              <div class="field">
+                <label for="pen-fixed-employer">Employer monthly contribution</label>
+                <div class="input-wrap"><span class="prefix">&pound;</span><input type="number" id="pen-fixed-employer" class="has-prefix" placeholder="0.00" min="0" step="1" oninput="window._calc()"></div>
+              </div>
+            </div>
+            <div class="field" style="margin-top:12px">
               <label for="pen-scheme">Pension scheme type</label>
               <select id="pen-scheme" onchange="window._onPenScheme();window._calc()">
                 <option value="relief_at_source">Relief at source</option>
@@ -358,14 +412,8 @@
               </select>
               <p class="field-note" id="pen-scheme-note">Contributions taken from net pay. Your provider adds 20% basic rate tax relief automatically.</p>
             </div>
-            <label class="toggle-row" style="margin-bottom:0"><input type="checkbox" id="tog-pen-employer" onchange="window._togSection('pen-employer');window._calc()"><span class="toggle-label">My employer also contributes</span></label>
-            <div class="toggle-content" id="sec-pen-employer">
-              <div class="field" style="margin-top:10px">
-                <label for="pen-employer-pct">Employer contribution</label>
-                <div class="input-wrap"><input type="number" id="pen-employer-pct" class="has-suffix" placeholder="3" min="0" max="100" step="0.5" oninput="window._calc()"><span class="suffix">%</span></div>
-              </div>
-            </div>
             <div class="live-calc" id="pen-calc" style="margin-top:8px;display:none"></div>
+            <div id="pen-min-panel" class="pen-min-panel" style="display:none"></div>
           </div>
         </div>
 

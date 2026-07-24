@@ -1,7 +1,7 @@
 import { state } from './state.js';
 import { $, fmt, esc, row, rowT, st, toast, debounce, loadScript, friendlyFsError } from './utils.js';
 import { MF, MS, SL_PLANS } from './constants.js';
-import { cTax, cNI, gPA, cStudentLoan } from './tax.js';
+import { cTax, cNI, gPA, cStudentLoan, parseTaxCode, cTaxWithCode } from './tax.js';
 import { getPD, getNextPD, movedReason, taxYearStart } from './payday.js';
 import { os, fdl, fds, ds } from './utils.js';
 import { db, doc, setDoc, deleteDoc, getDocs, collection } from './firebase.js';
@@ -35,7 +35,7 @@ export function showDashboard() {
   import('./dashboard.js').then(m => m.showDashboard());
 }
 
-export function goStep(n) {
+export function goStep(n, { pushUrl = true } = {}) {
   const prev = state.currentStep || 1;
   state.currentStep = n;
   const dir = n > prev ? 'left' : 'right';
@@ -50,6 +50,14 @@ export function goStep(n) {
     const ln=$('sl'+i);if(ln)ln.classList.toggle('done',i<n);
   }
   if (n===3) renderPots();
+  if (pushUrl) {
+    const paths = { 1: '/new-month', 2: '/new-month/adjustments', 3: '/new-month/pots' };
+    const p = paths[n] || '/new-month';
+    const base = location.hostname === 'localhost' || location.hostname === '127.0.0.1' ? '' : '/finance-tracker';
+    const full = base + p;
+    if (location.pathname !== full) history.pushState({ path: p }, '', full);
+    document.title = 'New Month — Finance Tracker';
+  }
 }
 
 export function toggleSection(n) { $('sec-'+n)?.classList.toggle('open', $('tog-'+n)?.checked); }
@@ -63,11 +71,16 @@ export function onSLPlan() {
 
 // ── Pension UI helpers ────────────────────────────────────────────────────────
 export function onPenType() {
-  const type = document.querySelector('input[name="pen-contrib-type"]:checked')?.value || 'percentage';
-  const suf  = $('pen-amount-suffix');
-  const inp  = $('pen-amount');
-  if (suf) suf.textContent = type === 'percentage' ? '%' : '/month';
-  if (inp) inp.placeholder = type === 'percentage' ? '5' : '100';
+  const type = document.querySelector('input[name="pen-contrib-type"]:checked')?.value || 'percentage_gross';
+  const isFixed = type === 'fixed_monthly';
+  const pctEl   = $('pen-pct-inputs');
+  const fixedEl = $('pen-fixed-inputs');
+  if (pctEl)   pctEl.style.display   = isFixed ? 'none' : '';
+  if (fixedEl) fixedEl.style.display = isFixed ? ''     : 'none';
+  if (!isFixed) {
+    const note = $('pen-qe-note');
+    if (note) note.style.display = type === 'percentage_qualifying' ? 'block' : 'none';
+  }
 }
 
 export function onPenScheme() {
@@ -107,17 +120,31 @@ function _readSL() {
 
 function _readPension(sal) {
   const enabled = $('tog-pension')?.checked || false;
-  if (!enabled) return { enabled: false, monthlyContrib: 0, employeeCost: 0, employerMonthly: 0, scheme: 'relief_at_source', schemeLabel: 'Relief at source', taxableSal: sal, niSal: sal };
-  const contribType   = document.querySelector('input[name="pen-contrib-type"]:checked')?.value || 'percentage';
-  const penAmount     = parseFloat($('pen-amount')?.value) || 0;
-  const scheme        = $('pen-scheme')?.value || 'relief_at_source';
-  const empEnabled    = $('tog-pen-employer')?.checked || false;
-  const empPct        = parseFloat($('pen-employer-pct')?.value) || 0;
+  if (!enabled) return { enabled: false, monthlyContrib: 0, employeeCost: 0, employerMonthly: 0, scheme: 'relief_at_source', schemeLabel: 'Relief at source', taxableSal: sal, niSal: sal, contribType: 'percentage_gross' };
+  const contribType = document.querySelector('input[name="pen-contrib-type"]:checked')?.value || 'percentage_gross';
+  const penAmount   = parseFloat($('pen-amount')?.value) || 0;
+  const scheme      = $('pen-scheme')?.value || 'relief_at_source';
+  const monthlyGross = sal / 12;
 
-  let monthly = contribType === 'percentage' ? (sal / 12) * (penAmount / 100) : penAmount;
-  monthly = Math.max(0, monthly);
+  // Auto-enrolment qualifying earnings (April 2019 thresholds)
+  const QE_LOWER = 520, QE_UPPER = 4189.17;
+  const qualifying = Math.max(0, Math.min(monthlyGross, QE_UPPER) - QE_LOWER);
+
+  let monthly = 0, employerMonthly = 0;
+
+  if (contribType === 'fixed_monthly') {
+    monthly = Math.max(0, parseFloat($('pen-fixed-employee')?.value) || 0);
+    employerMonthly = Math.max(0, parseFloat($('pen-fixed-employer')?.value) || 0);
+  } else {
+    const base = contribType === 'percentage_qualifying' ? qualifying : monthlyGross;
+    monthly = base * (penAmount / 100);
+    monthly = Math.max(0, monthly);
+    const empEnabled = $('tog-pen-employer')?.checked || false;
+    const empPct = parseFloat($('pen-employer-pct')?.value) || 0;
+    employerMonthly = empEnabled ? base * (empPct / 100) : 0;
+  }
+
   const annual = monthly * 12;
-
   let taxableSal = sal, niSal = sal, employeeCost = monthly;
   let schemeLabel = 'Relief at source';
   if (scheme === 'salary_sacrifice') {
@@ -128,12 +155,107 @@ function _readPension(sal) {
     taxableSal  = Math.max(0, sal - annual);
     schemeLabel = 'Net pay arrangement';
   } else {
-    employeeCost = monthly * 0.80;
+    employeeCost = monthly * 0.80; // relief_at_source: employee pays 80%, provider tops up
   }
 
-  const employerMonthly = empEnabled ? (sal / 12) * (empPct / 100) : 0;
-  return { enabled, monthlyContrib: monthly, employeeCost, employerMonthly, scheme, schemeLabel, taxableSal, niSal };
+  // Legal minimum checker
+  const empMin   = qualifying * 0.05;
+  const erMin    = qualifying * 0.03;
+  const totalMin = qualifying * 0.08;
+  const empOk    = monthly >= empMin - 0.01;
+  const erOk     = employerMonthly >= erMin - 0.01;
+  const totalOk  = (monthly + employerMonthly) >= totalMin - 0.01;
+  const legalMin = { qualifying, empMin, erMin, totalMin, empOk, erOk, totalOk };
+
+  return { enabled, monthlyContrib: monthly, employeeCost, employerMonthly, scheme, schemeLabel, taxableSal, niSal, contribType, legalMin };
 }
+
+function _updatePenMinPanel(pen, sal) {
+  const panel = $('pen-min-panel'); if (!panel) return;
+  if (!pen.enabled || sal <= 0) { panel.style.display = 'none'; return; }
+  const { qualifying, empMin, erMin, totalMin, empOk, erOk, totalOk } = pen.legalMin;
+  if (qualifying <= 0) { panel.style.display = 'none'; return; }
+  const fmtM = v => '£' + v.toFixed(2);
+  const tick = ok => ok ? '<span class="pen-min-tick">&#10003;</span>' : '<span class="pen-min-cross">&#10007;</span>';
+  const statusClass = totalOk ? (empOk && erOk ? 'pen-min-green' : 'pen-min-amber') : 'pen-min-red';
+  const statusMsg   = totalOk
+    ? (empOk && erOk ? 'Meets auto-enrolment minimums' : 'Total meets minimum but one contribution is below its individual threshold')
+    : 'Below the auto-enrolment legal minimum — check with your employer';
+  panel.innerHTML = `
+    <div class="pen-min-header ${statusClass}">${statusMsg}</div>
+    <div class="pen-min-row"><span>Qualifying earnings this month</span><span>${fmtM(qualifying)}</span></div>
+    <div class="pen-min-row">${tick(empOk)}<span>Employee minimum (5%): ${fmtM(empMin)}</span><span>Yours: ${fmtM(pen.monthlyContrib)}</span></div>
+    <div class="pen-min-row">${tick(erOk)}<span>Employer minimum (3%): ${fmtM(erMin)}</span><span>Yours: ${fmtM(pen.employerMonthly)}</span></div>
+    <div class="pen-min-row pen-min-total">${tick(totalOk)}<span>Total minimum (8%): ${fmtM(totalMin)}</span><span>Total: ${fmtM(pen.monthlyContrib + pen.employerMonthly)}</span></div>
+    <div class="pen-min-link"><a href="https://www.gov.uk/workplace-pensions/what-you-your-employer-and-the-government-pay" target="_blank" rel="noopener">Learn more at gov.uk/workplace-pensions</a></div>`;
+  panel.style.display = 'block';
+}
+
+// ── Tax code ──────────────────────────────────────────────────────────────────
+function _readTaxCode() {
+  if (!$('tog-taxcode')?.checked) return null;
+  const raw = ($('tc-input')?.value || '').trim();
+  if (!raw) return null;
+  return state.currentTaxCode || parseTaxCode(raw);
+}
+
+export function onTaxCode() {
+  const raw = ($('tc-input')?.value || '').trim().toUpperCase();
+  if ($('tc-input')) $('tc-input').value = raw;
+  const expEl = $('tc-explanation');
+  const warnEl = $('tc-warning');
+  if (!raw) {
+    state.currentTaxCode = null;
+    if (expEl) { expEl.style.display = 'none'; expEl.textContent = ''; }
+    if (warnEl) { warnEl.style.display = 'none'; warnEl.textContent = ''; }
+    _calc();
+    return;
+  }
+  const tc = parseTaxCode(raw);
+  state.currentTaxCode = tc;
+  if (expEl && tc.explanation) { expEl.textContent = tc.explanation; expEl.style.display = 'block'; }
+  else if (expEl) expEl.style.display = 'none';
+  if (warnEl && tc.warning) {
+    warnEl.innerHTML = `<i class="ti ti-alert-triangle"></i> ${tc.warning}`;
+    warnEl.style.display = 'block';
+  } else if (warnEl) warnEl.style.display = 'none';
+  _calc();
+}
+
+function _renderTCHistory() {
+  const list = $('tc-history-list'); if (!list) return;
+  const hist = state.tcHistory || [];
+  if (!hist.length) { list.innerHTML = ''; return; }
+  list.innerHTML = hist.slice(0, 6).map((h, i) =>
+    `<div class="tc-history-row">
+      <input class="tc-history-input" style="width:90px;text-transform:uppercase" type="text" maxlength="12" value="${esc(h.code)}" placeholder="Code" oninput="window._tcHistoryCodeChange(${i},this.value)">
+      <input class="tc-history-input" style="width:78px" type="text" maxlength="7" value="${esc(h.monthYear)}" placeholder="MM/YYYY" oninput="window._tcHistoryDateChange(${i},this.value)">
+      <button class="tc-history-remove" onclick="window._removeTCHistory(${i})" aria-label="Remove">&times;</button>
+    </div>`
+  ).join('');
+}
+
+window._onTaxCode = onTaxCode;
+
+window._addTCHistory = () => {
+  if ((state.tcHistory || []).length >= 6) { toast('Maximum 6 previous codes'); return; }
+  state.tcHistory = state.tcHistory || [];
+  state.tcHistory.unshift({ code: '', monthYear: '' });
+  _renderTCHistory();
+};
+
+window._removeTCHistory = (i) => {
+  state.tcHistory.splice(i, 1);
+  _renderTCHistory();
+};
+
+window._tcHistoryCodeChange = (i, val) => {
+  if (state.tcHistory[i]) state.tcHistory[i].code = val.toUpperCase();
+};
+
+window._tcHistoryDateChange = (i, val) => {
+  if (state.tcHistory[i]) state.tcHistory[i].monthYear = val;
+};
 
 function _calc() {
   const sal = parseFloat($('salary').value) || 0;
@@ -146,6 +268,7 @@ function _calc() {
   const mA  = mi * MR;
   if (tM) $('mileage-calc').innerHTML = mi.toLocaleString('en-GB') + ' miles × 55p = ' + fmt(mA);
 
+  const tc  = _readTaxCode();
   const pen = _readPension(sal);
   const sl  = _readSL();
 
@@ -169,6 +292,7 @@ function _calc() {
       penCalcEl.style.display = 'none';
     }
   }
+  _updatePenMinPanel(pen, sal);
 
   // Update student loan live-calc display
   const slCalcEl = $('sl-calc');
@@ -180,18 +304,19 @@ function _calc() {
   onSLPlan();
 
   // ── Core calculations ─────────────────────────────────────────────
-  const aT = cTax(pen.taxableSal);
+  const cTaxFn = tc ? (g) => cTaxWithCode(g, tc) : cTax;
+  const aT = cTaxFn(pen.taxableSal);
   const aN = cNI(pen.niSal);
   const mG = sal / 12;
   const mT = aT / 12;
   const mN = aN / 12;
 
   // Work expenses reduce taxable income further (applied on top of pension)
-  const adjT = cTax(Math.max(0, pen.taxableSal - wE * 12)) / 12;
+  const adjT = cTaxFn(Math.max(0, pen.taxableSal - wE * 12)) / 12;
   const tS   = mT - adjT;
 
   // Overtime at marginal rates on effective salary
-  const oT = (cTax(pen.taxableSal + ot * 12) - cTax(pen.taxableSal)) / 12;
+  const oT = (cTaxFn(pen.taxableSal + ot * 12) - cTaxFn(pen.taxableSal)) / 12;
   const oN = (cNI(pen.niSal  + ot * 12) - cNI(pen.niSal)) / 12;
 
   const fT = adjT + oT;
@@ -227,13 +352,14 @@ function _calc() {
   $('monthly-table').innerHTML = mh;
 
   // Annual breakdown table — use pension-adjusted salaries so salary sacrifice / net pay reduce tax correctly
-  const rawTax = cTax(pen.taxableSal);
+  const rawTax = cTaxFn(pen.taxableSal);
   const rawNI  = cNI(pen.niSal);
   const annPen = pen.enabled ? pen.employeeCost * 12 : 0;
   const annSL  = totalSL * 12;
   const eff    = sal > 0 ? ((rawTax + rawNI) / sal * 100) : 0;
   let ah = row('Gross salary', sal);
-  ah += `<tr><td class="label-secondary">Personal allowance</td><td class="label-secondary" style="text-align:right">${fmt(gPA(sal))}</td></tr>`;
+  const paDisplay = tc ? (tc.flatRate !== null ? `${(tc.flatRate*100).toFixed(0)}% flat rate (code: ${tc.raw})` : tc.noTax ? 'None (code: NT)' : `£${Math.max(0,tc.pa).toLocaleString('en-GB')} (code: ${tc.raw})`) : fmt(gPA(sal));
+  ah += `<tr><td class="label-secondary">Personal allowance</td><td class="label-secondary" style="text-align:right">${paDisplay}</td></tr>`;
   ah += row('Income tax', -rawTax, 'deduction') + row('National Insurance', -rawNI, 'deduction');
   if (pen.enabled && annPen > 0) ah += row(`Pension (${pen.schemeLabel.toLowerCase()})`, -annPen, 'deduction');
   if (sl.enabled && annSL > 0)   ah += row('Student loan', -annSL, 'deduction');
@@ -250,6 +376,8 @@ function renderSum(th, mi) {
   const fr  = th + mi - tp;
   const pen = state._pen || { enabled: false };
   const sl  = state._sl  || { enabled: false };
+  const tc  = state.currentTaxCode;
+  const cTaxFn = tc ? (g) => cTaxWithCode(g, tc) : cTax;
 
   let h = fr >= 0
     ? `<div class="banner banner-green">${fmt(fr)} free money this month</div>`
@@ -258,13 +386,28 @@ function renderSum(th, mi) {
   h += `<div class="action-row"><button class="btn btn-success" id="save-month-btn">Save Month</button><button class="btn btn-amber" id="form-accounts-btn">Form Accounts</button></div>`;
   h += `<div class="card"><h3>Itemised Breakdown</h3><table class="breakdown">`;
 
+  // Tax code info line
+  if (tc && tc.raw) {
+    const paStr = tc.flatRate !== null ? `${(tc.flatRate*100).toFixed(0)}% flat rate` : tc.noTax ? 'No tax' : `Personal allowance £${Math.max(0,tc.pa).toLocaleString('en-GB')}`;
+    const emergencyNote = tc.isEmergency ? ' <span class="label-secondary">(emergency code)</span>' : '';
+    h += `<tr><td class="label-secondary" colspan="2" style="padding-bottom:4px">Tax code: <strong>${esc(tc.raw)}</strong>${emergencyNote} — ${paStr}</td></tr>`;
+  }
+
   // Full deduction chain from gross to take-home
   const sal = parseFloat($('salary')?.value) || 0;
   h += row('Gross salary (monthly)', sal / 12);
-  const fT = cTax(pen.taxableSal ?? sal) / 12 + (cTax((pen.taxableSal ?? sal) + (parseFloat($('overtime')?.value)||0)*12) - cTax(pen.taxableSal ?? sal)) / 12;
-  const fN = cNI(pen.niSal  ?? sal) / 12 + (cNI((pen.niSal ?? sal) + (parseFloat($('overtime')?.value)||0)*12) - cNI(pen.niSal ?? sal)) / 12;
+  const ot  = parseFloat($('overtime')?.value) || 0;
+  const tSal = pen.taxableSal ?? sal;
+  const nSal = pen.niSal ?? sal;
+  const fT = cTaxFn(tSal) / 12 + (cTaxFn(tSal + ot*12) - cTaxFn(tSal)) / 12;
+  const fN = cNI(nSal) / 12 + (cNI(nSal + ot*12) - cNI(nSal)) / 12;
   h += row('Income tax', -fT, 'deduction') + row('National Insurance', -fN, 'deduction');
-  if (pen.enabled && pen.employeeCost > 0) h += row(`Pension (${pen.schemeLabel?.toLowerCase() || ''})`, -pen.employeeCost, 'deduction');
+  if (pen.enabled && pen.monthlyContrib > 0) {
+    h += row(`Pension (${pen.schemeLabel?.toLowerCase() || ''})`, -pen.employeeCost, 'deduction');
+    const relief = pen.scheme === 'relief_at_source' ? pen.monthlyContrib - pen.employeeCost : 0;
+    if (relief > 0) h += `<tr><td class="label-secondary" style="padding-left:20px">+ provider tax relief</td><td class="label-secondary" style="text-align:right">+${fmt(relief)}</td></tr>`;
+    if (pen.employerMonthly > 0) h += `<tr><td class="label-secondary" style="padding-left:20px">+ employer contribution</td><td class="label-secondary" style="text-align:right">+${fmt(pen.employerMonthly)}</td></tr>`;
+  }
   if (sl.enabled && sl.monthlyUG > 0)  h += row(`Student loan (${sl.planLabel})`, -sl.monthlyUG, 'deduction');
   if (sl.enabled && sl.monthlyPGL > 0) h += row('Postgraduate loan', -sl.monthlyPGL, 'deduction');
   h += rowT('Net take-home pay', th);
@@ -298,13 +441,24 @@ export function saveLocal() {
     overriding:     $('tog-sl-override')?.checked || false,
     overrideAmount: parseFloat($('sl-override')?.value) || 0,
   } : { enabled: false };
+  const contribType = document.querySelector('input[name="pen-contrib-type"]:checked')?.value || 'percentage_gross';
   const penPrefs = penEnabled ? {
-    enabled:        true,
-    contribType:    document.querySelector('input[name="pen-contrib-type"]:checked')?.value || 'percentage',
-    amount:         parseFloat($('pen-amount')?.value) || 0,
-    schemeType:     $('pen-scheme')?.value || 'relief_at_source',
-    employerEnabled:$('tog-pen-employer')?.checked || false,
-    employerPct:    parseFloat($('pen-employer-pct')?.value) || 0,
+    enabled:         true,
+    contribType,
+    amount:          parseFloat($('pen-amount')?.value) || 0,
+    schemeType:      $('pen-scheme')?.value || 'relief_at_source',
+    employerEnabled: $('tog-pen-employer')?.checked || false,
+    employerPct:     parseFloat($('pen-employer-pct')?.value) || 0,
+    fixedEmployee:   parseFloat($('pen-fixed-employee')?.value) || 0,
+    fixedEmployer:   parseFloat($('pen-fixed-employer')?.value) || 0,
+  } : { enabled: false };
+
+  const tcEnabled = $('tog-taxcode')?.checked || false;
+  const tcPrefs = tcEnabled ? {
+    enabled: true,
+    code: $('tc-input')?.value || '',
+    basis: document.querySelector('input[name="tc-basis"]:checked')?.value || 'cumulative',
+    history: state.tcHistory || [],
   } : { enabled: false };
 
   try {
@@ -320,6 +474,7 @@ export function saveLocal() {
     }));
     localStorage.setItem('finance_sl',      JSON.stringify(slPrefs));
     localStorage.setItem('finance_pension', JSON.stringify(penPrefs));
+    localStorage.setItem('finance_taxcode', JSON.stringify(tcPrefs));
   } catch(e) {}
 }
 
@@ -353,6 +508,11 @@ export function loadLocal() {
     const penRaw = localStorage.getItem('finance_pension');
     if (penRaw) { const pen = JSON.parse(penRaw); _applyPenPrefs(pen); }
   } catch(e) {}
+  // Load tax code prefs
+  try {
+    const tcRaw = localStorage.getItem('finance_taxcode');
+    if (tcRaw) { const tc = JSON.parse(tcRaw); _applyTCPrefs(tc); }
+  } catch(e) {}
   // Load history
   try {
     const o = localStorage.getItem('uk-finance-history'), n = localStorage.getItem('finance_history');
@@ -379,15 +539,37 @@ function _applyPenPrefs(pen) {
   if (!pen?.enabled) return;
   const tog = $('tog-pension'); if (!tog) return;
   tog.checked = true; toggleSection('pension');
-  const radio = document.querySelector(`input[name="pen-contrib-type"][value="${pen.contribType || 'percentage'}"]`);
+  // Backward compat: map old 'percentage' → 'percentage_gross', 'fixed' → 'fixed_monthly'
+  let ct = pen.contribType || 'percentage_gross';
+  if (ct === 'percentage') ct = 'percentage_gross';
+  if (ct === 'fixed') ct = 'fixed_monthly';
+  const radio = document.querySelector(`input[name="pen-contrib-type"][value="${ct}"]`);
   if (radio) radio.checked = true;
   onPenType();
   if ($('pen-amount') && pen.amount) $('pen-amount').value = pen.amount;
+  if ($('pen-fixed-employee') && pen.fixedEmployee) $('pen-fixed-employee').value = pen.fixedEmployee;
+  if ($('pen-fixed-employer') && pen.fixedEmployer) $('pen-fixed-employer').value = pen.fixedEmployer;
   if ($('pen-scheme') && pen.schemeType) { $('pen-scheme').value = pen.schemeType; onPenScheme(); }
   if (pen.employerEnabled && $('tog-pen-employer')) {
     $('tog-pen-employer').checked = true; toggleSection('pen-employer');
     if ($('pen-employer-pct') && pen.employerPct) $('pen-employer-pct').value = pen.employerPct;
   }
+}
+
+function _applyTCPrefs(tc) {
+  if (!tc?.enabled) return;
+  const tog = $('tog-taxcode'); if (!tog) return;
+  tog.checked = true; toggleSection('taxcode');
+  if (tc.code && $('tc-input')) { $('tc-input').value = tc.code; }
+  if (tc.basis) {
+    const rb = document.querySelector(`input[name="tc-basis"][value="${tc.basis}"]`);
+    if (rb) rb.checked = true;
+  }
+  if (tc.history?.length) {
+    state.tcHistory = tc.history;
+    _renderTCHistory();
+  }
+  if (tc.code) onTaxCode();
 }
 
 export async function saveMonth() {
@@ -460,11 +642,25 @@ export async function saveMonth() {
   if (state.currentUser) {
     try { await setDoc(doc(db, 'users', state.currentUser.uid, 'months', String(entry.id)), entry); }
     catch(e) { console.error('saveMonth Firestore write failed:', e); toast(friendlyFsError(e)); }
-    // Persist SL/pension settings as preferences
-    const slPrefs  = { enabled: sl.enabled,  plan: sl.plan, hasPgl: sl.hasPgl, overriding: sl.overriding, overrideAmount: sl.overrideAmount };
-    const penPrefs = { enabled: pen.enabled, contribType: document.querySelector('input[name="pen-contrib-type"]:checked')?.value || 'percentage', amount: parseFloat($('pen-amount')?.value)||0, schemeType: pen.scheme, employerEnabled: $('tog-pen-employer')?.checked||false, employerPct: parseFloat($('pen-employer-pct')?.value)||0 };
+    // Persist SL/pension/taxcode settings as preferences
+    const slPrefs  = { enabled: sl.enabled, plan: sl.plan, hasPgl: sl.hasPgl, overriding: sl.overriding, overrideAmount: sl.overrideAmount };
+    const ct = document.querySelector('input[name="pen-contrib-type"]:checked')?.value || 'percentage_gross';
+    const penPrefs = {
+      enabled: pen.enabled, contribType: ct, amount: parseFloat($('pen-amount')?.value)||0,
+      schemeType: pen.scheme, employerEnabled: $('tog-pen-employer')?.checked||false,
+      employerPct: parseFloat($('pen-employer-pct')?.value)||0,
+      fixedEmployee: parseFloat($('pen-fixed-employee')?.value)||0,
+      fixedEmployer: parseFloat($('pen-fixed-employer')?.value)||0,
+    };
+    const tcEnabled = $('tog-taxcode')?.checked || false;
+    const tcPrefs = tcEnabled ? {
+      enabled: true, code: $('tc-input')?.value || '',
+      basis: document.querySelector('input[name="tc-basis"]:checked')?.value || 'cumulative',
+      history: state.tcHistory || [],
+    } : { enabled: false };
     setDoc(doc(db, 'users', state.currentUser.uid, 'settings', 'studentLoan'), slPrefs, { merge: true }).catch(() => {});
     setDoc(doc(db, 'users', state.currentUser.uid, 'settings', 'pension'),     penPrefs, { merge: true }).catch(() => {});
+    setDoc(doc(db, 'users', state.currentUser.uid, 'settings', 'taxCode'),     tcPrefs,  { merge: true }).catch(() => {});
   }
 
   await addInboxItem('ti-circle-check', MF[entry.month] + ' ' + entry.year + ' saved successfully',

@@ -45,4 +45,7 @@ export const state = {
   collapsedSections: JSON.parse(localStorage.getItem('section_collapsed') || '{}'),
   // Savings goals (2.2.0) — keyed by slug derived from pot name
   savingsGoals: JSON.parse(localStorage.getItem('finance_goals') || '{}'),
+  // Tax code (2.4.0)
+  currentTaxCode: null,   // parseTaxCode() result for the current session
+  tcHistory: [],          // [{ code: '1257L', monthYear: '04/2026' }, ...]
 };

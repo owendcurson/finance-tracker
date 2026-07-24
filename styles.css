@@ -2611,6 +2611,32 @@ body:not([data-theme="dark"]) .toast {
 .calc-note { font-size: 0.8rem; color: var(--green,#34d399); margin-top: 4px; }
 #pen-calc div { font-size: 0.85rem; margin-bottom: 2px; }
 
+/* ── Pension legal minimum panel ─────────────────────────────────────────── */
+.pen-min-panel { border-radius: var(--radius-sm,8px); overflow: hidden; margin-top: 12px; border: 1px solid var(--border); font-size: 0.83rem; }
+.pen-min-header { padding: 8px 12px; font-weight: 600; font-size: 0.82rem; }
+.pen-min-green  { background: rgba(52,211,153,0.15); color: var(--green,#34d399); }
+.pen-min-amber  { background: rgba(245,158,11,0.15); color: var(--amber,#f59e0b); }
+.pen-min-red    { background: rgba(239,68,68,0.15);  color: var(--red,#ef4444); }
+.pen-min-row    { display: flex; align-items: center; gap: 6px; padding: 5px 12px; color: var(--text-secondary); border-top: 1px solid var(--border); flex-wrap: wrap; }
+.pen-min-row span:last-child { margin-left: auto; font-weight: 500; color: var(--text); white-space: nowrap; }
+.pen-min-total  { font-weight: 600; color: var(--text) !important; }
+.pen-min-tick   { color: var(--green,#34d399); font-size: 0.9rem; flex-shrink: 0; }
+.pen-min-cross  { color: var(--red,#ef4444);   font-size: 0.9rem; flex-shrink: 0; }
+.pen-min-link   { padding: 6px 12px 8px; border-top: 1px solid var(--border); font-size: 0.78rem; }
+.pen-min-link a { color: var(--primary); text-decoration: none; }
+.pen-min-link a:hover { text-decoration: underline; }
+
+/* ── Tax code history ─────────────────────────────────────────────────────── */
+.tc-input { text-transform: uppercase; letter-spacing: 0.04em; }
+.tc-history-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border); }
+.tc-history-row:last-child { border-bottom: none; }
+.tc-history-code { font-weight: 600; font-size: 0.88rem; min-width: 80px; }
+.tc-history-date { flex: 1; font-size: 0.83rem; color: var(--text-secondary); }
+.tc-history-remove { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.1rem; padding: 2px 6px; border-radius: 4px; }
+.tc-history-remove:hover { background: var(--border); color: var(--text); }
+.tc-history-input { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: var(--radius-sm,6px); padding: 4px 8px; font-size: 0.82rem; width: 100%; }
+.tc-history-input:focus { outline: none; border-color: var(--primary); }
+
 /* ── Savings goals — tracker pot panels ──────────────────────────────────── */
 .goal-panel { padding: 4px 0 8px; }
 .goal-toggle-row { padding: 6px 0; margin-bottom: 0; background: none; }

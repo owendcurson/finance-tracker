@@ -1,6 +1,7 @@
-var CACHE_NAME = 'finance-tracker-v40';
+var CACHE_NAME = 'finance-tracker-v41';
 var ASSETS = [
   './index.html',
+  './404.html',
   './styles.css',
   './app.js',
   './manifest.json',
@@ -27,6 +28,7 @@ var ASSETS = [
   './modules/notifications.js',
   './modules/payday_modal.js',
   './modules/goals.js',
+  './modules/router.js',
   './modules/privacy.js',
   './modules/onboarding.js',
   './modules/demo.js',

@@ -1,4 +1,4 @@
-// Finance Tracker v2.1.2 — ES module entry point
+// Finance Tracker v2.4.0 — ES module entry point
 import { APP_VERSION } from './modules/constants.js';
 import { state } from './modules/state.js';
 import { initBH } from './modules/payday.js';
@@ -12,6 +12,7 @@ import { attachChartTypeListeners } from './modules/charts.js';
 import { initBackToTop } from './modules/ui.js';
 import { checkPaydayNotifications } from './modules/notifications.js';
 import { initSplash } from './modules/splash.js';
+import { navigate, initRouter } from './modules/router.js';
 
 // ── Global error handlers ─────────────────────────────────────────────────────
 // Log details to console for debugging; show only a generic message to users.
@@ -48,20 +49,10 @@ function init() {
     const btn = e.target.closest('[data-nav]');
     if (!btn) return;
     const tab = btn.dataset.nav;
-    if (tab === 'dashboard') {
-      import('./modules/dashboard.js').then(m => m.showDashboard());
-    } else if (tab === 'tracker') {
-      import('./modules/tracker.js').then(m => m.showTracker());
-    } else if (tab === 'history') {
-      import('./modules/dashboard.js').then(m => {
-        m.showDashboard().then(() => {
-          const el = document.getElementById('ds-history');
-          if (el) el.scrollIntoView({ behavior:'smooth', block:'start' });
-        });
-      });
-    } else if (tab === 'settings') {
-      showSettingsScreen();
-    }
+    if (tab === 'dashboard')  navigate('/dashboard');
+    else if (tab === 'tracker')  navigate('/new-month');
+    else if (tab === 'history')  navigate('/history');
+    else if (tab === 'settings') navigate('/settings');
   });
 
   // Modal close on backdrop click
@@ -75,6 +66,8 @@ function init() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./service-worker.js').catch(() => {});
   }
+
+  initRouter();
 }
 
 function showSettingsScreen() {
@@ -85,10 +78,14 @@ function showSettingsScreen() {
   renderSettingsScreen();
 }
 
-window._showSettings = showSettingsScreen;
-window._showDashboard = () => import('./modules/dashboard.js').then(m => m.showDashboard());
-window._showTracker   = () => import('./modules/tracker.js').then(m => m.showTracker());
-window._showTrackerNew= () => import('./modules/tracker.js').then(m => { state.editingId = null; m.clearTracker?.(); m.showTracker(); });
+window._showSettings  = () => navigate('/settings');
+window._showDashboard = () => navigate('/dashboard');
+window._showTracker   = () => navigate('/new-month');
+window._showTrackerNew = () => {
+  state.editingId = null;
+  import('./modules/tracker.js').then(m => m.clearTracker?.());
+  navigate('/new-month');
+};
 
 // ── Settings screen event wiring ──────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {

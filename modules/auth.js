@@ -7,6 +7,7 @@ import { auth, db, doc, getDoc, setDoc, collection, getDocs,
          setPersistence, browserLocalPersistence, browserSessionPersistence } from './firebase.js';
 import { initBH } from './payday.js';
 import { loadSettingsFS } from './settings.js';
+import { navigate, resolvePendingRoute } from './router.js';
 
 // ── Session inactivity timeout (60 minutes) ───────────────────────────────────
 const SESSION_TIMEOUT_MS = 60 * 60 * 1000;
@@ -75,7 +76,7 @@ function showApp() {
   const c = $('app-container'); if (c) c.style.display = '';
   window._closeAuth?.();
   import('./splash.js').then(m => m.pauseSplash?.());
-  import('./dashboard.js').then(m => m.showDashboard());
+  resolvePendingRoute();
 }
 
 // ── Load user data from Firestore ─────────────────────────────────────────────
@@ -124,6 +125,7 @@ export function initAuth() {
       stopSessionWatcher();
       import('./tracker.js').then(m => m.loadLocal());
       showAuthScreen();
+      navigate('/', { replace: true });
     }
   });
 }

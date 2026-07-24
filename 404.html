@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Finance Tracker</title>
+  <script>
+    // GitHub Pages SPA routing: redirect to index.html preserving the path
+    var path = location.pathname.replace('/finance-tracker', '') || '/';
+    var search = location.search;
+    var hash   = location.hash;
+    location.replace('/finance-tracker/?redirect=' + encodeURIComponent(path + search + hash));
+  </script>
+</head>
+<body></body>
+</html>
