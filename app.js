@@ -62,9 +62,13 @@ function init() {
     }
   });
 
-  // Service worker
+  // Service worker — always fetch fresh SW script, auto-reload when new version activates
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+    navigator.serviceWorker.register('./service-worker.js', { updateViaCache: 'none' }).catch(() => {});
+    let _swReloading = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!_swReloading) { _swReloading = true; location.reload(); }
+    });
   }
 
   initRouter();
