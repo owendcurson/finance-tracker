@@ -1,4 +1,4 @@
-var CACHE_NAME = 'payunite-v44';
+var CACHE_NAME = 'payunite-v45';
 var ASSETS = [
   './index.html',
   './404.html',
@@ -34,6 +34,8 @@ var ASSETS = [
   './modules/demo.js',
   './modules/offline.js',
   './modules/splash.js',
+  './assets/logo-mark.svg',
+  './assets/logo-mark-app-icon.svg',
 ];
 var CDN_ASSETS = [
   'https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js',

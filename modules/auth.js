@@ -59,7 +59,7 @@ function authErr(id, msg) {
 }
 
 function hideLoading() {
-  const l = $('loading-screen'); if (l) l.style.display = 'none';
+  const l = $('loading-screen'); if (l) l.remove();
 }
 
 function showAuthScreen() {

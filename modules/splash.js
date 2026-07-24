@@ -86,8 +86,8 @@ function _tick() {
 // ── Word stagger ───────────────────────────────────────────────────────────────
 function _staggerWords() {
   const words = document.querySelectorAll('.hero-word');
-  words.forEach((w, i) => setTimeout(() => w.classList.add('hw-in'), 60 + i * 82));
-  const done = 60 + words.length * 82;
+  words.forEach((w, i) => setTimeout(() => w.classList.add('hw-in'), 430 + i * 82));
+  const done = 430 + words.length * 82;
   setTimeout(() => document.querySelector('.hero-sub')?.classList.add('hw-in'), done + 370);
   setTimeout(() => {
     document.querySelector('.hero-ctas')?.classList.add('hw-in');

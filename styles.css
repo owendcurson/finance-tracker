@@ -2683,3 +2683,11 @@ body:not([data-theme="dark"]) .toast {
 .goal-balance-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); gap: 12px; }
 .goal-balance-row:last-child { border-bottom: none; }
 .goal-balance-name { font-size: 0.88rem; font-weight: 500; }
+
+/* ── PayUnite logo animations ─────────────────────────────────────────────── */
+@keyframes pu-pulse   { 0%,100%{opacity:1} 50%{opacity:0.6} }
+@keyframes pu-logo-in { from{opacity:0;transform:scale(0.8)} to{opacity:1;transform:scale(1)} }
+.pu-pulse   { animation: pu-pulse   1.2s ease-in-out infinite; }
+.pu-logo-in { animation: pu-logo-in 0.4s ease-out both; }
+#splash-logo-icon { transition: opacity 0.4s ease-out, transform 0.4s ease-out; }
+@media (max-width:768px) { #splash-logo-icon svg { width:48px!important; height:48px!important; } }
