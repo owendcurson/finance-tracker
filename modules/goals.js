@@ -8,6 +8,7 @@
 import { state } from './state.js';
 import { $, fmt, esc } from './utils.js';
 import { db, doc, setDoc, getDocs, collection, deleteDoc } from './firebase.js';
+import { getPD, getNextPD } from './payday.js';
 
 export function goalSlug(potName) {
   return 'sg_' + (potName || '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '') || 'unnamed';
@@ -50,6 +51,22 @@ export async function loadGoalsFS(uid) {
 
 // ── Dashboard render ──────────────────────────────────────────────────────────
 
+function _lastCompletedPayDate() {
+  const now = new Date();
+  const thisPD = getPD(now.getFullYear(), now.getMonth());
+  if (now >= thisPD.payDate) return thisPD.payDate;
+  let m = now.getMonth() - 1, y = now.getFullYear();
+  if (m < 0) { m = 11; y--; }
+  return getPD(y, m).payDate;
+}
+
+function _nextPayDate() {
+  const now = new Date();
+  const thisPD = getPD(now.getFullYear(), now.getMonth());
+  if (now < thisPD.payDate) return thisPD.payDate;
+  return getNextPD(now.getFullYear(), now.getMonth()).payDate;
+}
+
 function monthsApart(fromDate, toIso) {
   const to = new Date(toIso);
   return (to.getFullYear() - fromDate.getFullYear()) * 12
@@ -64,31 +81,46 @@ function relDate(toIso) {
   return `${m} month${m!==1?'s':''} away`;
 }
 
-function sparklineSVG(saved, target, startDate, targetDate) {
+function sparklineSVG(saved, target, startDate, targetDate, monthlyContrib) {
   const now = new Date();
   const start = startDate ? new Date(startDate) : now;
   const end   = targetDate ? new Date(targetDate) : null;
   if (!end || end <= start || target <= 0) return '';
 
-  const totalMs  = end - start;
-  const elapsedMs = Math.max(0, now - start);
-  const progress = Math.min(1, elapsedMs / totalMs);
-  const pctSaved = Math.min(1, saved / target);
-
+  const totalMs = end - start;
   const w = 140, h = 44, pad = 6;
-  const x1 = pad, y1 = h - pad;
-  const x2 = w - pad, y2 = pad;
-  const dotX = pad + progress * (w - 2 * pad);
-  const dotY = h - pad - pctSaved * (h - 2 * pad);
-  const midX = (x1 + dotX) / 2;
-  // Area fill under the progress path
-  const fillPath = `M${x1},${y1} Q${midX},${y1} ${dotX},${dotY} L${dotX},${y1} Z`;
+
+  const dateToX = d => pad + Math.max(0, Math.min(1, (new Date(d) - start) / totalMs)) * (w - 2 * pad);
+  const amtToY  = a => h - pad - Math.max(0, Math.min(1, a / target)) * (h - 2 * pad);
+
+  const x1 = pad, y1 = h - pad;  // origin (start date, £0)
+  const x2 = w - pad, y2 = pad;  // target diagonal endpoint
+
+  // Green confirmed line: from start to most recently completed pay date
+  const confirmedDate = _lastCompletedPayDate();
+  const confX = dateToX(confirmedDate);
+  const confY = amtToY(saved);
+  const midX  = (x1 + confX) / 2;
+  const fillPath = `M${x1},${y1} Q${midX},${y1} ${confX},${confY} L${confX},${y1} Z`;
+
+  // Orange projected line: confirmed point → next pay date
+  let projSVG = '';
+  if (monthlyContrib > 0) {
+    const projDate   = _nextPayDate();
+    const projSaved  = Math.min(target, saved + monthlyContrib);
+    const projX      = dateToX(projDate);
+    const projY      = amtToY(projSaved);
+    projSVG = `
+      <path d="M${confX},${confY} L${projX},${projY}" stroke="#f59e0b" stroke-width="2" fill="none" stroke-dasharray="4 3" stroke-linecap="round"/>
+      <circle cx="${projX}" cy="${projY}" r="3.5" fill="var(--surface)" stroke="#f59e0b" stroke-width="2"/>`;
+  }
 
   return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" class="goal-sparkline" aria-hidden="true">
     <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--border)" stroke-width="1.5" stroke-dasharray="4 3"/>
-    <path d="${fillPath}" fill="var(--primary)" fill-opacity="0.15"/>
-    <path d="M${x1},${y1} Q${midX},${y1} ${dotX},${dotY}" stroke="var(--primary)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-    <circle cx="${dotX}" cy="${dotY}" r="4.5" fill="var(--primary)" stroke="var(--surface)" stroke-width="1.5"/>
+    <path d="${fillPath}" fill="#34d399" fill-opacity="0.15"/>
+    <path d="M${x1},${y1} Q${midX},${y1} ${confX},${confY}" stroke="#34d399" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <circle cx="${confX}" cy="${confY}" r="4.5" fill="#34d399" stroke="var(--surface)" stroke-width="1.5"/>
+    ${projSVG}
   </svg>`;
 }
 
@@ -153,6 +185,8 @@ export function renderSavingsGoals() {
       projStr = proj.toLocaleDateString('en-GB', { month:'long', year:'numeric' });
     }
 
+    const projectedSaved = monthly > 0 ? Math.min(target, saved + monthly) : null;
+
     return `<div class="goal-card">
       <div class="goal-card-top">
         <div>
@@ -161,15 +195,17 @@ export function renderSavingsGoals() {
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
           <span class="goal-status goal-${statusKey}">${esc(statusLabel)}</span>
-          ${sparklineSVG(saved, target, g.startDate, g.targetDate)}
+          ${sparklineSVG(saved, target, g.startDate, g.targetDate, monthly)}
         </div>
       </div>
       <div class="goal-progress-track">
         <div class="goal-progress-fill" style="width:${pct.toFixed(1)}%;background:${barColor}"></div>
       </div>
       <div class="goal-progress-labels">
-        <span>${fmt(saved)} saved of ${fmt(target)}</span>
-        <span>${fmt(remaining)} remaining</span>
+        <span style="color:#34d399">Confirmed: ${fmt(saved)}</span>
+        ${projectedSaved !== null
+          ? `<span style="color:#f59e0b">Projected: ${fmt(projectedSaved)}</span>`
+          : `<span>${fmt(remaining)} remaining</span>`}
       </div>
       <div class="goal-meta-row">
         ${monthly > 0 ? `<span>Contributing ${fmt(monthly)}/month</span>` : ''}

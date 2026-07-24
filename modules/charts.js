@@ -11,7 +11,12 @@ function loadChartJS() {
   if (_chartJsLoad) return _chartJsLoad;
   _chartJsLoad = new Promise((resolve, reject) => {
     const s = document.createElement('script');
-    s.src = CHART_CDN; s.onload = resolve; s.onerror = reject;
+    s.src = CHART_CDN;
+    s.onload = resolve;
+    s.onerror = () => {
+      console.error('Charts: failed to load Chart.js from CDN:', CHART_CDN);
+      reject(new Error('Chart.js CDN load failed'));
+    };
     document.head.appendChild(s);
   });
   return _chartJsLoad;
@@ -53,7 +58,9 @@ export function initChartObserver() {
   chartObserver = new IntersectionObserver(entries => {
     if (entries.some(e => e.isIntersecting)) {
       chartObserver?.disconnect();
-      loadChartJS().then(() => renderCharts()).catch(() => {});
+      loadChartJS()
+        .then(() => renderCharts())
+        .catch(e => { console.error('Charts: cannot render, Chart.js failed to load:', e); showChartEmptyStates(); });
     }
   }, { threshold: 0.1 });
   chartObserver.observe(wrap);
@@ -61,11 +68,19 @@ export function initChartObserver() {
 
 // ── Main chart renderer ───────────────────────────────────────────────────────
 export function renderCharts() {
-  chartsRendered = true;
   const C = window.Chart;
-  if (!C || !state.financeHistory.length) {
-    showChartEmptyStates(); return;
+  if (!C) {
+    // Chart.js not yet loaded — leave DOM intact so the observer can trigger it
+    return;
   }
+  if (!state.financeHistory.length) {
+    // Don't show empty state while Firestore is still syncing
+    if (state.currentUser && !state.fsSynced) return;
+    chartsRendered = true;
+    showChartEmptyStates();
+    return;
+  }
+  chartsRendered = true;
   const tc = chartTextColor(), gc = chartGridColor();
 
   // Take-home chart

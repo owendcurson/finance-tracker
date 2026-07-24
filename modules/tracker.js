@@ -692,7 +692,11 @@ export function clearTracker() {
   state.lastTakeHome = 0; state.lastMileage = 0;
   saveLocal();
   if (state.mpInit) {
-    const n = new Date(); $('pick-month').value = n.getMonth(); $('pick-year').value = n.getFullYear();
+    const n = new Date();
+    const thisPD = getPD(n.getFullYear(), n.getMonth());
+    let defM = n.getMonth(), defY = n.getFullYear();
+    if (n < thisPD.payDate) { defM--; if (defM < 0) { defM = 11; defY--; } }
+    $('pick-month').value = defM; $('pick-year').value = defY;
     updPD();
   }
 }
@@ -710,11 +714,30 @@ export function initMP() {
   const msEl = $('pick-month'), ysEl = $('pick-year');
   if (!state.mpInit) {
     const now = new Date();
-    for (let m=0;m<12;m++) { const o=document.createElement('option');o.value=m;o.textContent=MF[m];if(m===now.getMonth())o.selected=true;msEl.appendChild(o); }
-    for (let y=2024;y<=2028;y++) { const o=document.createElement('option');o.value=y;o.textContent=y;if(y===now.getFullYear())o.selected=true;ysEl.appendChild(o); }
+    // Default to current month if pay date has passed, previous month otherwise
+    const thisPD = getPD(now.getFullYear(), now.getMonth());
+    let defMonth = now.getMonth(), defYear = now.getFullYear();
+    if (now < thisPD.payDate) {
+      defMonth--;
+      if (defMonth < 0) { defMonth = 11; defYear--; }
+    }
+    for (let m=0;m<12;m++) { const o=document.createElement('option');o.value=m;o.textContent=MF[m];if(m===defMonth)o.selected=true;msEl.appendChild(o); }
+    for (let y=2024;y<=2028;y++) { const o=document.createElement('option');o.value=y;o.textContent=y;if(y===defYear)o.selected=true;ysEl.appendChild(o); }
     state.mpInit = true;
   }
   updPD();
+  // Check if the selected month already has a saved record (new-month flow only)
+  if (!state.editingId) {
+    const m = parseInt(msEl.value), y = parseInt(ysEl.value);
+    const existing = state.financeHistory.find(e => e.month === m && e.year === y);
+    const b = $('template-banner');
+    if (b && existing) {
+      state.editingId = existing.id;
+      b.innerHTML = `You've already saved <strong>${MF[m]} ${y}</strong>. Saving will overwrite the existing record.`;
+      b.style.display = 'block';
+      _prefillEntry(existing);
+    }
+  }
 }
 
 export function shiftM(d) {
@@ -753,14 +776,8 @@ export function loadTemplate(id) {
   setTimeout(() => b.style.display = 'none', 8000);
 }
 
-export function editEntry(id) {
-  const h = state.financeHistory.find(e => e.id === id); if (!h) return;
-  state.editingId = id;
-  $('detail-modal').classList.remove('open');
-  showTracker();
-  state.currentStep = 1; goStep(1);
+function _prefillEntry(h) {
   $('salary').value = h.salary;
-  $('pick-month').value = h.month; $('pick-year').value = h.year; updPD();
   state.pots = h.pots.map(p => ({ name:p.name||'', amount:p.amount||'', account:p.account||'', target:p.target||'' }));
   renderPots();
   if (h.togExpenses && h.workExpenses > 0) { $('tog-expenses').checked=true; toggleSection('expenses'); $('work-expenses').value=h.workExpenses; }
@@ -769,12 +786,21 @@ export function editEntry(id) {
   else { $('tog-mileage').checked=false; $('sec-mileage')?.classList.remove('open'); $('miles').value=''; }
   if (h.togOvertime && h.overtime > 0) { $('tog-overtime').checked=true; toggleSection('overtime'); $('overtime').value=h.overtime; }
   else { $('tog-overtime').checked=false; $('sec-overtime')?.classList.remove('open'); $('overtime').value=''; }
-  // Restore SL/pension from saved entry
   if (h.studentLoan?.enabled) _applySLPrefs({ enabled:true, plan:h.studentLoan.plan, hasPgl:false, overriding:false });
   else { if($('tog-sl')){$('tog-sl').checked=false;} $('sec-sl')?.classList.remove('open'); }
   if (h.pension?.enabled) _applyPenPrefs({ enabled:true, schemeType:h.pension.scheme });
   else { if($('tog-pension')){$('tog-pension').checked=false;} $('sec-pension')?.classList.remove('open'); }
   calc();
+}
+
+export function editEntry(id) {
+  const h = state.financeHistory.find(e => e.id === id); if (!h) return;
+  state.editingId = id;
+  $('detail-modal').classList.remove('open');
+  showTracker();
+  state.currentStep = 1; goStep(1);
+  $('pick-month').value = h.month; $('pick-year').value = h.year; updPD();
+  _prefillEntry(h);
   const b = $('template-banner');
   b.textContent = `Editing ${MF[h.month]} ${h.year}. Make your changes then save`;
   b.style.display = 'block';
