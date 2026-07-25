@@ -710,6 +710,41 @@ export function updPD() {
   $('paydate-info').innerHTML = h;
 }
 
+function _resetFormToPrefs() {
+  state.pots = []; renderPots();
+  if ($('salary')) $('salary').value = '';
+  if ($('work-expenses')) $('work-expenses').value = '';
+  if ($('miles')) $('miles').value = '';
+  if ($('overtime')) $('overtime').value = '';
+  if ($('tog-expenses')) $('tog-expenses').checked = false;
+  if ($('tog-mileage'))  $('tog-mileage').checked  = false;
+  if ($('tog-overtime')) $('tog-overtime').checked = false;
+  $('sec-expenses')?.classList.remove('open');
+  $('sec-mileage')?.classList.remove('open');
+  $('sec-overtime')?.classList.remove('open');
+  calc();
+}
+
+function _checkBanner() {
+  const msEl = $('pick-month'), ysEl = $('pick-year');
+  if (!msEl || !ysEl) return;
+  const m = parseInt(msEl.value), y = parseInt(ysEl.value);
+  if (isNaN(m) || isNaN(y)) return;
+  const existing = state.financeHistory.find(e => e.month === m && e.year === y);
+  const b = $('template-banner');
+  if (!b) return;
+  if (existing) {
+    state.editingId = existing.id;
+    b.innerHTML = `You've already saved <strong>${MF[m]} ${y}</strong>. Saving will overwrite the existing record.`;
+    b.style.display = 'block';
+    _prefillEntry(existing);
+  } else {
+    state.editingId = null;
+    b.style.display = 'none';
+    _resetFormToPrefs();
+  }
+}
+
 export function initMP() {
   const msEl = $('pick-month'), ysEl = $('pick-year');
   if (!state.mpInit) {
@@ -726,18 +761,7 @@ export function initMP() {
     state.mpInit = true;
   }
   updPD();
-  // Check if the selected month already has a saved record (new-month flow only)
-  if (!state.editingId) {
-    const m = parseInt(msEl.value), y = parseInt(ysEl.value);
-    const existing = state.financeHistory.find(e => e.month === m && e.year === y);
-    const b = $('template-banner');
-    if (b && existing) {
-      state.editingId = existing.id;
-      b.innerHTML = `You've already saved <strong>${MF[m]} ${y}</strong>. Saving will overwrite the existing record.`;
-      b.style.display = 'block';
-      _prefillEntry(existing);
-    }
-  }
+  if (!state.editingId) _checkBanner();
 }
 
 export function shiftM(d) {
@@ -908,8 +932,8 @@ window._pdfMonth       = exportMonthPDF;
 window._xlYTD          = exportYTDExcel;
 window._showTracker    = showTracker;
 window._goStep         = goStep;
-window._updPD          = updPD;
-window._shiftM         = shiftM;
+window._updPD          = function() { updPD(); _checkBanner(); };
+window._shiftM         = function(d) { shiftM(d); _checkBanner(); };
 window._togSection     = (n) => toggleSection(n);
 window._addPot         = () => { addPotToState(); renderPots(); calc(); };
 window._initMP         = initMP;
