@@ -92,6 +92,43 @@ function _logoMode() {
   return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
 }
 
+// ── Mobile avatar dropdown ────────────────────────────────────────────────────
+
+window._setMobileAvatarUser = function(name, email) {
+  const btn = document.getElementById('mobile-avatar-btn');
+  const madName  = document.getElementById('mad-name');
+  const madEmail = document.getElementById('mad-email');
+  if (btn)      btn.textContent  = (name || '?')[0].toUpperCase();
+  if (madName)  madName.textContent  = name  || '';
+  if (madEmail) madEmail.textContent = email || '';
+};
+
+window._toggleAvatarDropdown = function(forceOpen) {
+  const btn      = document.getElementById('mobile-avatar-btn');
+  const dropdown = document.getElementById('mobile-avatar-dropdown');
+  if (!dropdown) return;
+  const isOpen = dropdown.classList.contains('mad-open');
+  const open   = forceOpen !== undefined ? forceOpen : !isOpen;
+  if (open) {
+    dropdown.style.display = 'block';
+    void dropdown.offsetWidth;
+    dropdown.classList.add('mad-open');
+    btn?.setAttribute('aria-expanded', 'true');
+  } else {
+    dropdown.classList.remove('mad-open');
+    btn?.setAttribute('aria-expanded', 'false');
+    setTimeout(() => { if (!dropdown.classList.contains('mad-open')) dropdown.style.display = 'none'; }, 160);
+  }
+};
+
+document.addEventListener('click', e => {
+  const dropdown = document.getElementById('mobile-avatar-dropdown');
+  const btn      = document.getElementById('mobile-avatar-btn');
+  if (dropdown?.classList.contains('mad-open') && !btn?.contains(e.target) && !dropdown.contains(e.target)) {
+    window._toggleAvatarDropdown(false);
+  }
+}, true);
+
 function _initLogos() {
   // Header logo
   const hdrEl = document.getElementById('header-logo');

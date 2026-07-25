@@ -663,7 +663,9 @@ textarea.contact-input { resize: vertical; min-height: 100px; }
 
 @media (max-width: 767px) {
   #bottom-nav { display: flex; }
-  #settings-btn, #signout-btn { display: none; }
+  #signout-btn { display: none; }
+  #user-display-name { display: none; }
+  #mobile-avatar-btn { display: flex; }
   .container { padding-bottom: 80px; }
   .achievements-grid { display: flex; overflow-x: auto; gap: 12px; padding-bottom: 8px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
   .achievements-grid::-webkit-scrollbar { display: none; }
@@ -2691,3 +2693,47 @@ body:not([data-theme="dark"]) .toast {
 .pu-logo-in { animation: pu-logo-in 0.4s ease-out both; }
 #splash-logo-icon { transition: opacity 0.4s ease-out, transform 0.4s ease-out; }
 @media (max-width:768px) { #splash-logo-icon svg { width:48px!important; height:48px!important; } }
+
+/* ── Mobile avatar button & dropdown ─────────────────────────────────────── */
+#mobile-avatar-btn {
+  display: none;
+  width: 32px; height: 32px;
+  background: #4f46e5;
+  border-radius: 50%;
+  font-size: 0.82rem; font-weight: 700;
+  align-items: center; justify-content: center;
+  color: #fff;
+  border: none; cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  line-height: 1;
+}
+#mobile-avatar-dropdown {
+  display: none;
+  position: fixed;
+  top: 52px; right: 12px;
+  background: rgba(8,11,20,0.95);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  min-width: 200px;
+  z-index: 1050;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+#mobile-avatar-dropdown.mad-open { opacity: 1; transform: translateY(0); }
+.mad-user-info { padding: 14px 16px 10px; }
+.mad-name  { font-size: 0.88rem; font-weight: 500; color: #fff; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mad-email { font-size: 0.75rem; color: rgba(255,255,255,0.45); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mad-divider { height: 1px; background: rgba(255,255,255,0.1); }
+.mad-item {
+  display: flex; align-items: center; gap: 9px;
+  width: 100%; padding: 12px 16px;
+  background: none; border: none;
+  color: #fff; font-size: 0.88rem; font-family: inherit;
+  cursor: pointer; text-align: left;
+  border-radius: 0 0 12px 12px;
+}
+.mad-item:active, .mad-item:hover { background: rgba(255,255,255,0.08); }

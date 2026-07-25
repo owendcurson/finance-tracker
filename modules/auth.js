@@ -114,6 +114,7 @@ export function initAuth() {
       const emailEl= $('user-display-email');
       if (nameEl)  nameEl.textContent  = user.displayName || user.email || 'User';
       if (emailEl) emailEl.textContent = user.email || '';
+      window._setMobileAvatarUser?.(user.displayName || user.email || 'User', user.email || '');
       if (!state.fsSynced) await loadUserData(user.uid);
       showApp();
       startSessionWatcher();
