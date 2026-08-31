@@ -777,7 +777,9 @@ export function closeAccounts() { $('accounts-modal').classList.remove('open'); 
 // ── Load / edit from history ──────────────────────────────────────────────────
 export function loadTemplate(id) {
   const h = state.financeHistory.find(e => e.id === id); if (!h) return;
-  state.editingId = null; $('salary').value = h.salary;
+  // Sentinel: prevents _checkBanner in initMP from overwriting template data
+  state.editingId = '__template__';
+  $('salary').value = h.salary;
   state.pots = h.pots.map(p => ({ name:p.name||'', amount:p.amount||'', account:p.account||'', target:p.target||'' }));
   renderPots();
   $('work-expenses').value=''; $('miles').value=''; $('overtime').value='';
@@ -786,8 +788,10 @@ export function loadTemplate(id) {
   // Restore SL/pension from template if present
   if (h.studentLoan?.enabled) _applySLPrefs({ enabled:true, plan:h.studentLoan.plan, hasPgl:false, overriding:false });
   if (h.pension?.enabled) _applyPenPrefs({ enabled:true, schemeType:h.pension.scheme });
+  $('detail-modal').classList.remove('open'); showTracker();
+  state.editingId = null;
   const now = new Date(); $('pick-month').value = now.getMonth(); $('pick-year').value = now.getFullYear(); updPD();
-  $('detail-modal').classList.remove('open'); showTracker(); calc();
+  calc();
   const b = $('template-banner');
   b.textContent = `Template loaded from ${MF[h.month]} ${h.year}. Salary and pots ready, fill in this month's adjustments`;
   b.style.display = 'block';
