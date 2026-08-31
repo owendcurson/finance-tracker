@@ -711,7 +711,9 @@ export function clearTracker() {
 }
 
 export function updPD() {
-  const m = parseInt($('pick-month').value), y = parseInt($('pick-year').value), r = getPD(y,m), nx = getNextPD(y,m);
+  const m = parseInt($('pick-month').value), y = parseInt($('pick-year').value);
+  if (isNaN(m) || isNaN(y)) return;
+  const r = getPD(y,m), nx = getNextPD(y,m);
   const cs = new Date(r.payDate); cs.setDate(cs.getDate()+1);
   let h = `<div class="paydate-card"><div class="paydate-header"><span class="paydate-icon">&#128197;</span><span class="paydate-title">Pay Date for ${MF[m]} ${y}</span></div><div class="paydate-date">${fdl(r.payDate)}</div>`;
   if (r.moved) h += `<div class="paydate-note">${movedReason(r.original)}. Paid ${['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][r.payDate.getDay()]} ${r.payDate.getDate()}${os(r.payDate.getDate())} instead</div>`;
