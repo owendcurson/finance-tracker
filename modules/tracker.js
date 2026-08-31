@@ -734,7 +734,7 @@ function _resetFormToPrefs() {
   calc();
 }
 
-function _checkBanner() {
+function _checkBanner(clearOnMiss = false) {
   const msEl = $('pick-month'), ysEl = $('pick-year');
   if (!msEl || !ysEl) return;
   const m = parseInt(msEl.value), y = parseInt(ysEl.value);
@@ -750,7 +750,7 @@ function _checkBanner() {
   } else {
     state.editingId = null;
     b.style.display = 'none';
-    _resetFormToPrefs();
+    if (clearOnMiss) _resetFormToPrefs();
   }
 }
 
@@ -770,7 +770,7 @@ export function initMP() {
     state.mpInit = true;
   }
   updPD();
-  if (!state.editingId) _checkBanner();
+  if (!state.editingId) _checkBanner(false);
 }
 
 export function shiftM(d) {
@@ -941,8 +941,8 @@ window._pdfMonth       = exportMonthPDF;
 window._xlYTD          = exportYTDExcel;
 window._showTracker    = showTracker;
 window._goStep         = goStep;
-window._updPD          = function() { updPD(); _checkBanner(); };
-window._shiftM         = function(d) { shiftM(d); _checkBanner(); };
+window._updPD          = function() { updPD(); _checkBanner(true); };
+window._shiftM         = function(d) { shiftM(d); _checkBanner(true); };
 window._togSection     = (n) => { toggleSection(n); calc(); };
 window._addPot         = () => { addPotToState(); renderPots(); calc(); };
 window._initMP         = initMP;
