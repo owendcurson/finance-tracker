@@ -719,22 +719,8 @@ export function updPD() {
   $('paydate-info').innerHTML = h;
 }
 
-function _resetFormToPrefs() {
-  state.pots = []; renderPots();
-  if ($('salary')) $('salary').value = '';
-  if ($('work-expenses')) $('work-expenses').value = '';
-  if ($('miles')) $('miles').value = '';
-  if ($('overtime')) $('overtime').value = '';
-  if ($('tog-expenses')) $('tog-expenses').checked = false;
-  if ($('tog-mileage'))  $('tog-mileage').checked  = false;
-  if ($('tog-overtime')) $('tog-overtime').checked = false;
-  $('sec-expenses')?.classList.remove('open');
-  $('sec-mileage')?.classList.remove('open');
-  $('sec-overtime')?.classList.remove('open');
-  calc();
-}
 
-function _checkBanner(clearOnMiss = false) {
+function _checkBanner() {
   const msEl = $('pick-month'), ysEl = $('pick-year');
   if (!msEl || !ysEl) return;
   const m = parseInt(msEl.value), y = parseInt(ysEl.value);
@@ -750,7 +736,6 @@ function _checkBanner(clearOnMiss = false) {
   } else {
     state.editingId = null;
     b.style.display = 'none';
-    if (clearOnMiss) _resetFormToPrefs();
   }
 }
 
@@ -770,7 +755,7 @@ export function initMP() {
     state.mpInit = true;
   }
   updPD();
-  if (!state.editingId) _checkBanner(false);
+  if (!state.editingId) _checkBanner();
 }
 
 export function shiftM(d) {
@@ -941,8 +926,8 @@ window._pdfMonth       = exportMonthPDF;
 window._xlYTD          = exportYTDExcel;
 window._showTracker    = showTracker;
 window._goStep         = goStep;
-window._updPD          = function() { updPD(); _checkBanner(true); };
-window._shiftM         = function(d) { shiftM(d); _checkBanner(true); };
+window._updPD          = function() { updPD(); _checkBanner(); };
+window._shiftM         = function(d) { shiftM(d); _checkBanner(); };
 window._togSection     = (n) => { toggleSection(n); calc(); };
 window._addPot         = () => { addPotToState(); renderPots(); calc(); };
 window._initMP         = initMP;
