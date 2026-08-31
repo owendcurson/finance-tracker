@@ -21,12 +21,21 @@ const SCHEME_NOTES = {
 };
 
 // ── Navigation ────────────────────────────────────────────────────────────────
+let _inputsBound = false;
+
 export function showTracker() {
   const ds2 = $('dashboard-screen'), ts = $('tracker-screen');
   if (ds2) ds2.style.display = 'none';
   if (ts) { ts.style.display = 'block'; screenEnter(ts); }
   const hb = $('header-back'); if (hb) hb.style.display = 'flex';
   const tb = $('template-banner'); if (tb) tb.style.display = 'none';
+  if (!_inputsBound) {
+    _inputsBound = true;
+    $('salary')?.addEventListener('input', calc);
+    $('work-expenses')?.addEventListener('input', calc);
+    $('miles')?.addEventListener('input', calc);
+    $('overtime')?.addEventListener('input', calc);
+  }
   initMP();
   goStep(state.currentStep || 1);
 }
@@ -934,7 +943,7 @@ window._showTracker    = showTracker;
 window._goStep         = goStep;
 window._updPD          = function() { updPD(); _checkBanner(); };
 window._shiftM         = function(d) { shiftM(d); _checkBanner(); };
-window._togSection     = (n) => toggleSection(n);
+window._togSection     = (n) => { toggleSection(n); calc(); };
 window._addPot         = () => { addPotToState(); renderPots(); calc(); };
 window._initMP         = initMP;
 window._calc           = calc;
