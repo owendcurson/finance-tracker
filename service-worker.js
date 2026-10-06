@@ -1,4 +1,4 @@
-var CACHE_NAME = 'payunite-v53';
+var CACHE_NAME = 'payunite-v54';
 var ASSETS = [
   './index.html',
   './404.html',
