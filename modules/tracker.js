@@ -320,15 +320,11 @@ function _calc() {
   const mT = aT / 12;
   const mN = aN / 12;
 
-  // Work expenses reduce taxable income further (applied on top of pension)
-  const adjT = cTaxFn(Math.max(0, pen.taxableSal - wE * 12)) / 12;
-  const tS   = mT - adjT;
-
   // Overtime at marginal rates on effective salary
   const oT = (cTaxFn(pen.taxableSal + ot * 12) - cTaxFn(pen.taxableSal)) / 12;
   const oN = (cNI(pen.niSal  + ot * 12) - cNI(pen.niSal)) / 12;
 
-  const fT = adjT + oT;
+  const fT = mT + oT;
   const fN = mN + oN;
 
   const totalSL = sl.monthlyUG + sl.monthlyPGL;
@@ -356,8 +352,8 @@ function _calc() {
   }
   if (sl.enabled && sl.monthlyUG > 0) mh += row(`Student loan (${sl.planLabel})`, -sl.monthlyUG, 'deduction');
   if (sl.enabled && sl.monthlyPGL > 0) mh += row('Postgraduate loan', -sl.monthlyPGL, 'deduction');
-  if (wE > 0) mh += row('Tax relief on expenses', tS, 'addition');
-  mh += rowT('Monthly take-home', th);
+  if (wE > 0) mh += row('Work expenses (reimbursed)', wE, 'addition');
+  mh += rowT('Monthly take-home', th + wE);
   $('monthly-table').innerHTML = mh;
 
   // Annual breakdown table — use pension-adjusted salaries so salary sacrifice / net pay reduce tax correctly
@@ -376,13 +372,13 @@ function _calc() {
   ah += `<tr><td class="label-secondary">Effective deduction rate</td><td class="label-secondary" style="text-align:right">${eff.toFixed(1)}%</td></tr>`;
   $('annual-table').innerHTML = ah;
 
-  renderSum(th, mA);
+  renderSum(th, mA, wE);
   saveLocal();
 }
 
-function renderSum(th, mi) {
+function renderSum(th, mi, wE = 0) {
   const tp  = state.pots.reduce((s,p) => s + (parseFloat(p.amount)||0), 0);
-  const fr  = th + mi - tp;
+  const fr  = th + mi + wE - tp;
   const pen = state._pen || { enabled: false };
   const sl  = state._sl  || { enabled: false };
   const tc  = state.currentTaxCode;
@@ -391,7 +387,7 @@ function renderSum(th, mi) {
   let h = fr >= 0
     ? `<div class="banner banner-green">${fmt(fr)} free money this month</div>`
     : `<div class="banner banner-red">${fmt(Math.abs(fr))} over budget this month</div>`;
-  h += `<div class="summary-grid">${st('Take-Home Pay',fmt(th))}${st('Mileage Received',fmt(mi))}${st('Total Outgoings',fmt(tp))}${st('Free Money',(fr<0?'−':'')+fmt(Math.abs(fr)))}</div>`;
+  h += `<div class="summary-grid">${st('Take-Home Pay',fmt(th))}${st('Mileage Received',fmt(mi))}${wE > 0 ? st('Expenses',fmt(wE)) : ''}${st('Total Outgoings',fmt(tp))}${st('Free Money',(fr<0?'−':'')+fmt(Math.abs(fr)))}</div>`;
   h += `<div class="action-row"><button class="btn btn-success" id="save-month-btn">Save Month</button><button class="btn btn-amber" id="form-accounts-btn">Form Accounts</button></div>`;
   h += `<div class="card"><h3>Itemised Breakdown</h3><table class="breakdown">`;
 
@@ -405,11 +401,13 @@ function renderSum(th, mi) {
   // Full deduction chain from gross to take-home
   const sal = parseFloat($('salary')?.value) || 0;
   h += row('Gross salary (monthly)', sal / 12);
-  const ot  = parseFloat($('overtime')?.value) || 0;
+  const tO  = $('tog-overtime')?.checked;
+  const ot  = tO ? (parseFloat($('overtime')?.value) || 0) : 0;
   const tSal = pen.taxableSal ?? sal;
   const nSal = pen.niSal ?? sal;
   const fT = cTaxFn(tSal) / 12 + (cTaxFn(tSal + ot*12) - cTaxFn(tSal)) / 12;
   const fN = cNI(nSal) / 12 + (cNI(nSal + ot*12) - cNI(nSal)) / 12;
+  if (ot > 0) h += row('Overtime / bonus', ot, 'addition');
   h += row('Income tax', -fT, 'deduction') + row('National Insurance', -fN, 'deduction');
   if (pen.enabled && pen.monthlyContrib > 0) {
     h += row(`Pension (${pen.schemeLabel?.toLowerCase() || ''})`, -pen.employeeCost, 'deduction');
@@ -420,7 +418,8 @@ function renderSum(th, mi) {
   if (sl.enabled && sl.monthlyUG > 0)  h += row(`Student loan (${sl.planLabel})`, -sl.monthlyUG, 'deduction');
   if (sl.enabled && sl.monthlyPGL > 0) h += row('Postgraduate loan', -sl.monthlyPGL, 'deduction');
   h += rowT('Net take-home pay', th);
-  if (mi > 0) h += row('Mileage expenses (tax-free)', mi, 'addition');
+  if (mi > 0) h += row('Mileage (tax-free)', mi, 'addition');
+  if (wE > 0) h += row('Work expenses (reimbursed)', wE, 'addition');
 
   h += '<tr class="divider"><td colspan="2" style="font-weight:600;padding-top:12px">Outgoings</td></tr>';
   state.pots.forEach(p => {
