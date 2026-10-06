@@ -194,7 +194,10 @@ export function renderSavingsGoals() {
           ${dateStr ? `<div class="goal-date">Target: ${esc(dateStr)} <span class="goal-rel">(${esc(relDate(g.targetDate))})</span></div>` : ''}
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-          <span class="goal-status goal-${statusKey}">${esc(statusLabel)}</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="goal-status goal-${statusKey}">${esc(statusLabel)}</span>
+            <button style="background:none;border:none;cursor:pointer;color:var(--text-secondary);padding:4px;opacity:0.6;line-height:1" onclick="window._removeGoal(${JSON.stringify(g.potName)})" aria-label="Remove goal" title="Remove goal"><i class="ti ti-trash" style="font-size:1rem"></i></button>
+          </div>
           ${sparklineSVG(saved, target, g.startDate, g.targetDate, monthly)}
         </div>
       </div>
@@ -273,3 +276,8 @@ export function maybeShowGoalBalancePrompt() {
     import('./dashboard.js').then(m => m.renderDashboard?.());
   });
 }
+
+window._removeGoal = async (potName) => {
+  await removeGoal(potName);
+  renderSavingsGoals();
+};
