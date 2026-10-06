@@ -196,7 +196,7 @@ export function renderSavingsGoals() {
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
           <div style="display:flex;align-items:center;gap:8px">
             <span class="goal-status goal-${statusKey}">${esc(statusLabel)}</span>
-            <button onclick='window._removeGoal(${JSON.stringify(g.potName)})' aria-label="Remove goal" title="Remove goal" style="background:none;border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--text-secondary);padding:2px 7px;font-size:1rem;line-height:1.4">&times;</button>
+            <button data-pot="${esc(g.potName)}" onclick="window._removeGoal(this.dataset.pot)" aria-label="Remove goal" title="Remove goal" style="background:none;border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--text-secondary);padding:2px 7px;font-size:1rem;line-height:1.4">&times;</button>
           </div>
           ${sparklineSVG(saved, target, g.startDate, g.targetDate, monthly)}
         </div>
@@ -277,7 +277,6 @@ export function maybeShowGoalBalancePrompt() {
   });
 }
 
-window._removeGoal = async (potName) => {
-  await removeGoal(potName);
-  renderSavingsGoals();
+window._removeGoal = (potName) => {
+  removeGoal(potName).then(() => renderSavingsGoals()).catch(e => console.error('removeGoal failed:', e));
 };
