@@ -4,11 +4,14 @@
   <meta charset="utf-8">
   <title>PayUnite</title>
   <script>
-    // GitHub Pages SPA routing: redirect to index.html preserving the path
-    var path = location.pathname.replace('/finance-tracker', '') || '/';
+    // GitHub Pages SPA routing: redirect to index.html preserving the path.
+    // Works for both /finance-tracker/ (github.io subdomain) and a custom domain at root.
+    var isGHP = location.pathname.startsWith('/finance-tracker');
+    var path   = isGHP ? (location.pathname.replace('/finance-tracker', '') || '/') : (location.pathname || '/');
     var search = location.search;
     var hash   = location.hash;
-    location.replace('/finance-tracker/?redirect=' + encodeURIComponent(path + search + hash));
+    var base   = isGHP ? '/finance-tracker/' : '/';
+    location.replace(base + '?redirect=' + encodeURIComponent(path + search + hash));
   </script>
 </head>
 <body></body>

@@ -6,10 +6,13 @@
 
 import { state } from './state.js';
 
-// Base path for GitHub Pages deployment. Empty string for local dev.
-const BASE = location.hostname === 'localhost' || location.hostname === '127.0.0.1'
-  ? ''
-  : '/finance-tracker';
+// Detect base path: /finance-tracker on GitHub Pages, empty on localhost or a custom domain at root.
+const BASE = (() => {
+  const h = location.hostname;
+  if (h === 'localhost' || h === '127.0.0.1' || h.endsWith('.localhost')) return '';
+  if (location.pathname.startsWith('/finance-tracker')) return '/finance-tracker';
+  return '';
+})();
 
 const TITLES = {
   '/':                       'PayUnite',
@@ -75,17 +78,38 @@ async function _render(path, { silent = false } = {}) {
     case '/new-month':
       (await import('./tracker.js')).showTracker();
       break;
-    case '/new-month/adjustments':
-      (await import('./tracker.js')).then(m => m.goStep(2, { pushUrl: false }));
+    case '/new-month/adjustments': {
+      const mt = await import('./tracker.js');
+      mt.goStep(2, { pushUrl: false });
       break;
-    case '/new-month/pots':
-      (await import('./tracker.js')).then(m => m.goStep(3, { pushUrl: false }));
+    }
+    case '/new-month/pots': {
+      const mt = await import('./tracker.js');
+      mt.goStep(3, { pushUrl: false });
       break;
+    }
     case '/history': {
       const d = await import('./dashboard.js');
-      d.showDashboard().then?.(() => {
-        setTimeout(() => document.getElementById('ds-history')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
-      });
+      await d.showDashboard();
+      setTimeout(() => document.getElementById('ds-history')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+      break;
+    }
+    case '/savings': {
+      const d = await import('./dashboard.js');
+      await d.showDashboard();
+      setTimeout(() => document.getElementById('dash-savings')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+      break;
+    }
+    case '/insights': {
+      const d = await import('./dashboard.js');
+      await d.showDashboard();
+      setTimeout(() => document.querySelector('[data-widget="insights"]')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+      break;
+    }
+    case '/achievements': {
+      const d = await import('./dashboard.js');
+      await d.showDashboard();
+      setTimeout(() => document.querySelector('[data-widget="achievements"]')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
       break;
     }
     case '/settings':
