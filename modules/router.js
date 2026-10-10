@@ -16,17 +16,17 @@ const BASE = (() => {
 
 const TITLES = {
   '/':                       'PayUnite',
-  '/dashboard':              'Dashboard — PayUnite',
-  '/new-month':              'New Month — PayUnite',
-  '/new-month/adjustments':  'Adjustments — PayUnite',
-  '/new-month/pots':         'Pots & Summary — PayUnite',
-  '/history':                'History — PayUnite',
-  '/settings':               'Settings — PayUnite',
-  '/settings/privacy':       'Privacy — PayUnite',
-  '/savings':                'Savings Goals — PayUnite',
-  '/insights':               'Insights — PayUnite',
-  '/achievements':           'Achievements — PayUnite',
-  '/salary-calculator':      'Salary Calculator — PayUnite',
+  '/dashboard':              'Dashboard - PayUnite',
+  '/new-month':              'New Month - PayUnite',
+  '/new-month/adjustments':  'Adjustments - PayUnite',
+  '/new-month/pots':         'Pots & Summary - PayUnite',
+  '/history':                'History - PayUnite',
+  '/settings':               'Settings - PayUnite',
+  '/settings/privacy':       'Privacy - PayUnite',
+  '/savings':                'Savings Goals - PayUnite',
+  '/insights':               'Insights - PayUnite',
+  '/achievements':           'Achievements - PayUnite',
+  '/salary-calculator':      'Salary Calculator - PayUnite',
 };
 
 // Paths that require auth (everything except the root auth screen)
