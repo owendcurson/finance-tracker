@@ -151,12 +151,12 @@ function initSideNav() {
     { id:'ds-overview',     label:'Overview' },
     { id:'ds-takehome',     label:'Take-Home' },
     { id:'ds-breakdown',    label:'Spending' },
-    { id:'ds-stacked',      label:'By Category' },
     { id:'ds-free',         label:'Free Money' },
     { id:'ds-savings',      label:'Savings Goals' },
-    { id:'ds-ytd',          label:'Year-to-Date' },
+    { id:'ds-stacked',      label:'By Category' },
     { id:'ds-insights',     label:'Insights' },
     { id:'ds-achievements', label:'Achievements' },
+    { id:'ds-ytd',          label:'Year-to-Date' },
     { id:'ds-history',      label:'History' },
   ];
 
