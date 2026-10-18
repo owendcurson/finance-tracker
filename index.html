@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script>
   // Restore deep-link URL from 404.html redirect
-  (function(){var p=new URLSearchParams(location.search).get('redirect');if(p)history.replaceState(null,'','/finance-tracker'+p);})();
+  (function(){var p=new URLSearchParams(location.search).get('redirect');if(p){var base=location.hostname==='owendcurson.github.io'?'/finance-tracker':'';history.replaceState(null,'',base+p);}})();
 </script>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://formspree.io wss://*.firebaseio.com; img-src 'self' data: https:; frame-src https://accounts.google.com https://*.firebaseapp.com; object-src 'none';">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,17 +12,17 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="./manifest.json">
-<link rel="icon" type="image/svg+xml" href="/finance-tracker/assets/logo-mark.svg">
-<link rel="apple-touch-icon" href="/finance-tracker/assets/logo-mark-app-icon.svg">
+<link rel="icon" type="image/svg+xml" href="./assets/logo-mark.svg">
+<link rel="apple-touch-icon" href="./assets/logo-mark-app-icon.svg">
 <meta property="og:title" content="PayUnite — Know exactly where your pay goes">
 <meta property="og:description" content="Track your UK take-home pay, manage monthly pots, claim mileage, and always know your free money before payday. Free forever.">
-<meta property="og:image" content="https://owendcurson.github.io/finance-tracker/assets/logo-mark.svg">
-<meta property="og:url" content="https://owendcurson.github.io/finance-tracker/">
+<meta property="og:image" content="https://payunite.co.uk/assets/logo-mark.svg">
+<meta property="og:url" content="https://payunite.co.uk/">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="PayUnite">
 <meta name="twitter:description" content="Know exactly where your pay goes.">
-<meta name="twitter:image" content="https://owendcurson.github.io/finance-tracker/assets/logo-mark.svg">
+<meta name="twitter:image" content="https://payunite.co.uk/assets/logo-mark.svg">
 <title>PayUnite</title>
 <meta name="description" content="PayUnite — Know exactly where your pay goes. Track your UK take-home pay, manage monthly pots, and always know your free money before payday.">
 <link rel="preconnect" href="https://fonts.googleapis.com">

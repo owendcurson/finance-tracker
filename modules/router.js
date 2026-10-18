@@ -6,11 +6,12 @@
 
 import { state } from './state.js';
 
-// Detect base path: /finance-tracker on GitHub Pages, empty on localhost or a custom domain at root.
+// Detect base path: /finance-tracker only on the GitHub Pages subdomain.
+// The custom domain (payunite.co.uk) serves from root with no prefix.
 const BASE = (() => {
   const h = location.hostname;
   if (h === 'localhost' || h === '127.0.0.1' || h.endsWith('.localhost')) return '';
-  if (location.pathname.startsWith('/finance-tracker')) return '/finance-tracker';
+  if (h === 'owendcurson.github.io') return '/finance-tracker';
   return '';
 })();
 

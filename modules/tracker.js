@@ -63,7 +63,7 @@ export function goStep(n, { pushUrl = true } = {}) {
   if (pushUrl) {
     const paths = { 1: '/new-month', 2: '/new-month/adjustments', 3: '/new-month/pots' };
     const p = paths[n] || '/new-month';
-    const base = location.hostname === 'localhost' || location.hostname === '127.0.0.1' ? '' : '/finance-tracker';
+    const base = location.hostname === 'owendcurson.github.io' ? '/finance-tracker' : '';
     const full = base + p;
     if (location.pathname !== full) history.pushState({ path: p }, '', full);
     document.title = 'New Month — PayUnite';
