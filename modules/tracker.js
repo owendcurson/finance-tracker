@@ -621,7 +621,7 @@ export async function saveMonth() {
     takeHome:  Math.round(actualTH * 100) / 100,
     mileage:   Math.round(state.lastMileage  * 100) / 100,
     outgoings: Math.round(tp * 100) / 100,
-    freeMoney: Math.round((actualTH + state.lastMileage - tp) * 100) / 100,
+    freeMoney: Math.round((actualTH + state.lastMileage + (parseFloat($('work-expenses').value) || 0) * ($('tog-expenses').checked ? 1 : 0) - tp) * 100) / 100,
     pots: state.pots.filter(p => p.name || (parseFloat(p.amount)||0) > 0).map(p => ({
       name: p.name || 'Unnamed', amount: parseFloat(p.amount) || 0,
       account: p.account || '', target: parseFloat(p.target) || 0,
