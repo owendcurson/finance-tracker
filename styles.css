@@ -553,6 +553,7 @@ textarea { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); b
   padding: 6px 4px calc(6px + env(safe-area-inset-bottom)) 4px;
   align-items: flex-end;
   gap: 0;
+  overflow: visible;
 }
 .bnav-btn {
   flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
@@ -1661,15 +1662,6 @@ body:not([data-theme="dark"]) #bottom-nav {
 .bnav-btn.active { color: #6366f1 !important; }
 .bnav-btn.active i { color: #6366f1 !important; }
 .bnav-btn i { font-size: 22px; }
-.bnav-btn.active::before {
-  content: '';
-  display: block;
-  width: 28px;
-  height: 3px;
-  border-radius: 2px;
-  background: linear-gradient(90deg, #6366f1, #818cf8);
-  margin: 0 auto 4px;
-}
 
 /* ── 11. SKELETON SHIMMER — indigo tinted ── */
 @keyframes skeletonShimmerV30 {

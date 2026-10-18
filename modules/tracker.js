@@ -576,9 +576,11 @@ export function saveLocal() {
       bonus:       $('bonus')?.value,
       pots: state.pots,
     }));
-    localStorage.setItem('finance_sl',      JSON.stringify(slPrefs));
-    localStorage.setItem('finance_pension', JSON.stringify(penPrefs));
-    localStorage.setItem('finance_taxcode', JSON.stringify(tcPrefs));
+    // Only persist pension/TC/SL when enabled — avoids wiping saved prefs
+    // when the user temporarily unchecks a toggle mid-entry.
+    if (slEnabled)  localStorage.setItem('finance_sl',      JSON.stringify(slPrefs));
+    if (penEnabled) localStorage.setItem('finance_pension', JSON.stringify(penPrefs));
+    if (tcEnabled)  localStorage.setItem('finance_taxcode', JSON.stringify(tcPrefs));
   } catch(e) {}
 }
 
@@ -930,14 +932,15 @@ function _prefillEntry(h) {
   else { $('tog-bonus').checked=false; $('sec-bonus')?.classList.remove('open'); $('bonus').value=''; }
   if (h.studentLoan?.enabled) _applySLPrefs({ enabled:true, plan:h.studentLoan.plan, hasPgl:false, overriding:false });
   else { if($('tog-sl')){$('tog-sl').checked=false;} $('sec-sl')?.classList.remove('open'); }
-  // Always restore pension and tax code from localStorage — these are user-level prefs, not per-month
+  // Always restore pension and tax code from localStorage — these are user-level prefs, not per-month.
+  // enabled:true goes AFTER the spread so it can't be overwritten by a stale enabled:false in storage.
   try {
     const penRaw = localStorage.getItem('finance_pension');
-    if (penRaw) _applyPenPrefs({ enabled:true, ...JSON.parse(penRaw) });
+    if (penRaw) _applyPenPrefs({ ...JSON.parse(penRaw), enabled: true });
   } catch(e) {}
   try {
     const tcRaw = localStorage.getItem('finance_taxcode');
-    if (tcRaw) _applyTCPrefs(JSON.parse(tcRaw));
+    if (tcRaw) _applyTCPrefs({ ...JSON.parse(tcRaw), enabled: true });
   } catch(e) {}
   calc();
 }
