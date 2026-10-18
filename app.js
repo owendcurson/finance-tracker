@@ -240,6 +240,10 @@ window._showTrackerNew = () => {
   navigate('/new-month');
 };
 
+window._dupModalEdit   = () => import('./modules/tracker.js').then(m => m.dupModalEdit());
+window._dupModalFresh  = () => import('./modules/tracker.js').then(m => m.dupModalFresh());
+window._dupModalCancel = () => import('./modules/tracker.js').then(m => m.dupModalCancel());
+
 // ── Settings screen event wiring ──────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   init();

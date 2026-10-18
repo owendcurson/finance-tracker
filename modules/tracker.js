@@ -72,6 +72,53 @@ export function goStep(n, { pushUrl = true } = {}) {
 
 export function toggleSection(n) { $('sec-'+n)?.classList.toggle('open', $('tog-'+n)?.checked); }
 
+function _setTrackerMode(mode, label = '') {
+  const title = $('tracker-page-title');
+  const sub   = $('tracker-page-subtitle');
+  if (mode === 'edit') {
+    if (title) { title.textContent = `Editing ${label}`; title.style.color = 'var(--amber, #e08000)'; }
+    if (sub)   sub.textContent = 'Make your changes and save.';
+    document.title = `Editing ${label} — PayUnite`;
+  } else {
+    if (title) { title.textContent = 'New Month'; title.style.color = ''; }
+    if (sub)   sub.innerHTML = 'Tax Year 2026/27 &middot; England, Wales &amp; NI';
+    document.title = 'New Month — PayUnite';
+  }
+}
+
+// ── Duplicate month modal handlers ───────────────────────────────────────────
+export function dupModalEdit() {
+  const h = state._dupEntry; if (!h) return;
+  $('dup-month-modal').style.display = 'none';
+  state.editingId = h.id;
+  state._dupEntry = null;
+  _prefillEntry(h);
+  _setTrackerMode('edit', `${MF[h.month]} ${h.year}`);
+}
+export function dupModalFresh() {
+  $('dup-month-modal').style.display = 'none';
+  // Keep editingId null so save creates a new entry that replaces on duplicate key
+  // Actually we do want to overwrite: find the existing and set editingId
+  const h = state._dupEntry;
+  state._dupEntry = null;
+  if (h) state.editingId = h.id;
+  _setTrackerMode('new');
+}
+export function dupModalCancel() {
+  $('dup-month-modal').style.display = 'none';
+  state._dupEntry = null;
+  // Revert month picker to a month that isn't already saved
+  const hist = state.financeHistory;
+  const m = parseInt($('pick-month')?.value), y = parseInt($('pick-year')?.value);
+  // Just shift back one month
+  let nm = m - 1, ny = y;
+  if (nm < 0) { nm = 11; ny--; }
+  if ($('pick-month')) $('pick-month').value = nm;
+  if ($('pick-year'))  $('pick-year').value  = ny;
+  updPD();
+  _checkBanner();
+}
+
 // ── Student loan UI helpers ───────────────────────────────────────────────────
 export function onSLPlan() {
   const plan = $('sl-plan')?.value;
@@ -416,7 +463,8 @@ function renderSum(th, mi, wE = 0) {
     ? `<div class="banner banner-green">${fmt(fr)} free money this month</div>`
     : `<div class="banner banner-red">${fmt(Math.abs(fr))} over budget this month</div>`;
   h += `<div class="summary-grid">${st('Take-Home Pay',fmt(th))}${st('Mileage Received',fmt(mi))}${wE > 0 ? st('Expenses',fmt(wE)) : ''}${st('Total Outgoings',fmt(tp))}${st('Free Money',(fr<0?'−':'')+fmt(Math.abs(fr)))}</div>`;
-  h += `<div class="action-row"><button class="btn btn-success" id="save-month-btn">Save Month</button><button class="btn btn-amber" id="form-accounts-btn">Form Accounts</button></div>`;
+  const saveLabel = state.editingId ? 'Save Changes' : 'Save Month';
+  h += `<div class="action-row"><button class="btn btn-success" id="save-month-btn">${saveLabel}</button><button class="btn btn-amber" id="form-accounts-btn">Form Accounts</button></div>`;
   h += `<div class="card"><h3>Itemised Breakdown</h3><table class="breakdown">`;
 
   // Tax code info line
@@ -682,6 +730,7 @@ export async function saveMonth() {
   if (state.editingId) state.financeHistory = state.financeHistory.map(e => e.id === state.editingId ? entry : e);
   else state.financeHistory.unshift(entry);
   state.editingId = null;
+  _setTrackerMode('new');
   persistHL();
 
   // Save month to Firestore
@@ -739,6 +788,7 @@ export function clearTracker() {
   $('sec-bonus')?.classList.remove('open');
   // Student loan and pension settings are intentionally preserved between months
   state.lastTakeHome = 0; state.lastMileage = 0;
+  _setTrackerMode('new');
   saveLocal();
   if (state.mpInit) {
     const n = new Date();
@@ -770,14 +820,20 @@ function _checkBanner() {
   const existing = state.financeHistory.find(e => e.month === m && e.year === y);
   const b = $('template-banner');
   if (!b) return;
+  b.style.display = 'none';
   if (existing) {
-    state.editingId = existing.id;
-    b.innerHTML = `You've already saved <strong>${MF[m]} ${y}</strong>. Saving will overwrite the existing record.`;
-    b.style.display = 'block';
-    _prefillEntry(existing);
+    // Show modal asking what to do — don't auto-fill
+    state._dupEntry = existing;
+    const modal = $('dup-month-modal');
+    if (modal) {
+      $('dup-month-title').textContent = `${MF[m]} ${y} already saved`;
+      $('dup-month-msg').textContent = `You already have a saved record for ${MF[m]} ${y}. Would you like to edit it, or start fresh and replace it?`;
+      modal.style.display = 'flex';
+    }
   } else {
     state.editingId = null;
-    b.style.display = 'none';
+    state._dupEntry = null;
+    _setTrackerMode('new');
   }
 }
 
@@ -874,9 +930,9 @@ export function editEntry(id) {
   state.currentStep = 1; goStep(1);
   $('pick-month').value = h.month; $('pick-year').value = h.year; updPD();
   _prefillEntry(h);
+  _setTrackerMode('edit', `${MF[h.month]} ${h.year}`);
   const b = $('template-banner');
-  b.textContent = `Editing ${MF[h.month]} ${h.year}. Make your changes then save`;
-  b.style.display = 'block';
+  b.style.display = 'none';
 }
 
 // ── Salary calculator ─────────────────────────────────────────────────────────

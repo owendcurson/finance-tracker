@@ -308,8 +308,8 @@
   <!-- Tracker screen -->
   <div id="tracker-screen" class="screen">
     <div class="container">
-      <h1 style="font-size:1.3rem;padding:16px 0 4px">New Month</h1>
-      <p class="subtitle" style="margin-bottom:16px;font-size:0.85rem;color:var(--text-secondary)">Tax Year 2026/27 &middot; England, Wales &amp; NI</p>
+      <h1 id="tracker-page-title" style="font-size:1.3rem;padding:16px 0 4px">New Month</h1>
+      <p id="tracker-page-subtitle" class="subtitle" style="margin-bottom:16px;font-size:0.85rem;color:var(--text-secondary)">Tax Year 2026/27 &middot; England, Wales &amp; NI</p>
 
       <div class="month-picker">
         <button class="btn btn-outline" id="month-prev" aria-label="Previous month" onclick="window._shiftM(-1)">&larr;</button>
@@ -476,6 +476,21 @@
         </div>
         <div id="summary-section"></div>
         <div class="nav-row"><button class="btn btn-outline" onclick="window._goStep(2)">&larr; Back</button><div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Duplicate month modal -->
+  <div class="modal-overlay" id="dup-month-modal" style="display:none" onclick="if(event.target===this)window._dupModalCancel()">
+    <div class="modal-card" style="max-width:420px">
+      <div class="modal-header"><h3 id="dup-month-title">Month already saved</h3></div>
+      <div class="modal-body">
+        <p id="dup-month-msg" style="margin-bottom:16px;color:var(--text-secondary)"></p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button class="btn btn-primary" onclick="window._dupModalEdit()">Edit existing entry</button>
+          <button class="btn btn-outline" onclick="window._dupModalFresh()">Start fresh — replace it</button>
+          <button class="btn btn-outline" style="color:var(--text-secondary)" onclick="window._dupModalCancel()">Cancel</button>
+        </div>
       </div>
     </div>
   </div>
