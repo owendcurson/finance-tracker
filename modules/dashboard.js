@@ -120,7 +120,6 @@ export function renderDashboard() {
   });
 
   html += buildHistorySection(isEdit);
-  html += buildToolsSection();
 
   container.innerHTML = html;
   container.classList.toggle('dash-edit-mode', isEdit);
