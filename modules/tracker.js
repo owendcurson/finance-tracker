@@ -356,7 +356,9 @@ function _calc() {
   if (pen.enabled && pen.employeeCost > 0) {
     mh += row(`Pension (${pen.schemeLabel.toLowerCase()})`, -pen.employeeCost, 'deduction');
     if (pen.scheme === 'relief_at_source' && pen.monthlyContrib > pen.employeeCost) {
-      mh += `<tr><td class="label-secondary" style="padding-left:20px">Provider adds tax relief</td><td class="label-secondary" style="text-align:right">+${fmt(pen.monthlyContrib - pen.employeeCost)}</td></tr>`;
+      const relief = pen.monthlyContrib - pen.employeeCost;
+      const potTotal = pen.monthlyContrib + pen.employerMonthly;
+      mh += `<tr><td class="label-secondary" colspan="2" style="padding-left:20px;font-size:0.82em;color:var(--text-secondary)">Pension pot: ${fmt(pen.employeeCost)} you + ${fmt(relief)} gov relief${pen.employerMonthly > 0 ? ` + ${fmt(pen.employerMonthly)} employer` : ''} = ${fmt(potTotal)} total</td></tr>`;
     }
   }
   if (sl.enabled && sl.monthlyUG > 0) mh += row(`Student loan (${sl.planLabel})`, -sl.monthlyUG, 'deduction');
