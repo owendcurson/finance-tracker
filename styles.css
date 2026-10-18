@@ -30,15 +30,29 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', syst
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* Header */
-.app-header { background: var(--navy); color: #fff; padding: 8px 16px; display: flex; align-items: center; gap: 8px; font-size: 0.82rem; flex-wrap: wrap; }
-.app-header .header-title { font-weight: 700; font-size: 0.9rem; }
-.app-header .user-name { opacity: 0.85; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: right; }
-.header-btn { background: rgba(255,255,255,0.15); border: none; color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 0.8rem; font-family: inherit; cursor: pointer; white-space: nowrap; }
+.app-header { background: var(--navy); color: #fff; padding: 8px 16px; display: flex; align-items: center; gap: 8px; font-size: 0.82rem; flex-wrap: nowrap; }
+.app-header .header-title { font-weight: 700; font-size: 0.9rem; flex-shrink: 0; }
+.app-header .user-name { opacity: 0.85; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: right; flex-shrink: 1; }
+.header-btn { background: rgba(255,255,255,0.15); border: none; color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 0.8rem; font-family: inherit; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
 .header-btn:hover { background: rgba(255,255,255,0.25); }
-.header-icon { position: relative; background: none; border: none; color: #fff; cursor: pointer; padding: 4px; font-size: 1.1rem; line-height: 1; opacity: 0.8; }
+.header-icon { position: relative; background: none; border: none; color: #fff; cursor: pointer; padding: 4px; font-size: 1.1rem; line-height: 1; opacity: 0.8; flex-shrink: 0; }
 .header-icon:hover { opacity: 1; }
-.header-back { display: none; background: none; border: none; color: #fff; cursor: pointer; padding: 4px 8px; font-size: 0.85rem; font-family: inherit; opacity: 0.85; }
+.header-back { display: none; background: none; border: none; color: #fff; cursor: pointer; padding: 4px 8px; font-size: 0.85rem; font-family: inherit; opacity: 0.85; flex-shrink: 0; }
 .header-back:hover { opacity: 1; }
+
+/* ── Header tools nav (desktop only) ── */
+.header-tools-nav { display: none; flex: 1; align-items: center; gap: 2px; }
+.htn-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: none; border: none; color: rgba(255,255,255,0.72);
+  padding: 6px 11px; border-radius: 7px; font-size: 0.82rem; font-weight: 500;
+  font-family: inherit; cursor: pointer; white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+.htn-link:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.htn-link.active { background: rgba(255,255,255,0.15); color: #fff; }
+.htn-link i { font-size: 0.95rem; }
+@media (min-width: 900px) { .header-tools-nav { display: flex; } }
 
 /* Shared */
 .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: var(--card-padding); margin-bottom: var(--section-gap); }

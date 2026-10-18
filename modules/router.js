@@ -84,7 +84,10 @@ async function _render(path, { silent = false } = {}) {
 
   if (!silent) {
     document.title = TITLES[path] || 'PayUnite';
-    import('./ui.js').then(m => m.setBottomNav(_navTab(path)));
+    import('./ui.js').then(m => {
+      m.setBottomNav(_navTab(path));
+      m.setHeaderNav(path);
+    });
   }
 
   switch (path) {

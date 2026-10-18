@@ -34,6 +34,23 @@ export function setBottomNav(tab) {
   if (cb) cb.classList.toggle('active', tab === 'tracker');
 }
 
+// ── Header tools nav (desktop) ────────────────────────────────────────────────
+export function setHeaderNav(path) {
+  document.querySelectorAll('.htn-link').forEach(btn => {
+    const key = btn.dataset.htnav;
+    const active = path === '/dashboard' ? key === 'dashboard'
+      : path.startsWith('/' + key);
+    btn.classList.toggle('active', active);
+  });
+  // Show/hide header nav only when user is authenticated
+  const nav = document.getElementById('header-tools-nav');
+  if (nav) nav.style.display = state.currentUser ? '' : 'none';
+  // Hide back button when header nav is visible (desktop) on tool pages
+  const hb = $('header-back');
+  const onTool = ['/tax-year','/budget','/cost-of-living','/benefits'].some(p => path.startsWith(p));
+  if (hb && window.innerWidth >= 900) hb.style.display = onTool ? 'none' : 'none';
+}
+
 // ── Screen transitions ────────────────────────────────────────────────────────
 export function screenEnter(el) {
   if (!el) return;
