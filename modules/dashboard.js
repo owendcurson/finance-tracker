@@ -162,13 +162,15 @@ function initSideNav() {
 
   const visible = defs.filter(s => document.getElementById(s.id));
   nav.innerHTML = visible.map(s =>
-    `<a class="sidenav-item" href="#${s.id}" data-target="${s.id}">${s.label}</a>`
+    `<button class="sidenav-dot" data-target="${s.id}" aria-label="${s.label}">
+      <span class="sidenav-dot-pip"></span>
+      <span class="sidenav-dot-label">${s.label}</span>
+    </button>`
   ).join('');
 
-  nav.querySelectorAll('.sidenav-item').forEach(a => {
-    a.addEventListener('click', e => {
-      e.preventDefault();
-      document.getElementById(a.dataset.target)?.scrollIntoView({ behavior:'smooth', block:'start' });
+  nav.querySelectorAll('.sidenav-dot').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.getElementById(btn.dataset.target)?.scrollIntoView({ behavior:'smooth', block:'start' });
     });
   });
 
@@ -180,7 +182,7 @@ function initSideNav() {
   const obs = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (!entry.isIntersecting) return;
-      nav.querySelectorAll('.sidenav-item').forEach(l => l.classList.remove('active'));
+      nav.querySelectorAll('.sidenav-dot').forEach(d => d.classList.remove('active'));
       nav.querySelector(`[data-target="${entry.target.id}"]`)?.classList.add('active');
     });
   }, { threshold: 0.25, rootMargin:'-10% 0px -50% 0px' });
