@@ -134,6 +134,8 @@ function _initLogos() {
   const hdrEl = document.getElementById('header-logo');
   if (hdrEl) {
     hdrEl.innerHTML = payuniteLogo(_logoMode(), 32, 'hdr');
+    hdrEl.style.cursor = 'pointer';
+    hdrEl.addEventListener('click', () => import('./modules/dashboard.js').then(m => m.showDashboard()));
     // Re-render on theme change
     new MutationObserver(() => {
       hdrEl.innerHTML = payuniteLogo(_logoMode(), 32, _logoMode() === 'dark' ? 'hdr' : 'hdr2');
