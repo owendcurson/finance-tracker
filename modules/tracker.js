@@ -164,7 +164,10 @@ function _readPension(sal) {
     taxableSal  = Math.max(0, sal - annual);
     schemeLabel = 'Net pay arrangement';
   } else {
-    employeeCost = monthly * 0.80; // relief_at_source: employee pays 80%, provider tops up
+    // relief_at_source: user enters what's deducted from their payslip (net).
+    // HMRC adds 20% tax relief on top, so the gross into the pot = net / 0.8.
+    employeeCost = monthly;
+    monthly      = monthly / 0.8;
   }
 
   // Legal minimum checker
@@ -285,9 +288,15 @@ function _calc() {
   const penCalcEl = $('pen-calc');
   if (penCalcEl) {
     if (pen.enabled && pen.monthlyContrib > 0) {
-      let h = `<div>Your monthly contribution: <strong>${fmt(pen.monthlyContrib)}</strong>`;
-      if (pen.scheme === 'relief_at_source') h += ` (your cost: <strong>${fmt(pen.employeeCost)}</strong> + ${fmt(pen.monthlyContrib - pen.employeeCost)} provider tax relief)`;
-      h += '</div>';
+      let h = '';
+      if (pen.scheme === 'relief_at_source') {
+        const relief = pen.monthlyContrib - pen.employeeCost;
+        h += `<div>Your payslip deduction: <strong>${fmt(pen.employeeCost)}</strong></div>`;
+        h += `<div>Government tax relief: <strong>${fmt(relief)}</strong></div>`;
+        h += `<div>Into your pension pot: <strong>${fmt(pen.monthlyContrib)}</strong></div>`;
+      } else {
+        h += `<div>Your monthly contribution: <strong>${fmt(pen.monthlyContrib)}</strong></div>`;
+      }
       if (pen.employerMonthly > 0) h += `<div>Employer adds: <strong>${fmt(pen.employerMonthly)}</strong></div>`;
       const total = pen.monthlyContrib + pen.employerMonthly;
       h += `<div>Total going in: <strong>${fmt(total)}/month</strong> (${fmt(total * 12)}/year est.)</div>`;
