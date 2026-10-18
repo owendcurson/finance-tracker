@@ -597,6 +597,38 @@ textarea { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); b
 .bnav-center-btn.active { box-shadow: 0 4px 20px rgba(79,70,229,0.6), 0 0 0 3px rgba(79,70,229,0.18); }
 .bnav-center-label { font-size: 0.62rem; font-weight: 500; color: var(--text-secondary); letter-spacing: 0.01em; line-height: 1; }
 
+/* ── Tools section ── */
+.tools-grid { display: flex; flex-direction: column; gap: 2px; }
+.tools-card {
+  display: flex; align-items: center; gap: 14px; width: 100%;
+  padding: 14px 12px; background: none; border: none; border-radius: 10px;
+  cursor: pointer; color: var(--text); text-align: left;
+  transition: background 0.15s; font-family: inherit; -webkit-tap-highlight-color: transparent;
+}
+.tools-card:hover, .tools-card:focus-visible { background: var(--bg); }
+.tools-card-icon {
+  width: 42px; height: 42px; border-radius: 12px;
+  background: var(--primary-light); color: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.25rem; flex-shrink: 0;
+}
+.tools-card-body { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tools-card-label { font-weight: 600; font-size: 0.95rem; }
+.tools-card-desc { font-size: 0.8rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tools-card-arrow { color: var(--text-secondary); font-size: 1rem; flex-shrink: 0; }
+
+/* ── Tool page tables ── */
+.ty-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.ty-table th { text-align: left; padding: 8px 10px; font-size: 0.78rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.03em; border-bottom: 1.5px solid var(--border); }
+.ty-table td { padding: 10px 10px; border-bottom: 1px solid var(--border); }
+.ty-table tfoot td { padding: 10px 10px; }
+.ty-table tbody tr:last-child td { border-bottom: none; }
+
+/* ── Tool page summary rows ── */
+.ty-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+.ty-row:last-child { border-bottom: none; }
+.ty-row-total { font-weight: 700; font-size: 1rem; }
+
 /* ── Empty states ── */
 .empty-state { text-align: center; padding: 36px 20px; }
 .empty-state-icon { font-size: 2.5rem; color: var(--border); display: block; margin-bottom: 12px; }

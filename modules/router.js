@@ -31,6 +31,10 @@ const TITLES = {
   '/insights':                'Insights - PayUnite',
   '/achievements':            'Achievements - PayUnite',
   '/salary-calculator':       'Salary Calculator - PayUnite',
+  '/tax-year':                'Tax Year Summary - PayUnite',
+  '/budget':                  'Budget Planner - PayUnite',
+  '/cost-of-living':          'Cost of Living - PayUnite',
+  '/benefits':                'Benefits & Perks - PayUnite',
 };
 
 // Paths that require auth (everything except the root auth screen)
@@ -39,19 +43,24 @@ const PROTECTED = new Set([
   '/edit-month', '/edit-month/adjustments', '/edit-month/pots',
   '/history', '/settings', '/settings/privacy', '/savings',
   '/insights', '/achievements', '/salary-calculator',
+  '/tax-year', '/budget', '/cost-of-living', '/benefits',
 ]);
 
 // Navigation active tab for each path prefix
 const NAV_TAB = {
-  '/dashboard':  'dashboard',
-  '/new-month':  'tracker',
-  '/edit-month': 'tracker',
-  '/history':    'history',
-  '/settings':   'settings',
-  '/savings':           'dashboard',
-  '/insights':          'dashboard',
-  '/achievements':      'dashboard',
+  '/dashboard':      'dashboard',
+  '/new-month':      'tracker',
+  '/edit-month':     'tracker',
+  '/history':        'history',
+  '/settings':       'settings',
+  '/savings':        'dashboard',
+  '/insights':       'dashboard',
+  '/achievements':   'dashboard',
   '/salary-calculator': 'salary',
+  '/tax-year':       'dashboard',
+  '/budget':         'dashboard',
+  '/cost-of-living': 'dashboard',
+  '/benefits':       'dashboard',
 };
 
 function _getPath() {
@@ -138,6 +147,18 @@ async function _render(path, { silent = false } = {}) {
       break;
     case '/settings/privacy':
       import('./privacy.js').then(m => m.showPrivacy?.());
+      break;
+    case '/tax-year':
+      (await import('./tax-year.js')).showTaxYear();
+      break;
+    case '/budget':
+      (await import('./budget.js')).showBudget();
+      break;
+    case '/cost-of-living':
+      (await import('./cost-of-living.js')).showCOL();
+      break;
+    case '/benefits':
+      (await import('./benefits.js')).showBenefits();
       break;
     default:
       if (path.startsWith('/history/')) {

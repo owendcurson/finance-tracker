@@ -120,7 +120,7 @@ export function renderDashboard() {
   });
 
   html += buildHistorySection(isEdit);
-
+  html += buildToolsSection();
 
   container.innerHTML = html;
   container.classList.toggle('dash-edit-mode', isEdit);
@@ -223,6 +223,32 @@ function buildSection(item, isEdit) {
     </div>
     <div class="dash-section-body${bodyCls}">${inner}</div>
     ${resizeH}
+  </div>`;
+}
+
+function buildToolsSection() {
+  const tools = [
+    { path: '/tax-year',       icon: 'ti-calendar-stats', label: 'Tax Year',      desc: 'Full year summary of gross, tax & take-home' },
+    { path: '/budget',         icon: 'ti-target',         label: 'Budget',        desc: 'Set monthly spending targets by category' },
+    { path: '/cost-of-living', icon: 'ti-home',           label: 'Cost of Living', desc: 'Track fixed costs & see your breathing room' },
+    { path: '/benefits',       icon: 'ti-gift',           label: 'Benefits',      desc: 'Track perks & calculate your total compensation' },
+  ];
+  const cards = tools.map(t => `
+    <button class="tools-card" onclick="import('./modules/router.js').then(m=>m.navigate('${t.path}'))">
+      <span class="tools-card-icon"><i class="ti ${t.icon}"></i></span>
+      <span class="tools-card-body">
+        <span class="tools-card-label">${t.label}</span>
+        <span class="tools-card-desc">${t.desc}</span>
+      </span>
+      <i class="ti ti-chevron-right tools-card-arrow"></i>
+    </button>
+  `).join('');
+  return `<div class="dash-section" data-section="tools" id="ds-tools" style="grid-column:span 12">
+    <div class="dash-section-hdr" onclick="window._toggleDsSection('tools')">
+      <div class="dsh-left"><span>Tools</span></div>
+      <i class="ti ti-chevron-down ds-chevron"></i>
+    </div>
+    <div class="dash-section-body"><div class="tools-grid">${cards}</div></div>
   </div>`;
 }
 
