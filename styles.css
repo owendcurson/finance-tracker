@@ -544,10 +544,57 @@ textarea { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); b
 .achievement-toast.show { opacity: 1; transform: translateY(0); }
 
 /* ── Bottom nav ── */
-#bottom-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 800; background: var(--card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom); }
-.bnav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 4px 8px; background: none; border: none; color: var(--text-secondary); font-size: 0.65rem; font-family: inherit; cursor: pointer; font-weight: 500; transition: color 0.15s; }
-.bnav-btn i { font-size: 1.25rem; }
+#bottom-nav {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 800;
+  background: var(--card);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  padding: 6px 4px calc(6px + env(safe-area-inset-bottom)) 4px;
+  align-items: flex-end;
+  gap: 0;
+}
+.bnav-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 6px 4px 4px;
+  background: none; border: none; color: var(--text-secondary);
+  font-family: inherit; cursor: pointer; font-weight: 500;
+  transition: color 0.18s;
+  border-radius: 12px;
+  -webkit-tap-highlight-color: transparent;
+}
+.bnav-icon {
+  width: 42px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 16px;
+  transition: background 0.18s;
+}
+.bnav-btn i { font-size: 1.3rem; line-height: 1; }
+.bnav-label { font-size: 0.62rem; letter-spacing: 0.01em; line-height: 1; }
 .bnav-btn.active { color: var(--primary); }
+.bnav-btn.active .bnav-icon { background: var(--primary-light); }
+
+/* Centre floating action button */
+.bnav-center-slot {
+  flex: 1.2; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  position: relative; padding-bottom: 4px;
+}
+.bnav-center-btn {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), #7c3aed);
+  border: none; color: #fff; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem;
+  box-shadow: 0 4px 16px rgba(79,70,229,0.45);
+  margin-top: -18px;
+  transition: transform 0.15s, box-shadow 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+.bnav-center-btn:active { transform: scale(0.93); box-shadow: 0 2px 8px rgba(79,70,229,0.3); }
+.bnav-center-btn.active { box-shadow: 0 4px 20px rgba(79,70,229,0.6), 0 0 0 3px rgba(79,70,229,0.18); }
+.bnav-center-label { font-size: 0.62rem; font-weight: 500; color: var(--text-secondary); letter-spacing: 0.01em; line-height: 1; }
 
 /* ── Empty states ── */
 .empty-state { text-align: center; padding: 36px 20px; }
@@ -671,7 +718,7 @@ textarea.contact-input { resize: vertical; min-height: 100px; }
   #signout-btn { display: none; }
   #user-display-name { display: none; }
   #mobile-avatar-btn { display: flex; }
-  .container { padding-bottom: 80px; }
+  .container { padding-bottom: 96px; }
   .achievements-grid { display: flex; overflow-x: auto; gap: 12px; padding-bottom: 8px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
   .achievements-grid::-webkit-scrollbar { display: none; }
   .achievement-badge { min-width: 120px; flex-shrink: 0; scroll-snap-align: start; }
@@ -895,33 +942,19 @@ textarea.contact-input { resize: vertical; min-height: 100px; }
    ✨ APP INTERIOR REDESIGN — Dashboard, Tracker & all screens
    ═══════════════════════════════════════════════════════ */
 
-/* ── Bottom navigation — glass dock ── */
-#bottom-nav {
-  background: var(--card);
-  border-top: 1px solid var(--border);
-}
+/* ── Bottom navigation — glass dock (dark mode overrides) ── */
 [data-theme="dark"] #bottom-nav {
-  background: rgba(8, 10, 24, 0.88);
+  background: rgba(8, 10, 24, 0.92);
   border-top: 1px solid rgba(255,255,255,0.07);
   backdrop-filter: blur(24px) saturate(1.5);
   -webkit-backdrop-filter: blur(24px) saturate(1.5);
 }
-.bnav-btn { position: relative; }
 .bnav-btn.active { color: #6366f1; }
+.bnav-btn.active .bnav-icon { background: rgba(99,102,241,0.12); }
 [data-theme="dark"] .bnav-btn { color: rgba(160,160,176,0.65); }
 [data-theme="dark"] .bnav-btn.active { color: #818cf8; }
-/* Active indicator pill above icon */
-.bnav-btn.active::before {
-  content: '';
-  position: absolute;
-  top: 5px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 22px;
-  height: 3px;
-  border-radius: 2px;
-  background: linear-gradient(90deg, #4f46e5, #7c3aed);
-}
+[data-theme="dark"] .bnav-btn.active .bnav-icon { background: rgba(129,140,248,0.15); }
+[data-theme="dark"] .bnav-center-label { color: rgba(160,160,176,0.65); }
 
 /* ── App header — light mode upgrade ── */
 .app-header {

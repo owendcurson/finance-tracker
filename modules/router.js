@@ -48,9 +48,10 @@ const NAV_TAB = {
   '/edit-month': 'tracker',
   '/history':    'history',
   '/settings':   'settings',
-  '/savings':    'dashboard',
-  '/insights':   'dashboard',
-  '/achievements': 'dashboard',
+  '/savings':           'dashboard',
+  '/insights':          'dashboard',
+  '/achievements':      'dashboard',
+  '/salary-calculator': 'salary',
 };
 
 function _getPath() {

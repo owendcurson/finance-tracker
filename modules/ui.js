@@ -26,9 +26,12 @@ export function hideSkeleton() {
 // ── Bottom nav ────────────────────────────────────────────────────────────────
 export function setBottomNav(tab) {
   state.bottomNavActive = tab;
-  ['dashboard','tracker','history','settings'].forEach(t => {
+  ['dashboard','tracker','history','settings','salary'].forEach(t => {
     $('bnav-'+t)?.classList.toggle('active', t === tab);
   });
+  // Center button active state
+  const cb = document.querySelector('.bnav-center-btn');
+  if (cb) cb.classList.toggle('active', tab === 'tracker');
 }
 
 // ── Screen transitions ────────────────────────────────────────────────────────

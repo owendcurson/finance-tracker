@@ -135,7 +135,7 @@ function _initLogos() {
   if (hdrEl) {
     hdrEl.innerHTML = payuniteLogo(_logoMode(), 32, 'hdr');
     hdrEl.style.cursor = 'pointer';
-    hdrEl.addEventListener('click', () => import('./modules/dashboard.js').then(m => m.showDashboard()));
+    hdrEl.addEventListener('click', () => navigate('/dashboard'));
     // Re-render on theme change
     new MutationObserver(() => {
       hdrEl.innerHTML = payuniteLogo(_logoMode(), 32, _logoMode() === 'dark' ? 'hdr' : 'hdr2');
@@ -201,6 +201,7 @@ function init() {
     else if (tab === 'tracker')  navigate('/new-month');
     else if (tab === 'history')  navigate('/history');
     else if (tab === 'settings') navigate('/settings');
+    else if (tab === 'salary')   navigate('/salary-calculator');
   });
 
   // Modal close on backdrop click

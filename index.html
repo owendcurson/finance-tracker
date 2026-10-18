@@ -763,10 +763,28 @@
 
   <!-- Bottom navigation -->
   <nav id="bottom-nav" aria-label="Main navigation">
-    <button class="bnav-btn active" id="bnav-dashboard" data-nav="dashboard"><i class="ti ti-layout-dashboard"></i><span>Dashboard</span></button>
-    <button class="bnav-btn" id="bnav-tracker" data-nav="tracker"><i class="ti ti-plus-circle"></i><span>New month</span></button>
-    <button class="bnav-btn" id="bnav-history" data-nav="history"><i class="ti ti-history"></i><span>History</span></button>
-    <button class="bnav-btn" id="bnav-settings" data-nav="settings"><i class="ti ti-settings"></i><span>Settings</span></button>
+    <button class="bnav-btn active" id="bnav-dashboard" data-nav="dashboard">
+      <span class="bnav-icon"><i class="ti ti-layout-dashboard"></i></span>
+      <span class="bnav-label">Home</span>
+    </button>
+    <button class="bnav-btn" id="bnav-history" data-nav="history">
+      <span class="bnav-icon"><i class="ti ti-history"></i></span>
+      <span class="bnav-label">History</span>
+    </button>
+    <div class="bnav-center-slot">
+      <button class="bnav-center-btn" id="bnav-tracker" data-nav="tracker" aria-label="New Month">
+        <i class="ti ti-plus"></i>
+      </button>
+      <span class="bnav-center-label">New Month</span>
+    </div>
+    <button class="bnav-btn" id="bnav-settings" data-nav="settings">
+      <span class="bnav-icon"><i class="ti ti-settings"></i></span>
+      <span class="bnav-label">Settings</span>
+    </button>
+    <button class="bnav-btn" id="bnav-salary" data-nav="salary">
+      <span class="bnav-icon"><i class="ti ti-calculator"></i></span>
+      <span class="bnav-label">Calculator</span>
+    </button>
   </nav>
 </div>
 

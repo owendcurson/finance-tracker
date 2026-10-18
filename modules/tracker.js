@@ -53,7 +53,7 @@ export function showTracker() {
 }
 
 export function showDashboard() {
-  import('./dashboard.js').then(m => m.showDashboard());
+  import('./router.js').then(m => m.navigate('/dashboard'));
 }
 
 export function goStep(n, { pushUrl = true } = {}) {
@@ -778,7 +778,7 @@ export async function saveMonth() {
   if (overPots.length) await addInboxItem('ti-alert-triangle', overPots.length + ' pot' + (overPots.length===1?'':'s') + ' went over budget this month', overPots.join(', '));
 
   clearTracker();
-  import('./dashboard.js').then(m => m.showDashboard());
+  import('./router.js').then(m => m.navigate('/dashboard'));
   toast('Saved ' + entry.label);
 
   // Prompt to update savings goal balances
