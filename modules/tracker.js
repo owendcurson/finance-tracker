@@ -37,6 +37,17 @@ export function showTracker() {
     $('overtime')?.addEventListener('input', calc);
     $('bonus')?.addEventListener('input', calc);
   }
+  // If editing an existing entry, set up edit mode
+  if (state.editingId) {
+    const h = state.financeHistory.find(e => e.id === state.editingId);
+    if (h) { initMP(); _initEditMonth(h); return; }
+  }
+  // Unlock month picker for new month (may have been locked by a previous edit)
+  $('pick-month').disabled = false;
+  $('pick-year').disabled  = false;
+  $('month-prev')?.removeAttribute('disabled');
+  $('month-next')?.removeAttribute('disabled');
+  document.querySelector('.month-picker')?.removeAttribute('data-locked');
   initMP();
   goStep(state.currentStep || 1);
 }
@@ -61,12 +72,15 @@ export function goStep(n, { pushUrl = true } = {}) {
   }
   if (n===3) renderPots();
   if (pushUrl) {
-    const paths = { 1: '/new-month', 2: '/new-month/adjustments', 3: '/new-month/pots' };
-    const p = paths[n] || '/new-month';
+    const isEdit = !!state.editingId;
+    const paths = isEdit
+      ? { 1: '/edit-month', 2: '/edit-month/adjustments', 3: '/edit-month/pots' }
+      : { 1: '/new-month', 2: '/new-month/adjustments', 3: '/new-month/pots' };
+    const p = paths[n] || (isEdit ? '/edit-month' : '/new-month');
     const base = location.hostname === 'owendcurson.github.io' ? '/finance-tracker' : '';
     const full = base + p;
     if (location.pathname !== full) history.pushState({ path: p }, '', full);
-    document.title = 'New Month — PayUnite';
+    document.title = isEdit ? 'Edit Month — PayUnite' : 'New Month — PayUnite';
   }
 }
 
@@ -788,6 +802,12 @@ export function clearTracker() {
   $('sec-bonus')?.classList.remove('open');
   // Student loan and pension settings are intentionally preserved between months
   state.lastTakeHome = 0; state.lastMileage = 0;
+  // Unlock month picker (may have been locked during edit)
+  if ($('pick-month')) $('pick-month').disabled = false;
+  if ($('pick-year'))  $('pick-year').disabled  = false;
+  $('month-prev')?.removeAttribute('disabled');
+  $('month-next')?.removeAttribute('disabled');
+  document.querySelector('.month-picker')?.removeAttribute('data-locked');
   _setTrackerMode('new');
   saveLocal();
   if (state.mpInit) {
@@ -926,13 +946,23 @@ export function editEntry(id) {
   const h = state.financeHistory.find(e => e.id === id); if (!h) return;
   state.editingId = id;
   $('detail-modal').classList.remove('open');
-  showTracker();
-  state.currentStep = 1; goStep(1);
+  // Navigate to /edit-month — showTracker is called by the router
+  import('./router.js').then(m => m.navigate('/edit-month'));
+}
+
+export function _initEditMonth(h) {
+  state.currentStep = 1; goStep(1, { pushUrl: false });
   $('pick-month').value = h.month; $('pick-year').value = h.year; updPD();
+  // Lock the month picker — you cannot change the month when editing
+  const mpEl = document.querySelector('.month-picker');
+  if (mpEl) mpEl.setAttribute('data-locked', 'true');
+  $('pick-month').disabled = true;
+  $('pick-year').disabled  = true;
+  $('month-prev')?.setAttribute('disabled', 'true');
+  $('month-next')?.setAttribute('disabled', 'true');
   _prefillEntry(h);
   _setTrackerMode('edit', `${MF[h.month]} ${h.year}`);
-  const b = $('template-banner');
-  b.style.display = 'none';
+  $('template-banner').style.display = 'none';
 }
 
 // ── Salary calculator ─────────────────────────────────────────────────────────

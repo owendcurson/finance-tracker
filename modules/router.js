@@ -16,35 +16,40 @@ const BASE = (() => {
 })();
 
 const TITLES = {
-  '/':                       'PayUnite',
-  '/dashboard':              'Dashboard - PayUnite',
-  '/new-month':              'New Month - PayUnite',
-  '/new-month/adjustments':  'Adjustments - PayUnite',
-  '/new-month/pots':         'Pots & Summary - PayUnite',
-  '/history':                'History - PayUnite',
-  '/settings':               'Settings - PayUnite',
-  '/settings/privacy':       'Privacy - PayUnite',
-  '/savings':                'Savings Goals - PayUnite',
-  '/insights':               'Insights - PayUnite',
-  '/achievements':           'Achievements - PayUnite',
-  '/salary-calculator':      'Salary Calculator - PayUnite',
+  '/':                        'PayUnite',
+  '/dashboard':               'Dashboard - PayUnite',
+  '/new-month':               'New Month - PayUnite',
+  '/new-month/adjustments':   'Adjustments - PayUnite',
+  '/new-month/pots':          'Pots & Summary - PayUnite',
+  '/edit-month':              'Edit Month - PayUnite',
+  '/edit-month/adjustments':  'Edit Adjustments - PayUnite',
+  '/edit-month/pots':         'Edit Pots & Summary - PayUnite',
+  '/history':                 'History - PayUnite',
+  '/settings':                'Settings - PayUnite',
+  '/settings/privacy':        'Privacy - PayUnite',
+  '/savings':                 'Savings Goals - PayUnite',
+  '/insights':                'Insights - PayUnite',
+  '/achievements':            'Achievements - PayUnite',
+  '/salary-calculator':       'Salary Calculator - PayUnite',
 };
 
 // Paths that require auth (everything except the root auth screen)
 const PROTECTED = new Set([
   '/dashboard', '/new-month', '/new-month/adjustments', '/new-month/pots',
+  '/edit-month', '/edit-month/adjustments', '/edit-month/pots',
   '/history', '/settings', '/settings/privacy', '/savings',
   '/insights', '/achievements', '/salary-calculator',
 ]);
 
 // Navigation active tab for each path prefix
 const NAV_TAB = {
-  '/dashboard': 'dashboard',
-  '/new-month': 'tracker',
-  '/history':   'history',
-  '/settings':  'settings',
-  '/savings':   'dashboard',
-  '/insights':  'dashboard',
+  '/dashboard':  'dashboard',
+  '/new-month':  'tracker',
+  '/edit-month': 'tracker',
+  '/history':    'history',
+  '/settings':   'settings',
+  '/savings':    'dashboard',
+  '/insights':   'dashboard',
   '/achievements': 'dashboard',
 };
 
@@ -85,6 +90,20 @@ async function _render(path, { silent = false } = {}) {
       break;
     }
     case '/new-month/pots': {
+      const mt = await import('./tracker.js');
+      mt.goStep(3, { pushUrl: false });
+      break;
+    }
+    case '/edit-month':
+      // editingId must already be set in state before navigating here
+      (await import('./tracker.js')).showTracker();
+      break;
+    case '/edit-month/adjustments': {
+      const mt = await import('./tracker.js');
+      mt.goStep(2, { pushUrl: false });
+      break;
+    }
+    case '/edit-month/pots': {
       const mt = await import('./tracker.js');
       mt.goStep(3, { pushUrl: false });
       break;
