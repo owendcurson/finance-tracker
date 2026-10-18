@@ -458,8 +458,10 @@
           <div class="toggle-content" id="sec-expenses"><div class="field"><label>Monthly work expenses (reduces taxable income)</label><div class="input-wrap"><span class="prefix">&pound;</span><input type="number" id="work-expenses" class="has-prefix" placeholder="0" min="0" step="10"></div></div></div>
           <label class="toggle-row"><input type="checkbox" id="tog-mileage" onchange="window._togSection('mileage',this.checked)"><span class="toggle-label">Mileage / Fuel</span></label>
           <div class="toggle-content" id="sec-mileage"><div class="field"><label>Business miles driven this month</label><div class="input-wrap"><input type="number" id="miles" class="has-suffix" placeholder="0" min="0" step="1"><span class="suffix">miles</span></div></div><div class="live-calc" id="mileage-calc">0 miles &times; 55p = &pound;0.00</div></div>
-          <label class="toggle-row"><input type="checkbox" id="tog-overtime" onchange="window._togSection('overtime',this.checked)"><span class="toggle-label">Overtime / Bonus</span></label>
+          <label class="toggle-row"><input type="checkbox" id="tog-overtime" onchange="window._togSection('overtime',this.checked)"><span class="toggle-label">Overtime</span></label>
           <div class="toggle-content" id="sec-overtime"><div class="field"><label>Extra gross pay this month (before tax)</label><div class="input-wrap"><span class="prefix">&pound;</span><input type="number" id="overtime" class="has-prefix" placeholder="0" min="0" step="10"></div></div></div>
+          <label class="toggle-row"><input type="checkbox" id="tog-bonus" onchange="window._togSection('bonus',this.checked);window._calc()"><span class="toggle-label">Bonus</span></label>
+          <div class="toggle-content" id="sec-bonus"><div class="field"><label>Gross bonus received this month (before tax)</label><div class="input-wrap"><span class="prefix">&pound;</span><input type="number" id="bonus" class="has-prefix" placeholder="0" min="0" step="50"></div></div></div>
         </div>
         <div class="nav-row"><button class="btn btn-outline" onclick="window._goStep(1)">&larr; Back</button><button class="btn btn-primary" onclick="window._goStep(3)">Next &rarr;</button></div>
       </div>

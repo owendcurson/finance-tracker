@@ -35,6 +35,7 @@ export function showTracker() {
     $('work-expenses')?.addEventListener('input', calc);
     $('miles')?.addEventListener('input', calc);
     $('overtime')?.addEventListener('input', calc);
+    $('bonus')?.addEventListener('input', calc);
   }
   initMP();
   goStep(state.currentStep || 1);
@@ -274,9 +275,11 @@ function _calc() {
   const tE  = $('tog-expenses')?.checked;
   const tM  = $('tog-mileage')?.checked;
   const tO  = $('tog-overtime')?.checked;
+  const tB  = $('tog-bonus')?.checked;
   const wE  = tE ? (parseFloat($('work-expenses').value) || 0) : 0;
   const mi  = tM ? (parseFloat($('miles').value) || 0) : 0;
   const ot  = tO ? (parseFloat($('overtime').value) || 0) : 0;
+  const bn  = tB ? (parseFloat($('bonus').value) || 0) : 0;
   const mA  = mi * MR;
   if (tM) $('mileage-calc').innerHTML = mi.toLocaleString('en-GB') + ' miles × 55p = ' + fmt(mA);
 
@@ -329,15 +332,16 @@ function _calc() {
   const mT = aT / 12;
   const mN = aN / 12;
 
-  // Overtime at marginal rates on effective salary
-  const oT = (cTaxFn(pen.taxableSal + ot * 12) - cTaxFn(pen.taxableSal)) / 12;
-  const oN = (cNI(pen.niSal  + ot * 12) - cNI(pen.niSal)) / 12;
+  // Overtime and bonus taxed at marginal rates on effective salary
+  const extra = ot + bn;
+  const oT = (cTaxFn(pen.taxableSal + extra * 12) - cTaxFn(pen.taxableSal)) / 12;
+  const oN = (cNI(pen.niSal  + extra * 12) - cNI(pen.niSal)) / 12;
 
   const fT = mT + oT;
   const fN = mN + oN;
 
   const totalSL = sl.monthlyUG + sl.monthlyPGL;
-  const th = mG + ot - fT - fN - pen.employeeCost - totalSL;
+  const th = mG + extra - fT - fN - pen.employeeCost - totalSL;
 
   state.lastTakeHome = th;
   state.lastMileage  = mA;
@@ -351,7 +355,8 @@ function _calc() {
 
   // Monthly breakdown table
   let mh = row('Gross salary', mG);
-  if (ot > 0) mh += row('Overtime / bonus', ot, 'addition');
+  if (ot > 0) mh += row('Overtime', ot, 'addition');
+  if (bn > 0) mh += row('Bonus', bn, 'addition');
   mh += row('Income tax', -fT, 'deduction') + row('National Insurance', -fN, 'deduction');
   if (pen.enabled && pen.employeeCost > 0) {
     mh += row(`Pension (${pen.schemeLabel.toLowerCase()})`, -pen.employeeCost, 'deduction');
@@ -395,7 +400,19 @@ function renderSum(th, mi, wE = 0) {
   const tc  = state.currentTaxCode;
   const cTaxFn = tc ? (g) => cTaxWithCode(g, tc) : cTax;
 
-  let h = fr >= 0
+  const tB2 = $('tog-bonus')?.checked;
+  const bn2 = tB2 ? (parseFloat($('bonus')?.value) || 0) : 0;
+  const cTaxFn2 = tc ? (g) => cTaxWithCode(g, tc) : cTax;
+  const tSal2 = pen.taxableSal ?? (parseFloat($('salary')?.value) || 0);
+  const nSal2 = pen.niSal ?? (parseFloat($('salary')?.value) || 0);
+  let h = '';
+  if (bn2 > 0) {
+    const bonusTax = (cTaxFn2(tSal2 + bn2*12) - cTaxFn2(tSal2)) / 12;
+    const bonusNI  = (cNI(nSal2 + bn2*12) - cNI(nSal2)) / 12;
+    const bonusNet = bn2 - bonusTax - bonusNI;
+    h += `<div class="banner banner-purple" style="margin-bottom:8px">Congratulations on your bonus! After tax and NI you take home an extra <strong>${fmt(bonusNet)}</strong> this month.</div>`;
+  }
+  h += fr >= 0
     ? `<div class="banner banner-green">${fmt(fr)} free money this month</div>`
     : `<div class="banner banner-red">${fmt(Math.abs(fr))} over budget this month</div>`;
   h += `<div class="summary-grid">${st('Take-Home Pay',fmt(th))}${st('Mileage Received',fmt(mi))}${wE > 0 ? st('Expenses',fmt(wE)) : ''}${st('Total Outgoings',fmt(tp))}${st('Free Money',(fr<0?'−':'')+fmt(Math.abs(fr)))}</div>`;
@@ -413,12 +430,16 @@ function renderSum(th, mi, wE = 0) {
   const sal = parseFloat($('salary')?.value) || 0;
   h += row('Gross salary (monthly)', sal / 12);
   const tO  = $('tog-overtime')?.checked;
+  const tB  = $('tog-bonus')?.checked;
   const ot  = tO ? (parseFloat($('overtime')?.value) || 0) : 0;
+  const bn  = tB ? (parseFloat($('bonus')?.value) || 0) : 0;
   const tSal = pen.taxableSal ?? sal;
   const nSal = pen.niSal ?? sal;
-  const fT = cTaxFn(tSal) / 12 + (cTaxFn(tSal + ot*12) - cTaxFn(tSal)) / 12;
-  const fN = cNI(nSal) / 12 + (cNI(nSal + ot*12) - cNI(nSal)) / 12;
-  if (ot > 0) h += row('Overtime / bonus', ot, 'addition');
+  const extra = ot + bn;
+  const fT = cTaxFn(tSal) / 12 + (cTaxFn(tSal + extra*12) - cTaxFn(tSal)) / 12;
+  const fN = cNI(nSal) / 12 + (cNI(nSal + extra*12) - cNI(nSal)) / 12;
+  if (ot > 0) h += row('Overtime', ot, 'addition');
+  if (bn > 0) h += row('Bonus', bn, 'addition');
   h += row('Income tax', -fT, 'deduction') + row('National Insurance', -fN, 'deduction');
   if (pen.enabled && pen.monthlyContrib > 0) {
     h += row(`Pension (${pen.schemeLabel?.toLowerCase() || ''})`, -pen.employeeCost, 'deduction');
@@ -486,9 +507,11 @@ export function saveLocal() {
       togExpenses: $('tog-expenses')?.checked,
       togMileage:  $('tog-mileage')?.checked,
       togOvertime: $('tog-overtime')?.checked,
+      togBonus:    $('tog-bonus')?.checked,
       workExpenses:$('work-expenses')?.value,
       miles:       $('miles')?.value,
       overtime:    $('overtime')?.value,
+      bonus:       $('bonus')?.value,
       pots: state.pots,
     }));
     localStorage.setItem('finance_sl',      JSON.stringify(slPrefs));
@@ -508,9 +531,11 @@ export function loadLocal() {
       if (d.togExpenses)  { $('tog-expenses').checked = true;  toggleSection('expenses'); }
       if (d.togMileage)   { $('tog-mileage').checked  = true;  toggleSection('mileage');  }
       if (d.togOvertime)  { $('tog-overtime').checked = true;  toggleSection('overtime'); }
+      if (d.togBonus)     { $('tog-bonus').checked    = true;  toggleSection('bonus');    }
       if (d.workExpenses) $('work-expenses').value = d.workExpenses;
       if (d.miles)        $('miles').value = d.miles;
       if (d.overtime)     $('overtime').value = d.overtime;
+      if (d.bonus)        $('bonus').value = d.bonus;
       if (d.pots?.length) {
         state.pots = d.pots.map(p => ({ name:p.name||'', amount:p.amount||'', account:p.account||'', target:p.target||'' }));
         renderPots();
@@ -629,6 +654,8 @@ export async function saveMonth() {
     miles: parseFloat($('miles').value) || 0,
     togOvertime: $('tog-overtime').checked,
     overtime: parseFloat($('overtime').value) || 0,
+    togBonus: $('tog-bonus').checked,
+    bonus: parseFloat($('bonus').value) || 0,
     takeHome:  Math.round(actualTH * 100) / 100,
     mileage:   Math.round(state.lastMileage  * 100) / 100,
     outgoings: Math.round(tp * 100) / 100,
@@ -701,12 +728,15 @@ export function clearTracker() {
   if ($('work-expenses')) $('work-expenses').value = '';
   if ($('miles')) $('miles').value = '';
   if ($('overtime')) $('overtime').value = '';
+  if ($('bonus')) $('bonus').value = '';
   if ($('tog-expenses')) $('tog-expenses').checked = false;
   if ($('tog-mileage'))  $('tog-mileage').checked  = false;
   if ($('tog-overtime')) $('tog-overtime').checked = false;
+  if ($('tog-bonus'))    $('tog-bonus').checked    = false;
   $('sec-expenses')?.classList.remove('open');
   $('sec-mileage')?.classList.remove('open');
   $('sec-overtime')?.classList.remove('open');
+  $('sec-bonus')?.classList.remove('open');
   // Student loan and pension settings are intentionally preserved between months
   state.lastTakeHome = 0; state.lastMileage = 0;
   saveLocal();
@@ -794,9 +824,9 @@ export function loadTemplate(id) {
   $('salary').value = h.salary;
   state.pots = h.pots.map(p => ({ name:p.name||'', amount:p.amount||'', account:p.account||'', target:p.target||'' }));
   renderPots();
-  $('work-expenses').value=''; $('miles').value=''; $('overtime').value='';
-  $('tog-expenses').checked=false; $('tog-mileage').checked=false; $('tog-overtime').checked=false;
-  $('sec-expenses')?.classList.remove('open'); $('sec-mileage')?.classList.remove('open'); $('sec-overtime')?.classList.remove('open');
+  $('work-expenses').value=''; $('miles').value=''; $('overtime').value=''; $('bonus').value='';
+  $('tog-expenses').checked=false; $('tog-mileage').checked=false; $('tog-overtime').checked=false; $('tog-bonus').checked=false;
+  $('sec-expenses')?.classList.remove('open'); $('sec-mileage')?.classList.remove('open'); $('sec-overtime')?.classList.remove('open'); $('sec-bonus')?.classList.remove('open');
   // Restore SL/pension from template if present
   if (h.studentLoan?.enabled) _applySLPrefs({ enabled:true, plan:h.studentLoan.plan, hasPgl:false, overriding:false });
   if (h.pension?.enabled) _applyPenPrefs({ enabled:true, schemeType:h.pension.scheme });
@@ -820,6 +850,8 @@ function _prefillEntry(h) {
   else { $('tog-mileage').checked=false; $('sec-mileage')?.classList.remove('open'); $('miles').value=''; }
   if (h.togOvertime && h.overtime > 0) { $('tog-overtime').checked=true; toggleSection('overtime'); $('overtime').value=h.overtime; }
   else { $('tog-overtime').checked=false; $('sec-overtime')?.classList.remove('open'); $('overtime').value=''; }
+  if (h.togBonus && h.bonus > 0) { $('tog-bonus').checked=true; toggleSection('bonus'); $('bonus').value=h.bonus; }
+  else { $('tog-bonus').checked=false; $('sec-bonus')?.classList.remove('open'); $('bonus').value=''; }
   if (h.studentLoan?.enabled) _applySLPrefs({ enabled:true, plan:h.studentLoan.plan, hasPgl:false, overriding:false });
   else { if($('tog-sl')){$('tog-sl').checked=false;} $('sec-sl')?.classList.remove('open'); }
   // Always restore pension and tax code from localStorage — these are user-level prefs, not per-month
@@ -920,7 +952,8 @@ export async function exportMonthPDF(id) {
   sec('Income Breakdown');
   if (h.togExpenses&&h.workExpenses>0) line('Work expenses', fmt(h.workExpenses));
   if (h.togMileage&&h.miles>0) line('Business miles', h.miles+' miles');
-  if (h.togOvertime&&h.overtime>0) line('Overtime / bonus', fmt(h.overtime));
+  if (h.togOvertime&&h.overtime>0) line('Overtime', fmt(h.overtime));
+  if (h.togBonus&&h.bonus>0) line('Bonus', fmt(h.bonus));
   y+=2;
   sec('Pots');
   (h.pots||[]).forEach(p => { const l=p.name+(p.target?' (budget '+fmt(p.target)+')':'');line(l,fmt(p.amount));if(y>270){d.addPage();y=18;} });

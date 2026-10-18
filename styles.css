@@ -291,6 +291,9 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
 .banner { padding: 16px 20px; border-radius: var(--radius); font-weight: 600; font-size: 1.1rem; text-align: center; margin-bottom: 16px; }
 .banner-green { background: var(--green-bg); color: var(--green); border: 1.5px solid var(--green); }
 .banner-red { background: var(--red-bg); color: var(--red); border: 1.5px solid var(--red); }
+.banner-purple { background: #f3eeff; color: #6c3fc8; border: 1.5px solid #9b6fe8; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .banner-purple { background: #2a1f42; color: #c4a0f8; border-color: #7a50c8; } }
+:root[data-theme="dark"] .banner-purple { background: #2a1f42; color: #c4a0f8; border-color: #7a50c8; }
 .banner-info { background: var(--primary-light); color: var(--primary); border: 1.5px solid var(--primary); padding: 12px 16px; border-radius: var(--radius); font-size: 0.9rem; font-weight: 500; margin-bottom: 16px; display: none; }
 .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
 .summary-stat { background: var(--bg); border-radius: 8px; padding: 14px; }
