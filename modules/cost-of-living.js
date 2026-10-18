@@ -123,7 +123,7 @@ function render() {
             <td></td>
           </tr></tfoot>
         </table>
-      </div>` : `<p style="color:var(--text-secondary);font-size:0.88rem">Add your regular fixed costs — rent, mortgage, subscriptions, utilities — to see how much of your pay is already committed each month.</p>`}
+      </div>` : `<p style="color:var(--text-secondary);font-size:0.88rem">Add your regular fixed costs: rent, mortgage, subscriptions, utilities, to see how much of your pay is already committed each month.</p>`}
     </div>
   `;
 }

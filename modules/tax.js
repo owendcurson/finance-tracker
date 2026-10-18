@@ -122,7 +122,7 @@ export function parseTaxCode(rawInput) {
   else if (s === 'D0') { pa = 0; flatRate = HR; explanation = 'All income taxed at the higher rate (40%) with no personal allowance. Usually applies to additional income sources.'; }
   else if (s === 'D1') { pa = 0; flatRate = AR; explanation = 'All income taxed at the additional rate (45%) with no personal allowance.'; }
   else if (s === 'NT') { pa = 0; noTax = true;  explanation = 'No tax is deducted from this income source.'; }
-  else if (s === '0T') { pa = 0; explanation = 'No personal allowance — all income is taxable. Applied when HMRC lacks information or your allowance is used up elsewhere.'; }
+  else if (s === '0T') { pa = 0; explanation = 'No personal allowance: all income is taxable. Applied when HMRC lacks information or your allowance is used up elsewhere.'; }
   else {
     // 5. Numeric code: digits + optional letter suffix
     const m = s.match(/^(\d+)([A-Z]*)$/);
@@ -154,9 +154,9 @@ export function parseTaxCode(rawInput) {
 
   if (isEmergency) {
     const eMsg = {
-      W1: 'Week 1 (non-cumulative) emergency code — tax is calculated each week independently. You may overpay. Contact HMRC on 0300 200 3300 to get a corrected code.',
-      M1: 'Month 1 (non-cumulative) emergency code — tax is calculated each month independently. You may overpay. Contact HMRC on 0300 200 3300 to get a corrected code.',
-      X:  'Emergency tax code — contact HMRC on 0300 200 3300 to confirm your correct code.',
+      W1: 'Week 1 (non-cumulative) emergency code: tax is calculated each week independently. You may overpay. Contact HMRC on 0300 200 3300 to get a corrected code.',
+      M1: 'Month 1 (non-cumulative) emergency code: tax is calculated each month independently. You may overpay. Contact HMRC on 0300 200 3300 to get a corrected code.',
+      X:  'Emergency tax code; contact HMRC on 0300 200 3300 to confirm your correct code.',
     };
     warning = (warning ? warning + ' ' : '') + eMsg[emergencyType];
   }

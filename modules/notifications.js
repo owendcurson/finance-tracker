@@ -56,11 +56,11 @@ export function checkPaydayNotifications() {
     sent.d3=true; localStorage.setItem(key,JSON.stringify(sent));
   }
   if (diffDays === 1 && !sent.d1) {
-    fireNotification('PayUnite — Payday tomorrow! 💰', `Don\'t forget to plan your money.`);
+    fireNotification('PayUnite: Payday tomorrow! 💰', `Don\'t forget to plan your money.`);
     sent.d1=true; localStorage.setItem(key,JSON.stringify(sent));
   }
   if (diffDays === 0 && !sent.d0) {
-    fireNotification('PayUnite — It\'s payday! 💰', `Time to plan your money for this month.`);
+    fireNotification('PayUnite: It\'s payday! 💰', `Time to plan your money for this month.`);
     sent.d0=true; localStorage.setItem(key,JSON.stringify(sent));
   }
 }

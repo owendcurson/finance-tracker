@@ -135,7 +135,7 @@ function render() {
           </tr></tfoot>` : ''}
         </table>
       </div>` : `
-      <p style="color:var(--text-secondary);font-size:0.88rem;margin-bottom:16px">Track the value of your employer benefits — pension contributions, health insurance, car allowance — to see your true total compensation.</p>
+      <p style="color:var(--text-secondary);font-size:0.88rem;margin-bottom:16px">Track the value of your employer benefits: pension contributions, health insurance, car allowance, to see your true total compensation.</p>
       <button class="btn btn-secondary" onclick="window._benLoadPresets()" style="margin-right:8px">Load common benefits</button>
       <button class="btn btn-primary" onclick="window._benAdd()">Add custom benefit</button>`}
     </div>

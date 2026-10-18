@@ -80,7 +80,7 @@ export function goStep(n, { pushUrl = true } = {}) {
     const base = location.hostname === 'owendcurson.github.io' ? '/finance-tracker' : '';
     const full = base + p;
     if (location.pathname !== full) history.pushState({ path: p }, '', full);
-    document.title = isEdit ? 'Edit Month — PayUnite' : 'New Month — PayUnite';
+    document.title = isEdit ? 'Edit Month | PayUnite' : 'New Month | PayUnite';
   }
 }
 
@@ -92,11 +92,11 @@ function _setTrackerMode(mode, label = '') {
   if (mode === 'edit') {
     if (title) { title.textContent = `Editing ${label}`; title.style.color = 'var(--amber, #e08000)'; }
     if (sub)   sub.textContent = 'Make your changes and save.';
-    document.title = `Editing ${label} — PayUnite`;
+    document.title = `Editing ${label} | PayUnite`;
   } else {
     if (title) { title.textContent = 'New Month'; title.style.color = ''; }
     if (sub)   sub.innerHTML = 'Tax Year 2026/27 &middot; England, Wales &amp; NI';
-    document.title = 'New Month — PayUnite';
+    document.title = 'New Month | PayUnite';
   }
 }
 
@@ -254,7 +254,7 @@ function _updatePenMinPanel(pen, sal) {
   const statusClass = totalOk ? (empOk && erOk ? 'pen-min-green' : 'pen-min-amber') : 'pen-min-red';
   const statusMsg   = totalOk
     ? (empOk && erOk ? 'Meets auto-enrolment minimums' : 'Total meets minimum but one contribution is below its individual threshold')
-    : 'Below the auto-enrolment legal minimum — check with your employer';
+    : 'Below the auto-enrolment legal minimum, check with your employer';
   panel.innerHTML = `
     <div class="pen-min-header ${statusClass}">${statusMsg}</div>
     <div class="pen-min-row"><span>Qualifying earnings this month</span><span>${fmtM(qualifying)}</span></div>
@@ -433,7 +433,7 @@ function _calc() {
   mh += rowT('Monthly take-home', th + wE);
   $('monthly-table').innerHTML = mh;
 
-  // Annual breakdown table — use pension-adjusted salaries so salary sacrifice / net pay reduce tax correctly
+  // Annual breakdown table: use pension-adjusted salaries so salary sacrifice / net pay reduce tax correctly
   const rawTax = cTaxFn(pen.taxableSal);
   const rawNI  = cNI(pen.niSal);
   const annPen = pen.enabled ? pen.employeeCost * 12 : 0;
@@ -485,7 +485,7 @@ function renderSum(th, mi, wE = 0) {
   if (tc && tc.raw) {
     const paStr = tc.flatRate !== null ? `${(tc.flatRate*100).toFixed(0)}% flat rate` : tc.noTax ? 'No tax' : `Personal allowance £${Math.max(0,tc.pa).toLocaleString('en-GB')}`;
     const emergencyNote = tc.isEmergency ? ' <span class="label-secondary">(emergency code)</span>' : '';
-    h += `<tr><td class="label-secondary" colspan="2" style="padding-bottom:4px">Tax code: <strong>${esc(tc.raw)}</strong>${emergencyNote} — ${paStr}</td></tr>`;
+    h += `<tr><td class="label-secondary" colspan="2" style="padding-bottom:4px">Tax code: <strong>${esc(tc.raw)}</strong>${emergencyNote}, ${paStr}</td></tr>`;
   }
 
   // Full deduction chain from gross to take-home
@@ -576,7 +576,7 @@ export function saveLocal() {
       bonus:       $('bonus')?.value,
       pots: state.pots,
     }));
-    // Only persist pension/TC/SL when enabled — avoids wiping saved prefs
+    // Only persist pension/TC/SL when enabled, avoids wiping saved prefs
     // when the user temporarily unchecks a toggle mid-entry.
     if (slEnabled)  localStorage.setItem('finance_sl',      JSON.stringify(slPrefs));
     if (penEnabled) localStorage.setItem('finance_pension', JSON.stringify(penPrefs));
@@ -684,13 +684,13 @@ export async function saveMonth() {
   const salRaw = parseFloat($('salary').value) || 0;
   if (salRaw === 0) { toast('Enter a salary before saving'); return; }
   if (salRaw < 0)   { toast('Salary must be a positive number'); return; }
-  if (salRaw > 10_000_000) { toast('Salary looks too high — please check the value'); return; }
+  if (salRaw > 10_000_000) { toast('Salary looks too high, please check the value'); return; }
   const milesRaw = parseFloat($('miles').value) || 0;
-  if ($('tog-mileage').checked && milesRaw > 10000) { toast('Mileage over 10,000 miles — please check the value'); return; }
+  if ($('tog-mileage').checked && milesRaw > 10000) { toast('Mileage over 10,000 miles, please check the value'); return; }
   for (const pot of state.pots) {
     const a = parseFloat(pot.amount) || 0;
-    if (a > 100_000) { toast(`Pot "${pot.name||'Unnamed'}" amount looks too high — please check`); return; }
-    if ((parseFloat(pot.target)||0) > 100_000) { toast(`Pot "${pot.name||'Unnamed'}" target looks too high — please check`); return; }
+    if (a > 100_000) { toast(`Pot "${pot.name||'Unnamed'}" amount looks too high, please check`); return; }
+    if ((parseFloat(pot.target)||0) > 100_000) { toast(`Pot "${pot.name||'Unnamed'}" target looks too high, please check`); return; }
   }
 
   const pen = state._pen || { enabled: false, monthlyContrib: 0, employeeCost: 0, employerMonthly: 0, scheme: 'relief_at_source', schemeLabel: '' };
@@ -844,7 +844,7 @@ function _checkBanner() {
   if (!b) return;
   b.style.display = 'none';
   if (existing) {
-    // Show modal asking what to do — don't auto-fill
+    // Show modal asking what to do, don't auto-fill
     state._dupEntry = existing;
     const modal = $('dup-month-modal');
     if (modal) {
@@ -932,7 +932,7 @@ function _prefillEntry(h) {
   else { $('tog-bonus').checked=false; $('sec-bonus')?.classList.remove('open'); $('bonus').value=''; }
   if (h.studentLoan?.enabled) _applySLPrefs({ enabled:true, plan:h.studentLoan.plan, hasPgl:false, overriding:false });
   else { if($('tog-sl')){$('tog-sl').checked=false;} $('sec-sl')?.classList.remove('open'); }
-  // Always restore pension and tax code from localStorage — these are user-level prefs, not per-month.
+  // Always restore pension and tax code from localStorage; these are user-level prefs, not per-month.
   // enabled:true goes AFTER the spread so it can't be overwritten by a stale enabled:false in storage.
   try {
     const penRaw = localStorage.getItem('finance_pension');
@@ -949,14 +949,14 @@ export function editEntry(id) {
   const h = state.financeHistory.find(e => e.id === id); if (!h) return;
   state.editingId = id;
   $('detail-modal').classList.remove('open');
-  // Navigate to /edit-month — showTracker is called by the router
+  // Navigate to /edit-month; showTracker is called by the router
   import('./router.js').then(m => m.navigate('/edit-month'));
 }
 
 export function _initEditMonth(h) {
   state.currentStep = 1; goStep(1, { pushUrl: false });
   $('pick-month').value = h.month; $('pick-year').value = h.year; updPD();
-  // Lock the month picker — you cannot change the month when editing
+  // Lock the month picker; you cannot change the month when editing
   const mpEl = document.querySelector('.month-picker');
   if (mpEl) mpEl.setAttribute('data-locked', 'true');
   $('pick-month').disabled = true;
@@ -1018,7 +1018,7 @@ export async function exportYTDExcel() {
   sorted.forEach(h => { rows.push([MF[h.month]+' '+h.year,h.takeHome,h.mileage,h.outgoings,h.freeMoney]); t.th+=h.takeHome||0;t.mi+=h.mileage||0;t.out+=h.outgoings||0;t.fr+=h.freeMoney||0; });
   rows.push(['TOTAL', t.th, t.mi, t.out, t.fr]);
   window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.aoa_to_sheet([['Tax Year', start.getFullYear()+'/'+String(start.getFullYear()+1).slice(2)]]), 'Summary');
-  window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.aoa_to_sheet(rows), 'PayUnite — Year to Date');
+  window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.aoa_to_sheet(rows), 'PayUnite Year to Date');
   window.XLSX.writeFile(wb, 'payunite-ytd-'+start.getFullYear()+'.xlsx');
 }
 
@@ -1027,7 +1027,7 @@ export async function exportMonthPDF(id) {
   await loadScript(JSPDF_CDN);
   if (!window.jspdf) { toast('Export unavailable'); return; }
   const jsPDF = window.jspdf.jsPDF; const d = new jsPDF(); let y = 18;
-  d.setFontSize(18); d.text('PayUnite — '+MF[h.month]+' '+h.year, 14, y); y+=8;
+  d.setFontSize(18); d.text('PayUnite '+MF[h.month]+' '+h.year, 14, y); y+=8;
   d.setFontSize(10); d.setTextColor(120); d.text('Pay date: '+(h.payDateLong||h.payDate), 14, y); y+=10; d.setTextColor(0);
   const sec = t => { d.setFontSize(12);d.setFont(undefined,'bold');d.text(t,14,y);d.setFont(undefined,'normal');y+=6;d.setFontSize(10); };
   const line = (l,v) => { d.text(l,16,y);d.text(v,190,y,{align:'right'});y+=6; };
@@ -1050,7 +1050,7 @@ export async function exportMonthPDF(id) {
   sec('Summary');
   line('Total outgoings', fmt(h.outgoings));
   line('Free money', (h.freeMoney<0?'−':'')+fmt(Math.abs(h.freeMoney)));
-  d.setFontSize(8); d.setTextColor(150); d.text('Generated by PayUnite — figures based on 2026/27 UK tax rates', 14, 287); d.setTextColor(0);
+  d.setFontSize(8); d.setTextColor(150); d.text('Generated by PayUnite, figures based on 2026/27 UK tax rates', 14, 287); d.setTextColor(0);
   d.save('payunite-'+MS[h.month].toLowerCase()+'-'+h.year+'.pdf');
 }
 

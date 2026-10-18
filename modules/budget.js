@@ -45,13 +45,13 @@ function render() {
     const actuals = getActuals(cat.name);
     const recent = actuals.find(a => a.amount !== null);
     const diff = recent ? recent.amount - cat.target : null;
-    const diffStr = diff === null ? '—'
+    const diffStr = diff === null ? '-'
       : diff > 0 ? `<span style="color:var(--red)">+${fmt(diff)} over</span>`
       : diff < 0 ? `<span style="color:var(--green)">${fmt(Math.abs(diff))} under</span>`
       : `<span style="color:var(--green)">On target</span>`;
 
     const actCols = actuals.slice(0, 3).map(a =>
-      `<td style="text-align:right;font-size:0.82rem">${a.amount !== null ? fmt(a.amount) : '<span style="color:var(--border)">—</span>'}</td>`
+      `<td style="text-align:right;font-size:0.82rem">${a.amount !== null ? fmt(a.amount) : '<span style="color:var(--border)">-</span>'}</td>`
     ).join('');
 
     return `<tr>

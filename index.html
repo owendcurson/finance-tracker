@@ -14,18 +14,18 @@
 <link rel="manifest" href="./manifest.json">
 <link rel="icon" type="image/svg+xml" href="https://payunite.co.uk/assets/logo-mark.svg">
 <link rel="apple-touch-icon" href="https://payunite.co.uk/assets/logo-mark-app-icon.svg">
-<meta property="og:title" content="PayUnite — The free UK pay tracker">
-<meta property="og:description" content="Enter your salary and instantly see your exact take-home, tax, NI, pension, and free money. Track monthly pots, mileage, and spending — free forever.">
+<meta property="og:title" content="PayUnite: The free UK pay tracker">
+<meta property="og:description" content="Enter your salary and instantly see your exact take-home, tax, NI, pension, and free money. Track monthly pots, mileage, and spending, free forever.">
 <meta property="og:image" content="https://payunite.co.uk/assets/logo-mark.svg">
 <meta property="og:url" content="https://payunite.co.uk/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="PayUnite">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="PayUnite — The free UK pay tracker">
+<meta name="twitter:title" content="PayUnite: The free UK pay tracker">
 <meta name="twitter:description" content="Enter your salary and instantly see your exact take-home, tax, NI and free money each month. Free forever.">
 <meta name="twitter:image" content="https://payunite.co.uk/assets/logo-mark.svg">
-<title>PayUnite — The free UK pay tracker</title>
-<meta name="description" content="The free UK pay tracker. Enter your salary and PayUnite calculates your exact take-home pay, income tax, National Insurance, pension, and free money every month. Track pots, mileage, budgets, and benefits — all in one place.">
+<title>PayUnite: The free UK pay tracker</title>
+<meta name="description" content="The free UK pay tracker. Enter your salary and PayUnite calculates your exact take-home pay, income tax, National Insurance, pension, and free money every month. Track pots, mileage, budgets, and benefits, all in one place.">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -398,13 +398,13 @@
                 <label class="radio-opt"><input type="radio" name="tc-basis" value="cumulative" checked onchange="window._calc()"> Cumulative (standard)</label>
                 <label class="radio-opt"><input type="radio" name="tc-basis" value="wm1" onchange="window._calc()"> Week 1 / Month 1 (non-cumulative)</label>
               </div>
-              <p class="field-note">Cumulative tax considers all pay to date in the tax year. Week 1 / Month 1 treats each pay period independently — used with emergency codes and new employees.</p>
+              <p class="field-note">Cumulative tax considers all pay to date in the tax year. Week 1 / Month 1 treats each pay period independently, used with emergency codes and new employees.</p>
             </div>
             <div style="margin-top:14px">
               <div class="toggle-row-label" style="font-size:0.88rem;font-weight:600;color:var(--text);margin-bottom:6px">Previous tax codes</div>
               <div id="tc-history-list"></div>
               <button class="btn btn-outline" style="font-size:0.8rem;margin-top:8px;padding:6px 14px" onclick="window._addTCHistory()">+ Add previous code</button>
-              <p class="field-note" style="margin-top:6px">Optional record of prior codes. Useful for spotting if you were overtaxed in a previous month — contact HMRC on 0300 200 3300 if you think a code was wrong.</p>
+              <p class="field-note" style="margin-top:6px">Optional record of prior codes. Useful for spotting if you were overtaxed in a previous month. Contact HMRC on 0300 200 3300 if you think a code was wrong.</p>
             </div>
           </div>
         </div>
@@ -416,10 +416,10 @@
             <div class="field" style="margin-top:12px">
               <label for="sl-plan">Loan plan</label>
               <select id="sl-plan" onchange="window._onSLPlan();window._calc()">
-                <option value="plan1">Plan 1 — pre-Sept 2012 / Scotland / NI (threshold: £24,990)</option>
-                <option value="plan2" selected>Plan 2 — England/Wales, Sept 2012+ (threshold: £28,470)</option>
-                <option value="plan4">Plan 4 — Scotland, Sept 2012+ (threshold: £32,745)</option>
-                <option value="plan5">Plan 5 — Aug 2023+ undergraduate (threshold: £25,000)</option>
+                <option value="plan1">Plan 1: pre-Sept 2012 / Scotland / NI (threshold: £24,990)</option>
+                <option value="plan2" selected>Plan 2: England/Wales, Sept 2012+ (threshold: £28,470)</option>
+                <option value="plan4">Plan 4: Scotland, Sept 2012+ (threshold: £32,745)</option>
+                <option value="plan5">Plan 5: Aug 2023+ undergraduate (threshold: £25,000)</option>
                 <option value="pgl">Postgraduate Loan only (threshold: £21,000)</option>
               </select>
             </div>
@@ -433,7 +433,7 @@
               </div>
               <div class="info-banner-amber"><i class="ti ti-alert-triangle"></i> If you believe your deduction is incorrect, contact the Student Loans Company at <strong>studentloanscompany.eu</strong> or call <strong>0300 100 0611</strong> to check your balance and repayment status.</div>
             </div>
-            <p class="field-note">Student loan repayments are deducted from gross pay after tax and NI. Figures are estimates based on your salary — your actual deduction may vary.</p>
+            <p class="field-note">Student loan repayments are deducted from gross pay after tax and NI. Figures are estimates based on your salary. Your actual deduction may vary.</p>
           </div>
         </div>
 
@@ -531,7 +531,7 @@
         <p id="dup-month-msg" style="margin-bottom:16px;color:var(--text-secondary)"></p>
         <div style="display:flex;flex-direction:column;gap:10px">
           <button class="btn btn-primary" onclick="window._dupModalEdit()">Edit existing entry</button>
-          <button class="btn btn-outline" onclick="window._dupModalFresh()">Start fresh — replace it</button>
+          <button class="btn btn-outline" onclick="window._dupModalFresh()">Start fresh and replace it</button>
           <button class="btn btn-outline" style="color:var(--text-secondary)" onclick="window._dupModalCancel()">Cancel</button>
         </div>
       </div>
@@ -882,7 +882,7 @@ window._authTab = function(tab) {
   });
   var titles = {
     signin:  ['Welcome back to PayUnite', 'Sign in to your PayUnite account'],
-    signup:  ['Join PayUnite',            'Start tracking your pay today — free forever']
+    signup:  ['Join PayUnite',            'Start tracking your pay today, free forever']
   };
   var pair = titles[tab] || titles.signin;
   var tEl = document.getElementById('auth-card-title');
