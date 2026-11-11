@@ -615,6 +615,13 @@
         <div style="font-size:0.72rem;color:var(--text-secondary);margin-top:4px" id="user-display-email"></div>
         <button class="btn btn-danger-solid" onclick="window._doSignOut()" style="margin-top:12px;width:100%">Sign out</button>
       </div>
+
+      <div style="text-align:center;padding:20px 0 8px">
+        <div style="display:flex;gap:20px;justify-content:center">
+          <button onclick="import('./modules/router.js').then(m=>m.navigate('/privacy-policy'))" style="background:none;border:none;cursor:pointer;color:var(--primary);font-size:0.8rem;font-family:inherit;padding:0">Privacy Policy</button>
+          <button onclick="import('./modules/router.js').then(m=>m.navigate('/terms'))" style="background:none;border:none;cursor:pointer;color:var(--primary);font-size:0.8rem;font-family:inherit;padding:0">Terms of Use</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -781,14 +788,6 @@
       </div>
     </div>
 
-    <!-- Legal footer links -->
-    <div style="text-align:center;padding:24px 0 8px;border-top:1px solid var(--border);margin-top:8px">
-      <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:8px">PayUnite &copy; 2026</p>
-      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
-        <button onclick="import('./modules/router.js').then(m=>m.navigate('/privacy-policy'))" style="background:none;border:none;cursor:pointer;color:var(--primary);font-size:0.8rem;font-family:inherit;padding:0">Privacy Policy</button>
-        <button onclick="import('./modules/router.js').then(m=>m.navigate('/terms'))" style="background:none;border:none;cursor:pointer;color:var(--primary);font-size:0.8rem;font-family:inherit;padding:0">Terms of Use</button>
-      </div>
-    </div>
   </div>
 </div>
 
