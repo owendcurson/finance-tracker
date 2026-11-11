@@ -6,7 +6,7 @@ import { initTheme } from './modules/theme.js';
 import { initAuth } from './modules/auth.js';
 import { initOfflineListeners } from './modules/offline.js';
 import { initDensity, renderSettingsScreen } from './modules/settings.js';
-import { initContactForm } from './modules/privacy.js';
+import { initContactForm, openHelpModal } from './modules/privacy.js';
 import { initSplashDemo } from './modules/demo.js';
 import { attachChartTypeListeners } from './modules/charts.js';
 import { initBackToTop } from './modules/ui.js';

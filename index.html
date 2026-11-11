@@ -814,6 +814,29 @@
   </div>
 </div>
 
+<!-- Help button + modal -->
+<button id="help-fab" onclick="window._openHelpModal()" aria-label="Help" title="Get help">
+  <i class="ti ti-help"></i>
+</button>
+<div id="help-modal" style="display:none" role="dialog" aria-modal="true" aria-label="Get help">
+  <div id="help-modal-backdrop" onclick="window._closeHelpModal()"></div>
+  <div id="help-modal-sheet">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <h2 style="font-size:1rem;font-weight:700;margin:0">Get help</h2>
+      <button onclick="window._closeHelpModal()" style="background:none;border:none;cursor:pointer;color:var(--text-secondary);font-size:1.3rem;line-height:1;padding:4px" aria-label="Close">&times;</button>
+    </div>
+    <p style="font-size:0.84rem;color:var(--text-secondary);margin-bottom:16px">Question, suggestion, or found a bug? Send us a message.</p>
+    <form id="help-contact-form">
+      <div class="contact-field"><label class="contact-label" for="hcf-name">Name</label><input type="text" id="hcf-name" class="contact-input" placeholder="Your name"></div>
+      <div class="contact-field"><label class="contact-label" for="hcf-email">Email</label><input type="email" id="hcf-email" class="contact-input" placeholder="your@email.com"></div>
+      <div class="contact-field"><label class="contact-label" for="hcf-message">Message</label><textarea id="hcf-message" class="contact-input" rows="4" placeholder="Your message…"></textarea></div>
+      <div id="hcf-error" style="display:none;color:var(--red);font-size:0.82rem;margin-bottom:8px"></div>
+      <div id="hcf-success" style="display:none;color:var(--green);font-weight:600;font-size:0.88rem;margin-bottom:8px"></div>
+      <button class="btn btn-primary" id="hcf-submit" type="submit" style="width:100%;padding:11px"><i class="ti ti-send"></i> Send message</button>
+    </form>
+  </div>
+</div>
+
 <!-- Onboarding wizard -->
 <div id="onboarding-modal" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:1200;overflow-y:auto">
   <div style="max-width:520px;margin:0 auto;padding:24px 16px 80px;min-height:100%;display:flex;flex-direction:column">

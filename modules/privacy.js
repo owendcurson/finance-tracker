@@ -117,3 +117,59 @@ function showCfError(el, msg) {
 
 window._openPrivacy  = openPrivacy;
 window._closePrivacy = closePrivacy;
+
+// ── Help FAB modal ────────────────────────────────────────────────────────────
+export function openHelpModal() {
+  const modal = $('help-modal'); if (!modal) return;
+  modal.style.display = 'block';
+  if (state.currentUser) {
+    const n = $('hcf-name'), e = $('hcf-email');
+    if (n && !n.value) n.value = state.currentUser.displayName || '';
+    if (e && !e.value) e.value = state.currentUser.email || '';
+  }
+  const form = $('help-contact-form'); if (!form) return;
+  if (form._helpBound) return;
+  form._helpBound = true;
+  form.addEventListener('submit', async ev => {
+    ev.preventDefault();
+    const name    = ($('hcf-name')?.value||'').trim();
+    const email   = ($('hcf-email')?.value||'').trim();
+    const message = ($('hcf-message')?.value||'').trim();
+    const errEl   = $('hcf-error');
+    const succEl  = $('hcf-success');
+    const btn     = $('hcf-submit');
+    if (errEl) errEl.style.display = 'none';
+    if (succEl) succEl.style.display = 'none';
+    if (!checkRateLimit()) { if(errEl){errEl.textContent="Too many messages. Try again in an hour.";errEl.style.display='block';} return; }
+    if (!name || name.length < 2) { if(errEl){errEl.textContent='Please enter your name.';errEl.style.display='block';} return; }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { if(errEl){errEl.textContent='Please enter a valid email.';errEl.style.display='block';} return; }
+    if (!message || message.length < 10) { if(errEl){errEl.textContent='Message must be at least 10 characters.';errEl.style.display='block';} return; }
+    if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+    try {
+      const res = await fetch(CONTACT_ENDPOINT, {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ name, email, message }),
+      });
+      if (res.ok) {
+        incrementRateLimit();
+        form.reset();
+        if (succEl) { succEl.textContent = 'Message sent. Thanks!'; succEl.style.display = 'block'; }
+        setTimeout(() => closeHelpModal(), 2000);
+      } else {
+        if (errEl) { errEl.textContent = 'Something went wrong. Please try again.'; errEl.style.display = 'block'; }
+      }
+    } catch(e) {
+      if (errEl) { errEl.textContent = 'Network error. Check your connection.'; errEl.style.display = 'block'; }
+    } finally {
+      if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-send"></i> Send message'; }
+    }
+  });
+}
+
+export function closeHelpModal() {
+  const modal = $('help-modal'); if (!modal) return;
+  modal.style.display = 'none';
+}
+
+window._openHelpModal  = openHelpModal;
+window._closeHelpModal = closeHelpModal;
