@@ -209,8 +209,13 @@ export function initRouter() {
   // If we landed on a specific path (e.g. via 404.html redirect),
   // store it so auth can pick it up after sign-in
   const initialPath = _getPath();
-  if (initialPath !== '/' && PROTECTED.has(initialPath)) {
-    state._pendingRoute = initialPath;
+  if (initialPath !== '/') {
+    if (PROTECTED.has(initialPath)) {
+      state._pendingRoute = initialPath;
+    } else {
+      // Public route (e.g. /privacy-policy, /terms) — render immediately
+      _render(initialPath);
+    }
   }
 }
 
@@ -219,6 +224,12 @@ export function initRouter() {
  * Falls back to /dashboard.
  */
 export function resolvePendingRoute() {
+  const current = _getPath();
+  // Don't override a public page the user navigated to directly
+  if (!PROTECTED.has(current) && current !== '/') {
+    state._pendingRoute = null;
+    return;
+  }
   const target = state._pendingRoute || '/dashboard';
   state._pendingRoute = null;
   navigate(target, { replace: true });
