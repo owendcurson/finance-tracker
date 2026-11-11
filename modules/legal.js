@@ -6,13 +6,16 @@ const LAST_UPDATED_TERMS   = '11 November 2026';
 function renderPage(screenId, title, html) {
   document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
   const screen = $(screenId);
-  if (!screen) return;
+  if (!screen) { console.error('[legal] screen not found:', screenId); return; }
   screen.style.display = 'block';
   const hb = $('header-back'); if (hb) hb.style.display = 'inline-flex';
-  import('./ui.js').then(m => m.setBottomNav('settings'));
+  import('./ui.js').then(m => {
+    m.setBottomNav('settings');
+    m.setHeaderNav('/' + screenId.replace('-screen', ''));
+  });
 
   screen.innerHTML = `
-    <div style="max-width:680px;margin:0 auto;padding:20px 0 80px">
+    <div class="container" style="max-width:680px;padding-top:20px;padding-bottom:80px">
       <h1 style="font-size:1.3rem;font-weight:800;margin-bottom:4px">${title}</h1>
       <p style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:24px">Last updated: ${screenId === 'privacy-policy-screen' ? LAST_UPDATED_PRIVACY : LAST_UPDATED_TERMS}</p>
       ${html}
