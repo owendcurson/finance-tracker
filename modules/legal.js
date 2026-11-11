@@ -34,7 +34,7 @@ function ul(items) { return `<ul style="padding-left:20px;margin-bottom:8px">${i
 export function showPrivacyPolicy() {
   renderPage('privacy-policy-screen', 'Privacy Policy', `
     ${section('Who we are', `
-      ${p('PayUnite is a free UK pay and finance tracking tool operated by Owen Curson, based in the United Kingdom. You can contact us at: <a href="mailto:curson.social@gmail.com" style="color:var(--primary)">curson.social@gmail.com</a>')}
+      ${p('PayUnite is a free UK pay and finance tracking tool operated by Owen Curson, based in the United Kingdom. You can contact us at: <a href="mailto:help@payunite.co.uk" style="color:var(--primary)">help@payunite.co.uk</a>')}
       ${p('This policy explains what personal data we collect, how we use it, and your rights under the UK General Data Protection Regulation (UK GDPR) and the Data Protection Act 2018.')}
     `)}
     ${section('What data we collect', `
@@ -84,7 +84,7 @@ export function showPrivacyPolicy() {
         '<strong>Object</strong> to processing based on legitimate interests.',
         '<strong>Lodge a complaint</strong> with the Information Commissioner\'s Office (ICO) at <a href="https://ico.org.uk" target="_blank" rel="noopener" style="color:var(--primary)">ico.org.uk</a> if you believe we have mishandled your data.',
       ])}
-      ${p('To exercise any of these rights, contact us at <a href="mailto:curson.social@gmail.com" style="color:var(--primary)">curson.social@gmail.com</a>.')}
+      ${p('To exercise any of these rights, contact us at <a href="mailto:help@payunite.co.uk" style="color:var(--primary)">help@payunite.co.uk</a>.')}
     `)}
     ${section('Changes to this policy', `
       ${p('We may update this Privacy Policy from time to time. We will notify you of significant changes by updating the "Last updated" date above. Continued use of PayUnite after changes constitutes acceptance of the revised policy.')}
@@ -137,7 +137,7 @@ export function showTerms() {
       ${p('We may update these Terms from time to time. Continued use of the Service after changes are posted constitutes your acceptance of the revised Terms.')}
     `)}
     ${section('Contact', `
-      ${p('For any questions about these Terms, contact us at <a href="mailto:curson.social@gmail.com" style="color:var(--primary)">curson.social@gmail.com</a>.')}
+      ${p('For any questions about these Terms, contact us at <a href="mailto:help@payunite.co.uk" style="color:var(--primary)">help@payunite.co.uk</a>.')}
     `)}
   `);
 }
