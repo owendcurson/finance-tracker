@@ -4,10 +4,9 @@ const LAST_UPDATED_PRIVACY = '11 November 2026';
 const LAST_UPDATED_TERMS   = '11 November 2026';
 
 function renderPage(screenId, title, html) {
-  const screen = $(screenId);
-  console.log('[legal] renderPage', screenId, 'found:', !!screen, 'parent:', screen?.parentElement?.id);
-  if (!screen) { console.error('[legal] screen not found:', screenId); return; }
   document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+  const screen = $(screenId);
+  if (!screen) { console.error('[legal] screen not found:', screenId); return; }
   screen.style.display = 'block';
   const hb = $('header-back'); if (hb) hb.style.display = 'inline-flex';
   import('./ui.js').then(m => {
@@ -22,7 +21,6 @@ function renderPage(screenId, title, html) {
       ${html}
     </div>
   `;
-  console.log('[legal] done. display:', screen.style.display, 'len:', screen.innerHTML.length, 'appContainer display:', document.getElementById('app-container')?.style.display);
   window.scrollTo(0, 0);
 }
 

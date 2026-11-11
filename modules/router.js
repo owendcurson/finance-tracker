@@ -225,9 +225,10 @@ export function initRouter() {
  */
 export function resolvePendingRoute() {
   const current = _getPath();
-  // Don't override a public page the user navigated to directly
+  // Public page rendered before auth resolved — re-render now that app is visible
   if (!PROTECTED.has(current) && current !== '/') {
     state._pendingRoute = null;
+    _render(current);
     return;
   }
   const target = state._pendingRoute || '/dashboard';
