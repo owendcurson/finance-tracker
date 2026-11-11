@@ -66,7 +66,7 @@ const NAV_TAB = {
 };
 
 function _getPath() {
-  const p = location.pathname;
+  const p = location.pathname.replace(/\/+$/, '') || '/';
   return p.startsWith(BASE) ? (p.slice(BASE.length) || '/') : '/';
 }
 
