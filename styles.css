@@ -2849,7 +2849,7 @@ body:not([data-theme="dark"]) .toast {
 #help-fab {
   position: fixed;
   bottom: calc(72px + env(safe-area-inset-bottom, 0px));
-  right: 16px;
+  left: 16px;
   z-index: 790;
   width: 40px; height: 40px;
   border-radius: 50%;
@@ -2867,6 +2867,7 @@ body:not([data-theme="dark"]) .toast {
 @media (min-width: 900px) {
   #help-fab {
     bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    left: 16px;
     z-index: 850;
   }
 }
