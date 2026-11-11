@@ -780,6 +780,15 @@
         <button class="btn btn-primary" onclick="window._confirmPreset()">Yes, apply</button>
       </div>
     </div>
+
+    <!-- Legal footer links -->
+    <div style="text-align:center;padding:24px 0 8px;border-top:1px solid var(--border);margin-top:8px">
+      <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:8px">PayUnite &copy; 2026</p>
+      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+        <button onclick="import('./modules/router.js').then(m=>m.navigate('/privacy-policy'))" style="background:none;border:none;cursor:pointer;color:var(--primary);font-size:0.8rem;font-family:inherit;padding:0">Privacy Policy</button>
+        <button onclick="import('./modules/router.js').then(m=>m.navigate('/terms'))" style="background:none;border:none;cursor:pointer;color:var(--primary);font-size:0.8rem;font-family:inherit;padding:0">Terms of Use</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -813,6 +822,12 @@
     </div>
   </div>
 </div>
+
+<!-- Privacy Policy screen -->
+<div id="privacy-policy-screen" class="screen" style="display:none"></div>
+
+<!-- Terms of Use screen -->
+<div id="terms-screen" class="screen" style="display:none"></div>
 
 <!-- Help button + modal -->
 <button id="help-fab" onclick="window._openHelpModal()" aria-label="Help" title="Get help">

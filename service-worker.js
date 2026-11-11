@@ -1,4 +1,4 @@
-var CACHE_NAME = 'payunite-v77';
+var CACHE_NAME = 'payunite-v78';
 var ASSETS = [
   './index.html',
   './404.html',
@@ -34,6 +34,7 @@ var ASSETS = [
   './modules/budget.js',
   './modules/cost-of-living.js',
   './modules/benefits.js',
+  './modules/legal.js',
   './modules/onboarding.js',
   './modules/demo.js',
   './modules/offline.js',

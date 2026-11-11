@@ -35,6 +35,8 @@ const TITLES = {
   '/budget':                  'Budget Planner - PayUnite',
   '/cost-of-living':          'Cost of Living - PayUnite',
   '/benefits':                'Benefits & Perks - PayUnite',
+  '/privacy-policy':          'Privacy Policy - PayUnite',
+  '/terms':                   'Terms of Use - PayUnite',
 };
 
 // Paths that require auth (everything except the root auth screen)
@@ -162,6 +164,12 @@ async function _render(path, { silent = false } = {}) {
       break;
     case '/benefits':
       (await import('./benefits.js')).showBenefits();
+      break;
+    case '/privacy-policy':
+      (await import('./legal.js')).showPrivacyPolicy();
+      break;
+    case '/terms':
+      (await import('./legal.js')).showTerms();
       break;
     default:
       if (path.startsWith('/history/')) {
