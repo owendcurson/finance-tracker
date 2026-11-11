@@ -8,7 +8,7 @@
   "theme_color": "#0d1b2a",
   "orientation": "portrait",
   "icons": [
-    { "src": "/finance-tracker/assets/logo-mark.svg",          "sizes": "any",     "type": "image/svg+xml" },
-    { "src": "/finance-tracker/assets/logo-mark-app-icon.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "maskable" }
+    { "src": "/assets/logo-mark.svg",          "sizes": "any",     "type": "image/svg+xml" },
+    { "src": "/assets/logo-mark-app-icon.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "maskable" }
   ]
 }
